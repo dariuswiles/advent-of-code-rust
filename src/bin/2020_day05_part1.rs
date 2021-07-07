@@ -65,7 +65,8 @@ fn find_seat(line_num: usize, line: &str) -> Seat {
     }
 
     let seat_id = row_limit_front * 8 + col_limit_left;
-//     println!("Seat is in row {} and col {} with seat id {}", row, col, seat_id);
+//     println!("Seat is in row {} and col {} with seat id {}", row_limit_front, col_limit_left,
+//         seat_id);
 
     Seat { row: row_limit_front, column: col_limit_left, seat_id: seat_id }
 }
