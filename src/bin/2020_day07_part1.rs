@@ -3,8 +3,8 @@
 //!
 //! Challenge part 1
 //!
-//! For each block of data in the input file, determine the unique set of questions that were
-//! answered (labelled `a` to `z`). Sum the totals to obtain the answer to the challenge.
+//! Determine the number of different bag colors that can contain the bag color posed in the
+//! challenge.
 
 use std::collections::HashSet;
 use std::fs;
