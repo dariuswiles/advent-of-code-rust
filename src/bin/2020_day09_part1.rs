@@ -3,7 +3,9 @@
 //!
 //! Challenge part 1
 //!
-//!
+//! Find an "invalid" integer from an input file of integers. An integer is valid if any pair of
+//! integers in the preceding 25 sum to its value. The input file has one invalid number that must
+//! be identified.
 
 use std::fs;
 
