@@ -30,7 +30,7 @@ fn rsearch_for_number(gs: &GameState, num: u32) -> (Option<usize>, Option<usize>
 }
 
 
-fn initiliaze_game(start_string: &str) -> GameState{
+fn initialize_game(start_string: &str) -> GameState{
     start_string.split(',').map(|n| n.parse().unwrap()).collect()
 }
 
@@ -58,7 +58,7 @@ fn play_game(game: &mut GameState, play_until_round: usize) {
 
 
 fn main() {
-    let mut game = initiliaze_game(CHALLENGE_INPUT);
+    let mut game = initialize_game(CHALLENGE_INPUT);
     play_game(&mut game, STOP_AT_ROUND);
     println!("The answer to the challenge is {:?}", game.last().unwrap());
 }
@@ -79,7 +79,7 @@ mod tests {
 
     #[test]
     fn test_game_0() {
-        let mut game = initiliaze_game(TEST_INPUT_0);
+        let mut game = initialize_game(TEST_INPUT_0);
         play_game(&mut game, STOP_AT_ROUND);
 
         assert_eq!(*game.last().unwrap(), 436);
@@ -87,7 +87,7 @@ mod tests {
 
     #[test]
     fn test_game_1() {
-        let mut game = initiliaze_game(TEST_INPUT_1);
+        let mut game = initialize_game(TEST_INPUT_1);
         play_game(&mut game, STOP_AT_ROUND);
 
         assert_eq!(*game.last().unwrap(), 1);
@@ -95,7 +95,7 @@ mod tests {
 
     #[test]
     fn test_game_2() {
-        let mut game = initiliaze_game(TEST_INPUT_2);
+        let mut game = initialize_game(TEST_INPUT_2);
         play_game(&mut game, STOP_AT_ROUND);
 
         assert_eq!(*game.last().unwrap(), 10);
@@ -103,7 +103,7 @@ mod tests {
 
     #[test]
     fn test_game_3() {
-        let mut game = initiliaze_game(TEST_INPUT_3);
+        let mut game = initialize_game(TEST_INPUT_3);
         play_game(&mut game, STOP_AT_ROUND);
 
         assert_eq!(*game.last().unwrap(), 27);
@@ -111,7 +111,7 @@ mod tests {
 
     #[test]
     fn test_game_4() {
-        let mut game = initiliaze_game(TEST_INPUT_4);
+        let mut game = initialize_game(TEST_INPUT_4);
         play_game(&mut game, STOP_AT_ROUND);
 
         assert_eq!(*game.last().unwrap(), 78);
@@ -119,7 +119,7 @@ mod tests {
 
     #[test]
     fn test_game_5() {
-        let mut game = initiliaze_game(TEST_INPUT_5);
+        let mut game = initialize_game(TEST_INPUT_5);
         play_game(&mut game, STOP_AT_ROUND);
 
         assert_eq!(*game.last().unwrap(), 438);
@@ -127,7 +127,7 @@ mod tests {
 
     #[test]
     fn test_game_6() {
-        let mut game = initiliaze_game(TEST_INPUT_6);
+        let mut game = initialize_game(TEST_INPUT_6);
         play_game(&mut game, STOP_AT_ROUND);
 
         assert_eq!(*game.last().unwrap(), 1836);
