@@ -3,7 +3,8 @@
 //!
 //! Challenge part 1
 //!
-//!
+//! Sum all invalid fields of "nearby" tickets. A field is invalid if its value is outside the
+//! range of every field.
 
 use std::collections::HashSet;
 use std::fs;
@@ -31,6 +32,9 @@ struct ChallengeData {
 }
 
 impl ChallengeData {
+    /// Create and return a new `ChallengeData` object containing all data from the string passed.
+    /// The data is grouped into three sections: field definitions, data for my ticket, and data
+    /// for nearby tickets. Each is parsed and stored separately.
     fn from_string(s: &str) -> Self {
         let mut input_lines = s.lines();
 
@@ -123,7 +127,6 @@ impl ChallengeData {
 
         agg
     }
-
 }
 
 
