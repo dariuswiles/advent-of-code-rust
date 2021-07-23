@@ -3,7 +3,8 @@
 //!
 //! Challenge part 1
 //!
-//! Evaluate a math expression that has an equal order of precedence for all operators.
+//! Evaluate math expressions that have an equal order of precedence for all operators, allowing
+//! them to be evaluated left-to-right.
 
 use std::fs;
 
@@ -112,7 +113,7 @@ fn evaluate(expression: &str) -> u64 {
     let mut c = expression.chars().collect();
     let tokens = tokenize(&mut c);
 
-    println!("{:#?}", &tokens);
+//     println!("{:#?}", &tokens);
 
     evaluate_tokens(&mut tokens.clone())
 }
