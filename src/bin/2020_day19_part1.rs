@@ -67,6 +67,10 @@ fn build_ruleset(lines: &Vec<&str>) -> RuleSet {
 }
 
 
+/// Validates a ruleset `List`, which is a vector of rules, all of which must be met in the order
+/// they appear. If any rule does not match, 0 is immediately returned to indicate the List doesn't
+/// match. Otherwise, the number of characters in `msg` that are matched by all the rules is
+/// returned.
 fn validate_list(ruleset: &RuleSet, msg: &str, child_rules: &Vec<Id>) -> usize {
     let mut matched_so_far = 0;
     for cr in child_rules {
@@ -82,6 +86,9 @@ fn validate_list(ruleset: &RuleSet, msg: &str, child_rules: &Vec<Id>) -> usize {
 }
 
 
+/// The rule with id `rule_id` is looked up in `ruleset`, and is evaluated based on its type. If it
+/// matches the leftmost character or characters in `msg`, the number of characters matched is
+/// returned. If the rule doesn't match, 0 is returned.
 fn validate_message(ruleset: &RuleSet, msg: &str, rule_id: Id) -> usize {
     let rule = &ruleset[&rule_id];
 
@@ -115,6 +122,8 @@ fn validate_message(ruleset: &RuleSet, msg: &str, rule_id: Id) -> usize {
     }
 }
 
+
+/// Determines if `msg` matches any rules in `ruleset` and returns the result.
 fn is_message_valid(ruleset: &RuleSet, msg: &str) -> bool {
     if msg.len() == 0 {
         return false;
@@ -124,9 +133,6 @@ fn is_message_valid(ruleset: &RuleSet, msg: &str) -> bool {
 
     is_valid == msg.len()
 }
-
-
-
 
 
 fn parse_rules_and_verify_messages(input: &str) -> u32{
@@ -235,5 +241,4 @@ aaaabbb"#;
         assert!(!is_message_valid(&ruleset, &"ccdc".to_string()));
         assert!(!is_message_valid(&ruleset, &"".to_string()));
     }
-
 }
