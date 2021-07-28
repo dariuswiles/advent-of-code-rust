@@ -104,14 +104,17 @@ impl Tile {
         for self_border_idx in 0..4 {
             for other_border_idx in 0..4 {
                 if self.borders[self_border_idx] == other.borders[other_border_idx] {
-//                     println!("\tMatch found. Index of other tile's border is {}", self_border_idx);
+//                     println!("\tMatched tile {} border {} with tile {} border {}",
+//                         self.id, self_border_idx, other.id, other_border_idx
+//                     );
 
                     return Some((self_border_idx, other_border_idx, false));
                 }
 
                 if self.borders[self_border_idx] == other.borders_flipped[other_border_idx] {
-//                     println!("\tMatch found. Index of other tile's *flipped* border is {}",
-//                         self_border_idx);
+//                     println!("\tMatched tile {} border {} with *flipped* tile {} border {}",
+//                         self.id, self_border_idx, other.id, other_border_idx
+//                     );
 
                     return Some((self_border_idx, other_border_idx, true));
                 }
