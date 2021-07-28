@@ -27,7 +27,9 @@ type Id = u16;
 /// A `Tile` stores a single tile, which is a square with a pre-determined, constant length. For
 /// efficient searching of matching tiles the borders of the tile are stored in `borders`, and
 /// reversed (flipped) versions in `borders_flipped`. Borders are stored in the order: top, right,
-/// bottom, left.
+/// bottom, left. Borders are stored in a clockwise direction, e.g., left-to-right for the top
+/// border and right-to-left for the bottom border. This makes comparisons easier when the tile is
+/// rotated.
 #[derive(Clone, Debug, PartialEq)]
 struct Tile {
     id: Id,
@@ -79,11 +81,13 @@ impl Tile {
 
         for rows in &cells {
             let mut r_chars = rows.chars();
-            left.push(r_chars.next().unwrap());
+            left.insert(0, r_chars.next().unwrap());
             right.push(r_chars.last().unwrap());
         }
 
-        let borders = [cells[0].to_owned(), right, cells[TILE_SIZE - 1].to_owned(), left];
+        let top: String = cells[TILE_SIZE - 1].chars().rev().collect();
+
+        let borders = [cells[0].to_owned(), right, top, left];
         let borders_flipped: [String; 4] = [
             borders[TOP].chars().rev().collect(),
             borders[RIGHT].chars().rev().collect(),
@@ -383,13 +387,13 @@ Tile 7777:
 
         assert_eq!(tile.borders[0], "..##.#..#.");
         assert_eq!(tile.borders[1], "...#.##..#");
-        assert_eq!(tile.borders[2], "..###..###");
-        assert_eq!(tile.borders[3], ".#####..#.");
+        assert_eq!(tile.borders[2], "###..###..");
+        assert_eq!(tile.borders[3], ".#..#####.");
 
         assert_eq!(tile.borders_flipped[0], ".#..#.##..");
         assert_eq!(tile.borders_flipped[1], "#..##.#...");
-        assert_eq!(tile.borders_flipped[2], "###..###..");
-        assert_eq!(tile.borders_flipped[3], ".#..#####.");
+        assert_eq!(tile.borders_flipped[2], "..###..###");
+        assert_eq!(tile.borders_flipped[3], ".#####..#.");
     }
 
     #[test]
