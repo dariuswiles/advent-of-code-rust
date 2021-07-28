@@ -104,10 +104,17 @@ impl Tile {
     ///     - the border of `self` that matches.
     ///     - the border of `other` that matches.
     ///     - a bool that is true iff the match requires one of the tiles to be flipped.
+    ///
+    /// NOTE The algorithm used assumes that no tile borders are palindromes, as this requires
+    ///      more sophisticated logic that allows tile flips to be optional. An example of a
+    ///      palindromic border, that cannot be handled by this code, is "###....###".
     fn find_matching_border(&self, other: &Tile) -> Option<(usize, usize, bool)> {
         for self_border_idx in 0..4 {
             for other_border_idx in 0..4 {
-                if self.borders[self_border_idx] == other.borders[other_border_idx] {
+                // For the borders of two tiles to match, one must be a reversed version of the
+                // other, e.g., "####......" matches "......####". If a match like this is found,
+                // it is the simple case where neither of the tiles needs to be flipped.
+                if self.borders[self_border_idx] == other.borders_flipped[other_border_idx] {
 //                     println!("\tMatched tile {} border {} with tile {} border {}",
 //                         self.id, self_border_idx, other.id, other_border_idx
 //                     );
@@ -115,7 +122,9 @@ impl Tile {
                     return Some((self_border_idx, other_border_idx, false));
                 }
 
-                if self.borders[self_border_idx] == other.borders_flipped[other_border_idx] {
+                // As above, but this time look for *identical* borders. These still match, but
+                // only if one of the tiles is flipped.
+                if self.borders[self_border_idx] == other.borders[other_border_idx] {
 //                     println!("\tMatched tile {} border {} with *flipped* tile {} border {}",
 //                         self.id, self_border_idx, other.id, other_border_idx
 //                     );
