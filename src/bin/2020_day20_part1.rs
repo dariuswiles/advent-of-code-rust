@@ -206,7 +206,7 @@ fn do_challenge(input: &str) -> u64 {
     let corners: HashMap<_,_> = tile_matches.iter().filter(|tm| tm.1.len() == 2).collect();
 
     if corners.len() != 4 {
-        panic!(format!("Expecting four corners to be found, but found {}", corners.len()));
+        panic!("Expecting four corners to be found, but found {}", corners.len());
     }
 
     corners.iter().fold(1, |acc, x| acc * **x.0 as u64)

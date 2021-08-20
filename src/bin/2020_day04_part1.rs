@@ -81,8 +81,7 @@ fn count_valid_passports(input: &str) -> u32 {
                         current_passport.cid = Some(field_parts[1]);
                     }
                     _ => {
-                        panic!(format!("Found unexpected passport field on input line {}",
-                                line_num));
+                        panic!("Found unexpected passport field on input line {}", line_num);
                     }
                 }
             }

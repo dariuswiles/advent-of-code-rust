@@ -38,7 +38,7 @@ impl Bitmask {
                     set |= new_mask_bit;
                 }
                 _ => {
-                    panic!(format!("Unrecognized character in bitmask '{}'", s));
+                    panic!("Unrecognized character in bitmask '{}'", s);
                 }
             }
         }
@@ -102,7 +102,7 @@ fn parse_mem_command(location: &str, value: &str) -> (usize, u64) {
 
     let loc_str: Vec<&str> = location.strip_suffix(']').unwrap().split("[").collect();
     if loc_str.len() != 2 {
-        panic!(format!("Unrecognized format of command '{}'", location));
+        panic!("Unrecognized format of command '{}'", location);
     }
 
     (loc_str[1].parse::<usize>().unwrap(), value.parse::<u64>().unwrap())
@@ -120,7 +120,7 @@ fn execute_input(input: &str) -> HashMap<usize, u64> {
 
         let token: Vec<&str> = line.split(" = ").collect();
         if token.len() != 2 {
-            panic!(format!("Unrecognized format of line '{}'", &line));
+            panic!("Unrecognized format of line '{}'", &line);
         }
 
         if token[0].starts_with("mask") {
@@ -136,7 +136,7 @@ fn execute_input(input: &str) -> HashMap<usize, u64> {
             }
 
         } else {
-            panic!(format!("Unrecognized command '{}'", &token[0]));
+            panic!("Unrecognized command '{}'", &token[0]);
         }
     }
 

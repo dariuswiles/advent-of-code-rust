@@ -58,13 +58,13 @@ impl ChallengeData {
 
             let name_then_ranges: Vec<&str> = line.split(": ").collect();
             if name_then_ranges.len() != 2 {
-                panic!(format!("Missing colon separating name from ranges in string: '{}'", line));
+                panic!("Missing colon separating name from ranges in string: '{}'", line);
             }
             let name = name_then_ranges[0].to_string();
 
             let tokens: Vec<&str> = name_then_ranges[1].split(" or ").collect();
             if tokens.len() != 2 {
-                panic!(format!("Malformed ranges in string: '{}'", line));
+                panic!("Malformed ranges in string: '{}'", line);
             }
 
             let range0: Vec<u32> = tokens[0].split('-')
@@ -343,7 +343,7 @@ nearby tickets:
             31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50
         ] {
             if !all_ranges.contains(c) {
-                panic!(format!("Aggregate range should contain {} but does not.", c));
+                panic!("Aggregate range should contain {} but does not.", c);
             }
         }
     }

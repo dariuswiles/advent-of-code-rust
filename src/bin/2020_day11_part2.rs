@@ -82,7 +82,7 @@ impl SeatingGrid {
                         row.push(Cell::Seat(SeatState::Occupied));
                     }
                     _ => {
-                        panic!(format!("Error: unexpected character in input: '{}'", c));
+                        panic!("Error: unexpected character in input: '{}'", c);
                     }
                 }
             }

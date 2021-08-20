@@ -46,7 +46,7 @@ fn tokenize(chars: &mut Vec<char>) -> Vec<Token> {
                 if c.is_digit(10) {
                     output.push(Token::Number(c.to_digit(10).unwrap() as u64));
                 } else {
-                    panic!(format!("Input contains unexpected character '{}'", c));
+                    panic!("Input contains unexpected character '{}'", c);
                 }
             }
         }

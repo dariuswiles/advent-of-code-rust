@@ -42,7 +42,7 @@ impl Program {
 
             if tokens.len() != 2 {
                 let error_message = format!("Malformed program code: {}", &line);
-                panic!(error_message);
+                panic!("{}", error_message);
 
             }
 
@@ -61,7 +61,7 @@ impl Program {
                 }
                 _ => {
                     let error_message = format!("Unrecognized instruction in code: {}", &line);
-                    panic!(error_message);
+                    panic!("{}", error_message);
                 }
             }
         }

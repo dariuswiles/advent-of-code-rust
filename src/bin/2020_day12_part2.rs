@@ -121,7 +121,7 @@ impl Ship {
 //                     println!("Ship is now facing {} degrees", self.facing);
                 }
                 _ => {
-                    panic!(format!("Unrecognized command {}", &command));
+                    panic!("Unrecognized command {}", &command);
                 }
             }
         }
