@@ -252,10 +252,7 @@ sqjhc mxmxvkd sbzzf (contains fish)";
     #[test]
     fn test_all_ingredients() {
         let foods = TokenizedInput::parse_input(&TEST_INPUT);
-        let ing_sets = IngredientSets::map_allergens(&foods);
-        let initial_mapping = AllergenMapTransition::new(&ing_sets);
-
-        let mut all_ingredients = foods.all_ingredients();
+        let all_ingredients = foods.all_ingredients();
 
         let expected = vec![
             &"fvjkl",
