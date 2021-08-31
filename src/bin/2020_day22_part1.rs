@@ -91,7 +91,7 @@ impl Game {
             self.player2.push(p1_card);
         }
 
-        // Check a player has won.
+        // Check if a player has won the game.
         if self.player1.len() == 0 {
             return Some(2);
         }
