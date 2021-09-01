@@ -9,6 +9,7 @@
 use std::fs;
 
 const INPUT_FILENAME: &str = "2020_day23_input.txt";
+const GAME_ROUNDS: usize = 100;
 
 type Cup = u8;
 
@@ -147,7 +148,7 @@ fn main() {
 
         let mut game = Game::load_game(&input_file);
 
-        game.play_game(100);
+        game.play_game(GAME_ROUNDS);
         println!("Challenge answer is {}", game.get_challenge_answer());
 }
 
