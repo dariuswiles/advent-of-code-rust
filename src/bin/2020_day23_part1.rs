@@ -7,6 +7,7 @@
 //! making the required number of moves.
 
 use std::fs;
+use std::iter;
 
 const INPUT_FILENAME: &str = "2020_day23_input.txt";
 const GAME_ROUNDS: usize = 100;
@@ -107,17 +108,21 @@ impl Game {
 fn remove_three<T>(v: &mut Vec<T>, position: usize) -> Vec<T> {
     assert!(v.len() >= 3);
 
-    let mut result = Vec::new();
     let mut pos = position;
+    if position < (v.len() - 3) {
+        return  v.splice(pos..pos+3, iter::empty()).collect::<Vec<T>>();
+    } else {
+        let mut result = Vec::new();
 
-    pos %= v.len();
-    result.push(v.remove(pos));
-    pos %= v.len();
-    result.push(v.remove(pos));
-    pos %= v.len();
-    result.push(v.remove(pos));
+        pos %= v.len();
+        result.push(v.remove(pos));
+        pos %= v.len();
+        result.push(v.remove(pos));
+        pos %= v.len();
+        result.push(v.remove(pos));
 
-    result
+        return result;
+    }
 }
 
 
@@ -127,16 +132,14 @@ fn remove_three<T>(v: &mut Vec<T>, position: usize) -> Vec<T> {
 /// # Panics
 ///
 /// Panics if the length of `elements` is not 3 or if `position` is not a valid index into `v`.
-fn insert_three<T>(v: &mut Vec<T>, position: usize, elements: &mut Vec<T>) {
+fn insert_three<T: Clone>(v: &mut Vec<T>, position: usize, elements: &mut Vec<T>) {
     assert!(elements.len() == 3);
 
     if position == v.len() {
         v.append(elements);
     } else {
         let p = position + 1;
-        v.insert(p, elements.pop().unwrap());
-        v.insert(p, elements.pop().unwrap());
-        v.insert(p, elements.pop().unwrap());
+        v.splice(p..p, elements.iter().cloned().collect::<Vec<T>>());
     }
 }
 
@@ -247,7 +250,7 @@ mod tests {
     fn test_play_game() {
         let mut game = Game::load_game(&TEST_INPUT);
 
-        game.play_game(100);
+        game.play_game(GAME_ROUNDS);
         assert_eq!("67384529", game.get_challenge_answer());
     }
 }
