@@ -10,8 +10,8 @@ use std::fs;
 
 const INPUT_FILENAME: &str = "2021_day01_input.txt";
 
-/// Takes an `input_file` of integers, one per line, and returns the number of integers that are
-/// greater than the preceding one.
+/// Takes an `input_file` string that has one integer per line, and returns the number of integers
+/// that are greater than the preceding one.
 fn count_greater_ints(input_file: &str) -> u16 {
     input_file
         .lines()
