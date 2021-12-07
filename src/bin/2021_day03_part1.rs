@@ -49,7 +49,7 @@ fn calculate_gamma_epsilon(input: &str) -> (String, String) {
     for i in 0..bits_per_line.unwrap() {
         let count = count_of_ones[&i];
 
-        if count < line_count / 2 {
+        if count * 2 <= line_count {
             gamma.push('0');
             epsilon.push('1');
         } else {
