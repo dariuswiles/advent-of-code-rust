@@ -77,7 +77,7 @@ fn main() {
     println!("gamma = {}, epsilon = {}", gamma, epsilon);
 
     let answer = multiply_gamma_epsilon(&gamma, &epsilon);
-    println!("The submarine's power consupmtion is {}", answer);
+    println!("The submarine's power consumption is {}", answer);
 }
 
 
