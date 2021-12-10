@@ -88,9 +88,9 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let fish = parse_input(&TEST_INPUT);
+        let crabs = parse_input(&TEST_INPUT);
 
-        assert_eq!(fish,  vec![16, 1, 2, 0, 4, 2, 7, 1, 2, 14]);
+        assert_eq!(crabs,  vec![16, 1, 2, 0, 4, 2, 7, 1, 2, 14]);
     }
 
     #[test]
