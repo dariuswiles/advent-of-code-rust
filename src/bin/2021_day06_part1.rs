@@ -9,6 +9,7 @@
 use std::fs;
 
 const INPUT_FILENAME: &str = "2021_day06_input.txt";
+const CHALLENGE_DAYS: u32 = 80;
 
 type Fish = u8;
 
@@ -48,11 +49,11 @@ fn main() {
             .expect("Error reading input file");
     let mut fish = parse_input(&input_file);
 
-    for _ in 0..80 {
+    for _ in 0..CHALLENGE_DAYS {
         decrement_fish(&mut fish);
     }
 
-    println!("The total number of fish after 80 days is {}", fish.len());
+    println!("The total number of fish after {} days is {}", CHALLENGE_DAYS, fish.len());
 }
 
 
@@ -82,14 +83,14 @@ mod tests {
             vec![6, 0, 6, 4, 5, 6, 0, 1, 1, 2, 6, 0, 1, 1, 1, 2, 2, 3, 3, 4, 6, 7, 8, 8, 8, 8]
         );
 
-        println!("The total number of fish after 80 days is {}", fish.len());
+        println!("The total number of fish after {} days is {}", CHALLENGE_DAYS, fish.len());
     }
 
     #[test]
     fn challenge_answer() {
         let mut fish = parse_input(&TEST_INPUT);
 
-        for _ in 0..80 {
+        for _ in 0..CHALLENGE_DAYS {
             decrement_fish(&mut fish);
         }
 
