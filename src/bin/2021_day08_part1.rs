@@ -3,8 +3,10 @@
 //!
 //! Challenge part 1
 //!
-//! Deduce which wires connect to which segments of several 7-digit displays. Use this knowledge to
-//! determine the current readout on these displays and use it to determine the challenge answer.
+//! Count how many times the digits 1, 4, 7 and 8 appear in the display output provided in the
+//! input file, e.g., the sets of data provided to the right of the pipe. These digits are easy
+//! to deduce because each requires a unique number of display segments to be active, namely
+//! 2, 4, 3 and 7 respectively.
 
 use std::collections::{ HashSet };
 use std::fs;
