@@ -125,19 +125,19 @@ impl HeightMap {
         visited[row][col] = true;
         let mut total = 1;
 
-        if (col > 0) & (ignore_direction != Some(Direction::Left)) {
+        if col > 0 && ignore_direction != Some(Direction::Left) {
             total += self.basin_size_recurse(row, col - 1, Some(Direction::Right), visited);
         }
 
-        if (col < self.cells[row].len() - 1) & (ignore_direction != Some(Direction::Right)) {
+        if col < self.cells[row].len() - 1 && ignore_direction != Some(Direction::Right) {
             total += self.basin_size_recurse(row, col + 1, Some(Direction::Left), visited);
         }
 
-        if (row > 0) & (ignore_direction != Some(Direction::Up)) {
+        if row > 0 && ignore_direction != Some(Direction::Up) {
             total += self.basin_size_recurse(row - 1, col, Some(Direction::Down), visited);
         }
 
-        if (row < self.cells.len() - 1) & (ignore_direction != Some(Direction::Down)) {
+        if row < self.cells.len() - 1 && ignore_direction != Some(Direction::Down) {
             total += self.basin_size_recurse(row + 1, col, Some(Direction::Up), visited);
         }
 

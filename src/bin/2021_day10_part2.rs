@@ -42,10 +42,10 @@ fn validate_line(line: &str) -> Validity {
         } else {
             if CLOSERS.contains(c) {
                 if let Some(opening) = stack.pop() {
-                    if ((opening == '(') & (c != ')')) |
-                        ((opening == '[') & (c != ']')) |
-                        ((opening == '{') & (c != '}')) |
-                        ((opening == '<') & (c != '>')) {
+                    if ((opening == '(') && (c != ')')) ||
+                        ((opening == '[') && (c != ']')) ||
+                        ((opening == '{') && (c != '}')) ||
+                        ((opening == '<') && (c != '>')) {
                         return Validity::Corrupted(c);
                     }
                 } else {    // Stack is empty, so there is no matching opening symbol.
