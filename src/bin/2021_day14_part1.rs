@@ -11,6 +11,7 @@ use std::fs;
 use std::str::Lines;
 
 const INPUT_FILENAME: &str = "2021_day14_input.txt";
+const ITERATIONS: usize = 10;
 
 type Rule = [char; 2];
 
@@ -114,7 +115,7 @@ fn main() {
             .expect("Error reading input file");
 
     let (template, ruleset) = parse_input(&input_file);
-    let result = ruleset.apply_rules_repeatedly(template, 10);
+    let result = ruleset.apply_rules_repeatedly(template, ITERATIONS);
     let frequencies = count_letter_frequencies(&result);
 
     println!("The frequency of the most common letter in the output minus the least common is {}",
@@ -209,7 +210,7 @@ CN -> C"#;
     #[test]
     fn test_apply_rules_repeatedly() {
         let (template, ruleset) = parse_input(&TEST_INPUT);
-        let output = ruleset.apply_rules_repeatedly(template, 10);
+        let output = ruleset.apply_rules_repeatedly(template, ITERATIONS);
         let frequencies = count_letter_frequencies(&output);
 
         assert_eq!(frequencies[&'B'], 1749);
