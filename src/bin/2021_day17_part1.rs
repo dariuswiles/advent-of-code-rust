@@ -37,10 +37,10 @@ fn parse_input(input: &str) -> (RangeInclusive<Position>, RangeInclusive<Positio
     assert_eq!(x_tokens.len(), 2);
     assert_eq!(y_tokens.len(), 2);
 
-    let x_start = i16::from_str_radix(x_tokens[0], 10).unwrap();
-    let x_end = i16::from_str_radix(x_tokens[1], 10).unwrap();
-    let y_start = i16::from_str_radix(y_tokens[0], 10).unwrap();
-    let y_end = i16::from_str_radix(y_tokens[1], 10).unwrap();
+    let x_start = Velocity::from_str_radix(x_tokens[0], 10).unwrap();
+    let x_end = Velocity::from_str_radix(x_tokens[1], 10).unwrap();
+    let y_start = Velocity::from_str_radix(y_tokens[0], 10).unwrap();
+    let y_end = Velocity::from_str_radix(y_tokens[1], 10).unwrap();
 
     (RangeInclusive::new(x_start, x_end), RangeInclusive::new(y_start, y_end))
 }
@@ -49,7 +49,9 @@ fn parse_input(input: &str) -> (RangeInclusive<Position>, RangeInclusive<Positio
 /// Returns a `HashMap` containing information on initial velocities of y that lead to the probe
 /// entering the target. The returned HashMap is indexed by the round the probe is within the
 /// target, and the values are a tuple of the initial y velocity and highest y position achieved.
-fn possible_y_velocities(y_range: &RangeInclusive<i16>) -> HashMap<Round, (Velocity, Position)> {
+fn possible_y_velocities(y_range: &RangeInclusive<Position>)
+    -> HashMap<Round, (Velocity, Position)>
+{
     let y_min = *y_range.start();
 
     let mut results: HashMap<Round, (Velocity, Position)> = HashMap::new();
