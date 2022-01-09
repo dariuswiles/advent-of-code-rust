@@ -1,7 +1,7 @@
 //! Advent of Code 2021 Day 09
 //! https://adventofcode.com/2021/day/9
 //!
-//! Challenge part 1
+//! Challenge part 2
 //!
 //! Determines the size of each area of cells within the input data that are separated by the cell
 //! value '9', and calculates the product of the three largest to obtain the answer to the
