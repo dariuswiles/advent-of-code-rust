@@ -3,7 +3,7 @@
 //!
 //! Challenge part 1
 //!
-//! Displays the number of light pixels after enhancement a given image with a given enhancement
+//! Displays the number of light pixels after enhancing a given image with a given enhancement
 //! algorithm.
 
 use std::collections::HashSet;
