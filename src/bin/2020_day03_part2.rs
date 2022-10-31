@@ -25,7 +25,6 @@ const MOVE_PATTERN: [Pattern; 5] = [
     Pattern { right: 1, down: 2 },
 ];
 
-
 /// A movement pattern expressed as how many positions `down` and `right` constitute one move.
 #[derive(Clone, Copy, Debug)]
 struct Pattern {
@@ -33,29 +32,28 @@ struct Pattern {
     down: usize,
 }
 
-
 /// Returns the number of trees hit when the given pattern is taken through the map provided in
 /// `input`.
 fn tree_hits_for_pattern(input: &str, p: &Pattern) -> u32 {
-//     println!("Calculating total trees hit for movement pattern {:#?}", &p);
+    // println!("Calculating total trees hit for movement pattern {:#?}", &p);
 
     let mut trees_hit = 0;
 
     let mut y_pos: usize = 0;
     for (line_num, line) in input.lines().enumerate() {
         if line_num == 0 {
-//         println!("Skipping first line");
+            // println!("Skipping first line");
             continue;
         }
 
         if line_num % p.down != 0 {
-//             println!("Skipping line {} as it doesn't match the `down` value of this pattern",
-//                 line_num
-//             );
+            // println!("Skipping line {} as it doesn't match the `down` value of this pattern",
+            // line_num
+            // );
             continue;
         }
 
-//        println!("Terrain for line #{} is {}", line_num, line);
+        // println!("Terrain for line #{} is {}", line_num, line);
 
         y_pos += p.right;
 
@@ -63,19 +61,18 @@ fn tree_hits_for_pattern(input: &str, p: &Pattern) -> u32 {
         // corresponding position on the left edge.
         let y_pos_wrapped = y_pos % line.len();
 
-        let terrain = line.get(y_pos_wrapped..y_pos_wrapped+1).unwrap();
-//         println!("\tTerrain at y_pos={} is '{}'", y_pos, terrain);
+        let terrain = line.get(y_pos_wrapped..y_pos_wrapped + 1).unwrap();
+        // println!("\tTerrain at y_pos={} is '{}'", y_pos, terrain);
 
         if terrain == TREE {
             trees_hit += 1;
-//             println!("\tHit a tree.");
+            // println!("\tHit a tree.");
         }
     }
 
-//         println!("{} trees hit", trees_hit);
+    // println!("{} trees hit", trees_hit);
     trees_hit
 }
-
 
 /// Multiplies the number of trees hit when the given patterns are taken through the map provided
 /// in `input`.
@@ -88,13 +85,13 @@ fn product_of_tree_hits_for_patterns(input: &str, patterns: &[Pattern]) -> u32 {
     challenge_result
 }
 
-
 fn main() {
-    let input =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-    println!("Challenge answer is {}", product_of_tree_hits_for_patterns(&input, &MOVE_PATTERN));
+    println!(
+        "Challenge answer is {}",
+        product_of_tree_hits_for_patterns(&input, &MOVE_PATTERN)
+    );
 }
 
 #[cfg(test)]
@@ -141,7 +138,9 @@ mod tests {
 
     #[test]
     fn success_product() {
-        assert_eq!(product_of_tree_hits_for_patterns(INPUT_0, &MOVE_PATTERN), 336);
+        assert_eq!(
+            product_of_tree_hits_for_patterns(INPUT_0, &MOVE_PATTERN),
+            336
+        );
     }
 }
-
