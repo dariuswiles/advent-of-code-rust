@@ -19,7 +19,7 @@ type Ticket = Vec<u32>;
 
 #[derive(Debug)]
 struct TicketField {
-    name: String,
+    _name: String,
     range0: RangeInclusive<u32>,
     range1: RangeInclusive<u32>,
 }
@@ -27,7 +27,7 @@ struct TicketField {
 #[derive(Debug)]
 struct ChallengeData {
     field_definitions: Vec<TicketField>,
-    my_ticket: Ticket,
+    _my_ticket: Ticket,
     nearby_tickets: Vec<Ticket>,
 }
 
@@ -40,7 +40,7 @@ impl ChallengeData {
 
         Self {
             field_definitions: Self::parse_field_definitions(&mut input_lines),
-            my_ticket: Self::parse_my_ticket(&mut input_lines),
+            _my_ticket: Self::parse_my_ticket(&mut input_lines),
             nearby_tickets: Self::parse_nearby_tickets(&mut input_lines),
         }
     }
@@ -55,28 +55,26 @@ impl ChallengeData {
 
             let name_then_ranges: Vec<&str> = line.split(": ").collect();
             if name_then_ranges.len() != 2 {
-                panic!("Missing colon separating name from ranges in string: '{}'", line);
+                panic!(
+                    "Missing colon separating name from ranges in string: '{}'",
+                    line
+                );
             }
-            let name = name_then_ranges[0].to_string();
+            let _name = name_then_ranges[0].to_string();
 
             let tokens: Vec<&str> = name_then_ranges[1].split(" or ").collect();
             if tokens.len() != 2 {
                 panic!("Malformed ranges in string: '{}'", line);
             }
 
-            let range0: Vec<u32> = tokens[0].split('-')
-                .map(|n| n.parse().unwrap())
-                .collect();
-            let range1: Vec<u32> = tokens[1].split('-')
-                .map(|n| n.parse().unwrap())
-                .collect();
+            let range0: Vec<u32> = tokens[0].split('-').map(|n| n.parse().unwrap()).collect();
+            let range1: Vec<u32> = tokens[1].split('-').map(|n| n.parse().unwrap()).collect();
 
             defns.push(TicketField {
-                name: name,
+                _name,
                 range0: range0[0]..=range0[1],
                 range1: range1[0]..=range1[1],
             });
-
         }
 
         defns
@@ -129,7 +127,6 @@ impl ChallengeData {
     }
 }
 
-
 /// Return the sum of all values of all nearby tickets that are not in the superset of all
 /// allowed ticket field ranges. This is the answer required by part 1 of this challenge.
 fn perform_work(input: &str) -> u32 {
@@ -149,16 +146,12 @@ fn perform_work(input: &str) -> u32 {
     answer
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let answer = perform_work(&input_file);
     println!("The answer to the challenge is {:?}", answer);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -189,8 +182,10 @@ nearby tickets:
 
         assert_eq!(all_ranges.len(), 48);
 
-        for c in &[1,2,3,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,
-            31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50
+        for c in &[
+            1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+            27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
+            49, 50,
         ] {
             if !all_ranges.contains(c) {
                 panic!("Aggregate range should contain {} but does not.", c);
