@@ -15,13 +15,9 @@ const REQUIRED_SUM: u32 = 2020;
 /// integers that sum to that number. Return these as a tuple wrapped in an Option, or `None` if
 /// no integers sum to `required_sum`.
 fn find_sum_two(input_file: &str, required_sum: u32) -> Option<(u32, u32)> {
-    let input: Vec<u32> = input_file
-        .lines()
-        .map(|s| s.parse().unwrap())
-        .collect();
+    let input: Vec<u32> = input_file.lines().map(|s| s.parse().unwrap()).collect();
 
     let input_count = input.len();
-//     println!("Input contains {} numbers", input_count);
 
     let mut i_num: u32;
     let mut j_num: u32;
@@ -38,32 +34,34 @@ fn find_sum_two(input_file: &str, required_sum: u32) -> Option<(u32, u32)> {
     None
 }
 
-
 /// Returns the result of multiplying the two integers passed in the `integers` tuple.
 fn product(integers: (u32, u32)) -> u32 {
     integers.0 * integers.1
 }
 
-
 fn main() {
     let input = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     if let Some(r) = find_sum_two(&input, REQUIRED_SUM) {
-        println!("Integers {} and {} sum to required total, and multiplying them gives {}",
-            r.0, r.1, product(r));
+        println!(
+            "Integers {} and {} sum to required total, and multiplying them gives {}",
+            r.0,
+            r.1,
+            product(r)
+        );
     } else {
-        println!("Error: Input did not contain two integers whose sum is {}", REQUIRED_SUM);
+        println!(
+            "Error: Input did not contain two integers whose sum is {}",
+            REQUIRED_SUM
+        );
     }
 }
-
-
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const INPUT_0: &str =
-"1721
+    const INPUT_0: &str = "1721
 979
 366
 299
@@ -73,13 +71,14 @@ mod tests {
     #[test]
     fn find_answer_integers() {
         assert_eq!(find_sum_two(INPUT_0, REQUIRED_SUM), Some((1721, 299)));
-
     }
 
     #[test]
     fn find_answer_product() {
-        assert_eq!(product(find_sum_two(INPUT_0, REQUIRED_SUM).unwrap()), 514579);
-
+        assert_eq!(
+            product(find_sum_two(INPUT_0, REQUIRED_SUM).unwrap()),
+            514579
+        );
     }
 
     #[test]
