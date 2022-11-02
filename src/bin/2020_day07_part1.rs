@@ -10,8 +10,7 @@ use std::collections::HashSet;
 use std::fs;
 
 const INPUT_FILENAME: &str = "2020_day07_input.txt";
-const CHALLENGE_BAG: &str = "shiny gold";  // Name of bag needed for the challenge answer.
-
+const CHALLENGE_BAG: &str = "shiny gold"; // Name of bag needed for the challenge answer.
 
 /// A single bag.
 #[derive(Debug, PartialEq)]
@@ -20,7 +19,6 @@ struct Bag {
 }
 
 type BagId = usize;
-
 
 /// A collection of bags, each with a unique index.
 #[derive(Debug)]
@@ -35,23 +33,24 @@ impl Bags {
 
     fn add_bag_id(&mut self, name: &str) -> BagId {
         if let Some(b) = self.bags.iter().position(|b| b.name == name) {
-//             println!("\tLookup of bag '{}' found existing bag with BagId {}", &name, b);
+            // println!("\tLookup of bag '{}' found existing bag with BagId {}", &name, b);
 
             return b;
         } else {
-//             println!("\tNo bag '{}' exists, so adding with BagId {}", &name, self.bags.len());
-            self.bags.push(Bag { name: name.to_owned() });
+            // println!("\tNo bag '{}' exists, so adding with BagId {}", &name, self.bags.len());
+            self.bags.push(Bag {
+                name: name.to_owned(),
+            });
             return self.bags.len() - 1;
         }
     }
 
     fn get_bag_id(&self, name: &str) -> Option<BagId> {
-//         println!("Finding `BagId` for bag name '{}'", name);
+        // println!("Finding `BagId` for bag name '{}'", name);
 
         self.bags.iter().position(|b| b.name == name)
     }
 }
-
 
 /// A `Rule` maps a containing `outer_bag` to the zero or more `inner_bags` it contains. Each
 /// inner bag is a tuple of the `BagId` of the inner bag and a count of the number of those bags
@@ -62,13 +61,14 @@ struct Rule {
     inner_bags: Vec<(BagId, u32)>,
 }
 
-
 impl Rule {
     fn new(outer_bag: BagId, inner_bags: Vec<(BagId, u32)>) -> Self {
-        Self { outer_bag: outer_bag, inner_bags: inner_bags }
+        Self {
+            outer_bag: outer_bag,
+            inner_bags: inner_bags,
+        }
     }
 }
-
 
 /// A `Ruleset` holds zero or more `Rules`.
 #[derive(Debug)]
@@ -79,14 +79,16 @@ struct Ruleset {
 
 impl Ruleset {
     fn new() -> Self {
-        Self { rules: Vec::new(), bags: Bags::new() }
+        Self {
+            rules: Vec::new(),
+            bags: Bags::new(),
+        }
     }
 
     fn add_rule(&mut self, rule: Rule) {
         self.rules.push(rule)
     }
 }
-
 
 /// Returns the given string with either " bags " or " bag" removed from its end.
 ///
@@ -100,29 +102,31 @@ fn strip_bag_suffix(s: &str) -> &str {
     }
 }
 
-
 fn parse_rule(line: &str, bags: &mut Bags) -> Rule {
-//     println!("parse_rule parsing input line: {}", line);
+    // println!("parse_rule parsing input line: {}", line);
 
     let outside_inside: Vec<&str> = line.split(" bags contain ").collect();
-//     println!("\tOutside: '{}'", outside_inside[0]);
-//     println!("\tInside: '{}'", outside_inside[1]);
+    // println!("\tOutside: '{}'", outside_inside[0]);
+    // println!("\tInside: '{}'", outside_inside[1]);
     let outside_bag_id = bags.add_bag_id(outside_inside[0]);
 
-    let inside: Vec<&str>  = outside_inside[1].strip_suffix('.').unwrap()
-        .split(", ").collect();
-//     println!("\tInside tokenized: '{:?}'", inside);
+    let inside: Vec<&str> = outside_inside[1]
+        .strip_suffix('.')
+        .unwrap()
+        .split(", ")
+        .collect();
+    // println!("\tInside tokenized: '{:?}'", inside);
 
     let mut inside_bags = Vec::new();
     for b in inside {
-//         println!("\t\tExamining `inside` string: '{:?}'", b);
+        // println!("\t\tExamining `inside` string: '{:?}'", b);
 
         if b == "no other bags" {
-//             println!("\t\tLeaf rule");
+            // println!("\t\tLeaf rule");
             break;
         } else {
             let inside_split: Vec<&str> = b.splitn(2, ' ').collect();
-//             println!("\t\tBag '{}', count = '{}'", inside_split[1], inside_split[0]);
+            // println!("\t\tBag '{}', count = '{}'", inside_split[1], inside_split[0]);
 
             let bag_id = bags.add_bag_id(strip_bag_suffix(inside_split[1]));
 
@@ -130,10 +134,9 @@ fn parse_rule(line: &str, bags: &mut Bags) -> Rule {
         }
     }
 
-//     println!("\tReturning: {:?} = {:?}", outside_bag_id, inside_bags);
+    // println!("\tReturning: {:?} = {:?}", outside_bag_id, inside_bags);
     Rule::new(outside_bag_id, inside_bags)
 }
-
 
 fn parse_rules(input: &str) -> Ruleset {
     let mut ruleset = Ruleset::new();
@@ -146,27 +149,24 @@ fn parse_rules(input: &str) -> Ruleset {
     ruleset
 }
 
-
 /// Return the set of `BagId`s of all bags that can contain `target_bag_name`.
 fn outer_bag_options(rs: &Ruleset, target_bag_name: &str) -> HashSet<BagId> {
     let target_bag_id = rs.bags.get_bag_id(target_bag_name).unwrap();
 
-//     println!("Target bag: name = {}, BagId = {}", target_bag_name, target_bag_id);
-
+    // println!("Target bag: name = {}, BagId = {}", target_bag_name, target_bag_id);
 
     let mut matching_outer_bags = HashSet::new();
     let mut bags_to_check = Vec::new();
 
     bags_to_check.push(target_bag_id);
 
-
     while let Some(b) = bags_to_check.pop() {
-//         println!("Looking for outer bags that can directly contain bag {}", &b);
+        // println!("Looking for outer bags that can directly contain bag {}", &b);
 
         // If Bag `b` has already been examined, i.e., it is already in `matching_outer_bags`, skip
         // the rest of this loop and move on to the next `bag_to_check`.
         if matching_outer_bags.contains(&b) {
-//             println!("\tSkipping, as this bag has already been examined.");
+            // println!("\tSkipping, as this bag has already been examined.");
             matching_outer_bags.insert(b);
             continue;
         }
@@ -174,11 +174,13 @@ fn outer_bag_options(rs: &Ruleset, target_bag_name: &str) -> HashSet<BagId> {
         // Bag `b` has not previously been examined, so look for it in the `inner_bags` fields of
         // all rules in the ruleset.
         for r in &rs.rules {
-            let matching_bag = r.inner_bags.iter()
+            let matching_bag = r
+                .inner_bags
+                .iter()
                 .position(|(bag_id, _count)| *bag_id == b);
 
             if matching_bag != None {
-//                 println!("\tBag {} can contain bag {}", &r.outer_bag, &b);
+                // println!("\tBag {} can contain bag {}", &r.outer_bag, &b);
                 bags_to_check.push(r.outer_bag);
             }
         }
@@ -190,11 +192,8 @@ fn outer_bag_options(rs: &Ruleset, target_bag_name: &str) -> HashSet<BagId> {
     matching_outer_bags
 }
 
-
 fn main() {
-    let input =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let ruleset = parse_rules(&input);
 
@@ -202,7 +201,6 @@ fn main() {
 
     println!("Number of outer bag options is {}", obo.len());
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -219,7 +217,6 @@ dark olive bags contain 3 faded blue bags, 4 dotted black bags.
 vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
 faded blue bags contain no other bags.
 dotted black bags contain no other bags.";
-
 
     #[test]
     fn set_0() {

@@ -20,7 +20,6 @@ enum Instruction {
     Nop(i32),
 }
 
-
 #[derive(Debug)]
 struct Program {
     instructions: Vec<Instruction>,
@@ -31,7 +30,7 @@ impl Program {
         let mut instructions = Vec::new();
 
         for line in code.lines() {
-//             println!("Parsing line: {}", &line);
+            // println!("Parsing line: {}", &line);
 
             if line == "" {
                 println!("\tSkipping blank line");
@@ -43,20 +42,19 @@ impl Program {
             if tokens.len() != 2 {
                 let error_message = format!("Malformed program code: {}", &line);
                 panic!("{}", error_message);
-
             }
 
             match tokens[0] {
                 "acc" => {
-//                     println!("Found: acc with operand {}", tokens[1]);
+                    // println!("Found: acc with operand {}", tokens[1]);
                     instructions.push(Instruction::Acc(tokens[1].parse().unwrap()));
                 }
                 "jmp" => {
-//                     println!("Found: jmp with operand {}", tokens[1]);
+                    // println!("Found: jmp with operand {}", tokens[1]);
                     instructions.push(Instruction::Jmp(tokens[1].parse().unwrap()));
                 }
                 "nop" => {
-//                     println!("Found: nop with operand {}", tokens[1]);
+                    // println!("Found: nop with operand {}", tokens[1]);
                     instructions.push(Instruction::Nop(tokens[1].parse().unwrap()));
                 }
                 _ => {
@@ -66,7 +64,9 @@ impl Program {
             }
         }
 
-        Self { instructions: instructions }
+        Self {
+            instructions: instructions,
+        }
     }
 
     /// Executes given instruction and updates the accumulator `acc`, if necessary. Returns the
@@ -77,19 +77,18 @@ impl Program {
         match i {
             Instruction::Acc(delta) => {
                 *acc += delta;
-//                 println!("Executing: acc with operand {}. Now, `acc`={}", delta, *acc);
+                // println!("Executing: acc with operand {}. Now, `acc`={}", delta, *acc);
             }
             Instruction::Jmp(o) => {
-//                 println!("Executing: jmp with operand {}", o);
+                // println!("Executing: jmp with operand {}", o);
                 offset = o;
             }
             Instruction::Nop(_) => {
-//                 println!("Executing: nop");
+                // println!("Executing: nop");
             }
         }
         offset
     }
-
 
     /// Run a potentially modified version of the program. If `modify_line` is not `None` it
     /// indicates which line in the program (with the first line being 0), should be switched. As
@@ -106,24 +105,24 @@ impl Program {
 
         while !initial_run[ip] {
             initial_run[ip] = true;
-//             println!("Before executing instruction, `ip`={} and `acc`={}", ip, acc);
+            // println!("Before executing instruction, `ip`={} and `acc`={}", ip, acc);
             let offset = Program::execute_instruction(self.instructions[ip], &mut acc);
             ip = (ip as i32 + offset) as usize;
-//             println!("After executing instruction, `ip`={} and `acc`={}\n", ip, acc);
+            // println!("After executing instruction, `ip`={} and `acc`={}\n", ip, acc);
         }
 
         for line in 0..program_length {
             if !initial_run[line] {
-//                 println!("\nNot modifying line {} because it is never run", line);
+                // println!("\nNot modifying line {} because it is never run", line);
                 continue;
             }
 
             if let Instruction::Acc(_) = self.instructions[line] {
-//                 println!("\nNot modifying line {} because it is an `acc` instruction", line);
+                // println!("\nNot modifying line {} because it is an `acc` instruction", line);
                 continue;
             }
 
-//             println!("\n** Running program with modified instruction on line {} **", line);
+            // println!("\n** Running program with modified instruction on line {} **", line);
 
             ip = 0;
             acc = 0;
@@ -131,7 +130,7 @@ impl Program {
             run.resize(program_length, false);
             while !run[ip] {
                 run[ip] = true;
-//                 println!("Before executing instruction, `ip`={} and `acc`={}", ip, acc);
+                // println!("Before executing instruction, `ip`={} and `acc`={}", ip, acc);
 
                 let mut instruction = self.instructions[ip];
                 if ip == line {
@@ -139,23 +138,20 @@ impl Program {
                         Instruction::Acc(_) => {
                             panic!("Internal error: should never modify an `acc` instruction");
                         }
-                        Instruction::Jmp(o) => {
-                            Instruction::Nop(o)
-                        }
-                        Instruction::Nop(o) => {
-                            Instruction::Jmp(o)
-                        }
+                        Instruction::Jmp(o) => Instruction::Nop(o),
+                        Instruction::Nop(o) => Instruction::Jmp(o),
                     };
                 }
 
                 let offset = Program::execute_instruction(instruction, &mut acc);
                 ip = (ip as i32 + offset) as usize;
-//                 println!("After executing instruction {:?}, `ip`={} and `acc`={}",
-//                     instruction, ip, acc);
+                // println!("After executing instruction {:?}, `ip`={} and `acc`={}",
+                //     instruction, ip, acc
+                // );
 
                 // Check for successful program termination
                 if ip >= program_length {
-//                     println!("Program terminated successfully with `ip`={} and `acc`={}", ip, acc);
+                    // println!("Program terminated successfully with `ip`={} and `acc`={}", ip, acc);
                     return acc;
                 }
             }
@@ -164,18 +160,17 @@ impl Program {
     }
 }
 
-
 fn main() {
-    let program_code =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let program_code = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let program = Program::parse_program(&program_code);
     let result = program.correct_and_run_program();
 
-    println!("Contents of accumulator `acc` at time corrected program terminates is {}", result);
+    println!(
+        "Contents of accumulator `acc` at time corrected program terminates is {}",
+        result
+    );
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]

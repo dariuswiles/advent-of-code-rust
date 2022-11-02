@@ -11,27 +11,31 @@ const INPUT_FILENAME: &str = "2020_day04_input.txt";
 
 #[derive(Debug, Default)]
 struct Passport<'a> {
-    byr: Option<&'a str>,  // Birth Year
-    iyr: Option<&'a str>,  // Issue Year
-    eyr: Option<&'a str>,  // Expiration Year
-    hgt: Option<&'a str>,  // Height
-    hcl: Option<&'a str>,  // Hair Color
-    ecl: Option<&'a str>,  // Eye Color
-    pid: Option<&'a str>,  // Passport ID
-    cid: Option<&'a str>,  // Country ID
+    byr: Option<&'a str>, // Birth Year
+    iyr: Option<&'a str>, // Issue Year
+    eyr: Option<&'a str>, // Expiration Year
+    hgt: Option<&'a str>, // Height
+    hcl: Option<&'a str>, // Hair Color
+    ecl: Option<&'a str>, // Eye Color
+    pid: Option<&'a str>, // Passport ID
+    cid: Option<&'a str>, // Country ID
 }
 
 impl Passport<'_> {
     /// Returns `true` if all mandatory passport fields have data, `false` otherwise. All fields
     /// are mandatory except `cid`.
     fn is_valid(&self) -> bool {
-//         println!("{:?}", &self);
+        // println!("{:?}", &self);
 
-        (self.byr != None) & (self.iyr != None) & (self.eyr != None) & (self.hgt != None)
-            & (self.hcl != None) & (self.ecl != None) & (self.pid != None)
+        (self.byr != None)
+            & (self.iyr != None)
+            & (self.eyr != None)
+            & (self.hgt != None)
+            & (self.hcl != None)
+            & (self.ecl != None)
+            & (self.pid != None)
     }
 }
-
 
 /// Return the number of valid passports in `input` using the validity rules specified in the
 /// challenge.
@@ -40,12 +44,13 @@ fn count_valid_passports(input: &str) -> u32 {
 
     let mut current_passport = Passport::default();
     for (line_num, line) in input.lines().enumerate() {
-//         println!("{:?}", &line);
+        // println!("{:?}", &line);
 
-        if line == "" {  // A blank line indicates the end of all data for the current passport.
+        if line == "" {
+            // A blank line indicates the end of all data for the current passport.
             if current_passport.is_valid() {
                 valid_passport_count += 1;
-//                 println!("Passport is valid");
+                // println!("Passport is valid");
             }
 
             current_passport = Passport::default();
@@ -97,15 +102,11 @@ fn count_valid_passports(input: &str) -> u32 {
     valid_passport_count
 }
 
-
 fn main() {
-    let input =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     println!("{} passports are valid", count_valid_passports(&input));
 }
-
 
 #[cfg(test)]
 mod tests {

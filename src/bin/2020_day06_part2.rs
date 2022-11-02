@@ -11,17 +11,19 @@ use std::fs;
 
 const INPUT_FILENAME: &str = "2020_day06_input.txt";
 
-
 /// A set of questions, with each character being represented by a `char`.
 #[derive(Debug)]
 struct QuestionSet {
     questions: HashSet<char>,
-    never_used: bool,  // True iff no questions have ever been loaded.
+    never_used: bool, // True iff no questions have ever been loaded.
 }
 
 impl QuestionSet {
     fn new() -> Self {
-        Self { questions: HashSet::new(), never_used: true, }
+        Self {
+            questions: HashSet::new(),
+            never_used: true,
+        }
     }
 
     /// Treats each `char` in the given string as a separate question. If no questions have ever
@@ -39,7 +41,11 @@ impl QuestionSet {
             self.questions = new_question_set;
             self.never_used = false;
         } else {
-            self.questions = self.questions.intersection(&new_question_set).map(|c| *c).collect();
+            self.questions = self
+                .questions
+                .intersection(&new_question_set)
+                .map(|c| *c)
+                .collect();
         }
     }
 
@@ -57,7 +63,6 @@ impl QuestionSet {
     }
 }
 
-
 fn parse_question_sets(input: &str) -> Vec<QuestionSet> {
     let mut question_vec = Vec::new();
     let mut question_set = QuestionSet::new();
@@ -74,21 +79,17 @@ fn parse_question_sets(input: &str) -> Vec<QuestionSet> {
     question_vec
 }
 
-
 fn main() {
-    let input =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mut total = 0;
     for qs in parse_question_sets(&input) {
-//         println!("{:?} = {}", qs.as_string(), qs.count_unique_questions());
+        // println!("{:?} = {}", qs.as_string(), qs.count_unique_questions());
         total += qs.count_unique_questions();
     }
 
     println!("Sum of question counts is {}", total);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -113,7 +114,6 @@ a
 a";
 
     const QUESTION_SET_4: &str = "b";
-
 
     #[test]
     fn set_0() {

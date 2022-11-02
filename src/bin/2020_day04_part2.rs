@@ -14,24 +14,30 @@ const EYE_COLORS: [&str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
 
 #[derive(Debug, Default)]
 struct Passport<'a> {
-    byr: Option<&'a str>,  // Birth Year
-    iyr: Option<&'a str>,  // Issue Year
-    eyr: Option<&'a str>,  // Expiration Year
-    hgt: Option<&'a str>,  // Height
-    hcl: Option<&'a str>,  // Hair Color
-    ecl: Option<&'a str>,  // Eye Color
-    pid: Option<&'a str>,  // Passport ID
-    cid: Option<&'a str>,  // Country ID
+    byr: Option<&'a str>, // Birth Year
+    iyr: Option<&'a str>, // Issue Year
+    eyr: Option<&'a str>, // Expiration Year
+    hgt: Option<&'a str>, // Height
+    hcl: Option<&'a str>, // Hair Color
+    ecl: Option<&'a str>, // Eye Color
+    pid: Option<&'a str>, // Passport ID
+    cid: Option<&'a str>, // Country ID
 }
 
 impl Passport<'_> {
     /// Returns `true` if all mandatory passport fields have data, `false` otherwise. All fields
     /// are mandatory except `cid`.
     fn is_valid(&self) -> bool {
-//         println!("{:?}", &self);
+        // println!("{:?}", &self);
 
-        if (self.byr == None) | (self.iyr == None) | (self.eyr == None) | (self.hgt == None)
-            | (self.hcl == None) | (self.ecl == None) | (self.pid == None) {
+        if (self.byr == None)
+            | (self.iyr == None)
+            | (self.eyr == None)
+            | (self.hgt == None)
+            | (self.hcl == None)
+            | (self.ecl == None)
+            | (self.pid == None)
+        {
             return false;
         }
 
@@ -40,7 +46,7 @@ impl Passport<'_> {
         let eyr = self.eyr.unwrap().parse::<u16>();
 
         if byr.is_err() & iyr.is_err() & eyr.is_err() {
-//             println!("A date passport field failed validation because it is not a number");
+            // println!("A date passport field failed validation because it is not a number");
             return false;
         }
 
@@ -48,37 +54,34 @@ impl Passport<'_> {
         let iyr = iyr.unwrap();
         let eyr = eyr.unwrap();
 
-        if (byr < 1920) | (byr > 2002)
-            | (iyr < 2010) | (iyr > 2020)
-            | (eyr < 2020) | (eyr > 2030)
-        {
-//             println!("A date passport field failed validation");
+        if (byr < 1920) | (byr > 2002) | (iyr < 2010) | (iyr > 2020) | (eyr < 2020) | (eyr > 2030) {
+            // println!("A date passport field failed validation");
             return false;
         }
 
         let hgt = self.hgt.unwrap();
         if hgt.ends_with("cm") {
-            if let Ok(h) = hgt[..hgt.len()-2].parse::<u8>() {
+            if let Ok(h) = hgt[..hgt.len() - 2].parse::<u8>() {
                 if (h < 150) | (h > 193) {
-//                     println!("Height, given in cm, is outside valid range");
+                    // println!("Height, given in cm, is outside valid range");
                     return false;
                 }
             } else {
-//                 println!("Height was given in cm, but a valid number was not found.");
+                // println!("Height was given in cm, but a valid number was not found.");
                 return false;
             }
         } else if hgt.ends_with("in") {
-            if let Ok(h) = hgt[..hgt.len()-2].parse::<u8>() {
+            if let Ok(h) = hgt[..hgt.len() - 2].parse::<u8>() {
                 if (h < 59) | (h > 76) {
-//                     println!("Height, given in inches, is outside valid range");
+                    // println!("Height, given in inches, is outside valid range");
                     return false;
                 }
             } else {
-//                 println!("Height was given in inches, but a valid number was not found.");
+                // println!("Height was given in inches, but a valid number was not found.");
                 return false;
             }
         } else {
-//             println!("Height is invalid as it does not end in 'cm' or 'in'.");
+            // println!("Height is invalid as it does not end in 'cm' or 'in'.");
             return false;
         }
 
@@ -86,44 +89,41 @@ impl Passport<'_> {
             let hcl_chars: Vec<char> = self.hcl.unwrap().chars().collect();
 
             if hcl_chars[0] != '#' {
-//                 println!("'hcl' is invalid as it does not start with a '#' character");
+                // println!("'hcl' is invalid as it does not start with a '#' character");
                 return false;
             }
 
-
-            if !hcl_chars[1..].iter().fold(true, |acc, c| acc & c.is_ascii_hexdigit()) {
-//                 println!("'hcl' is invalid as it contains a non-hex character");
+            if !hcl_chars[1..]
+                .iter()
+                .fold(true, |acc, c| acc & c.is_ascii_hexdigit())
+            {
+                // println!("'hcl' is invalid as it contains a non-hex character");
                 return false;
             }
         } else {
-//             println!("'hcl' is the incorrect length");
+            // println!("'hcl' is the incorrect length");
             return false;
         }
-
 
         if EYE_COLORS.iter().position(|ec| ec == &self.ecl.unwrap()) == None {
-//             println!("Eye color is invalid");
+            // println!("Eye color is invalid");
             return false;
         }
-
 
         let pid = self.pid.unwrap();
         if pid.len() == 9 {
             if !pid.chars().fold(true, |acc, d| acc & d.is_numeric()) {
-//                 println!("'pid' is invalid as it contains a character that is not a digit");
+                // println!("'pid' is invalid as it contains a character that is not a digit");
                 return false;
             }
         } else {
-//             println!("'pid' is the incorrect length");
+            // println!("'pid' is the incorrect length");
             return false;
         }
 
         true
     }
-
-
 }
-
 
 /// Return the number of valid passports in `input` using the validity rules specified in the
 /// challenge.
@@ -132,12 +132,13 @@ fn count_valid_passports(input: &str) -> u32 {
 
     let mut current_passport = Passport::default();
     for (line_num, line) in input.lines().enumerate() {
-//         println!("{:?}", &line);
+        // println!("{:?}", &line);
 
-        if line == "" {  // A blank line indicates the end of all data for the current passport.
+        if line == "" {
+            // A blank line indicates the end of all data for the current passport.
             if current_passport.is_valid() {
                 valid_passport_count += 1;
-//                 println!("Passport is valid");
+                // println!("Passport is valid");
             }
 
             current_passport = Passport::default();
@@ -183,22 +184,18 @@ fn count_valid_passports(input: &str) -> u32 {
     // In case input does not end with a blank line, check for a valid passport when we reach the
     // end of the input file.
     if current_passport.is_valid() {
-//         println!("Passport is valid");
+        // println!("Passport is valid");
         valid_passport_count += 1;
     }
 
     valid_passport_count
 }
 
-
 fn main() {
-    let input =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     println!("{} passports are valid", count_valid_passports(&input));
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -278,6 +275,4 @@ iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719";
     fn valid_3() {
         assert_eq!(count_valid_passports(&VALID_3), 1);
     }
-
-
 }
