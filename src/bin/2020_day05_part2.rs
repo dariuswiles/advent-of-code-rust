@@ -1,10 +1,10 @@
 //! Advent of Code 2020 Day 05
 //! https://adventofcode.com/2020/day/5
 //!
-//! Challenge part 1
+//! Challenge part 2
 //!
-//! Read seating information from the input file, calculate the `seat ID` for each input row, and
-//! display the highest `seat ID`.
+//! Read seating information from the input file and determine the `seat ID` of the seat missing
+//! from the list.
 
 use std::fs;
 
