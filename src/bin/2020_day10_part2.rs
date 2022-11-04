@@ -25,7 +25,6 @@ fn parse_str_to_nums(input: &str) -> Vec<u32> {
     result
 }
 
-
 /// The challenge requires integers of 0 and 3 greater than the highest integer in the input file
 /// to be added to the vector of integers.
 fn add_outlet_and_device(v: &mut Vec<u32>) {
@@ -34,7 +33,6 @@ fn add_outlet_and_device(v: &mut Vec<u32>) {
 
     v.push(last_val + 3);
 }
-
 
 /// Given a vector of integers, calculates the number of combinations of integers that meet the
 /// challenge criteria, namely that there must be a chain of integers from 0 to the largest integer
@@ -60,7 +58,6 @@ fn calculate_combinations_inner(ints: &[u32]) -> u64 {
     total
 }
 
-
 /// Given a vector of integers, calculates the number of combinations of integers that meet the
 /// challenge criteria, namely that there must be a chain of integers from 0 to the largest integer
 /// where the difference between each pair of integers in the chain must be no greater than 3.
@@ -73,19 +70,21 @@ fn calculate_combinations(ints: &[u32]) -> u64 {
 
     // Calculate the differences between pairs of elements in `ints`. For example, [0, 3, 4, 7]
     // results in vec![0, 3, 1, 3].
-    let ints_diffs: Vec<u32> = ints.iter().scan(0, |previous, current| {
-        let diff = *current - *previous;
-        *previous = *current;
-        Some(diff)
-    }).collect();
+    let ints_diffs: Vec<u32> = ints
+        .iter()
+        .scan(0, |previous, current| {
+            let diff = *current - *previous;
+            *previous = *current;
+            Some(diff)
+        })
+        .collect();
 
-//     println!("{:#?}", &ints_diffs);
+    // println!("{:#?}", &ints_diffs);
 
-
-    let mut work_idx = 0;  // Index of the last int included in the last calculation.
-    while work_idx < ints.len()-1 {
+    let mut work_idx = 0; // Index of the last int included in the last calculation.
+    while work_idx < ints.len() - 1 {
         let mut next_group_end = 0;
-        for i in work_idx+DIVIDE_CONQUER_LENGTH..ints.len()-1 {
+        for i in work_idx + DIVIDE_CONQUER_LENGTH..ints.len() - 1 {
             if ints_diffs[i] == MAX_ALLOWED_DIFF {
                 next_group_end = i;
                 break;
@@ -98,25 +97,21 @@ fn calculate_combinations(ints: &[u32]) -> u64 {
         }
 
         if work_idx == next_group_end {
-//             println!("Breaking because work_idx and next_group_end are the same: {}", work_idx);
+            // println!("Breaking because work_idx and next_group_end are the same: {}", work_idx);
             break;
         }
 
-//         println!("Calculating combinations over range {}..={}", work_idx, next_group_end);
-//         println!("\ttotal before call is {}", total);
+        // println!("Calculating combinations over range {}..={}", work_idx, next_group_end);
+        // println!("\ttotal before call is {}", total);
         total *= calculate_combinations_inner(&ints[work_idx..=next_group_end]) as u64;
-//         println!("\ttotal after call is {}", total);
+        // println!("\ttotal after call is {}", total);
         work_idx = next_group_end;
     }
     total
 }
 
-
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mut input = parse_str_to_nums(&input_file);
 
@@ -127,7 +122,6 @@ fn main() {
 
     println!("The answer to the challenge is {}", result);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -180,8 +174,6 @@ mod tests {
 10
 3";
 
-
-
     #[test]
     fn test_0() {
         let mut input = parse_str_to_nums(&TEST_INPUT_0);
@@ -194,7 +186,6 @@ mod tests {
 
         assert_eq!(result, 8);
     }
-
 
     #[test]
     fn test_1() {
@@ -209,15 +200,16 @@ mod tests {
         assert_eq!(result, 19208);
     }
 
-
     #[test]
     fn test_parse_str_to_nums() {
-        let mut input = parse_str_to_nums("\
+        let mut input = parse_str_to_nums(
+            "\
 13
 
 7
 79
-");
+",
+        );
 
         input.sort_unstable();
         assert_eq!(input[0], 7);
@@ -225,12 +217,13 @@ mod tests {
         assert_eq!(input[2], 79);
     }
 
-
     #[test]
     fn test_add_outlet_and_device() {
-        let mut input = parse_str_to_nums("\
+        let mut input = parse_str_to_nums(
+            "\
 17
-55");
+55",
+        );
 
         input.sort_unstable();
         add_outlet_and_device(&mut input);

@@ -18,7 +18,6 @@ enum Token {
     SubExpression(Box<Vec<Token>>),
 }
 
-
 fn tokenize(chars: &mut Vec<char>) -> Vec<Token> {
     let mut output = Vec::new();
 
@@ -53,7 +52,6 @@ fn tokenize(chars: &mut Vec<char>) -> Vec<Token> {
     }
 }
 
-
 fn evaluate_tokens(tokens: &mut Vec<Token>) -> u64 {
     let mut total = 0;
     let mut operator = None;
@@ -82,56 +80,47 @@ fn evaluate_tokens(tokens: &mut Vec<Token>) -> u64 {
                     panic!("Input contains adjacent operators");
                 }
             }
-            Token::Number(n) => {
-                match operator {
-                    None => {
-                        total = n;
-                    }
-                    Some(op) => {
-                        match op {
-                            Token::Add => {
-                                total += n;
-                                operator = None;
-                            }
-                            Token::Multiply => {
-                                total *= n;
-                                operator = None;
-                            }
-                            _ => {
-                                panic!("Internal error due to unexpected token operator");
-                            }
-                        }
-                    }
+            Token::Number(n) => match operator {
+                None => {
+                    total = n;
                 }
-            }
+                Some(op) => match op {
+                    Token::Add => {
+                        total += n;
+                        operator = None;
+                    }
+                    Token::Multiply => {
+                        total *= n;
+                        operator = None;
+                    }
+                    _ => {
+                        panic!("Internal error due to unexpected token operator");
+                    }
+                },
+            },
         }
     }
 }
-
 
 fn evaluate(expression: &str) -> u64 {
     let mut c = expression.chars().collect();
     let tokens = tokenize(&mut c);
 
-//     println!("{:#?}", &tokens);
+    // println!("{:#?}", &tokens);
 
     evaluate_tokens(&mut tokens.clone())
 }
-
 
 fn do_challenge(input: &str) -> u64 {
     input.lines().fold(0, |acc, line| acc + evaluate(line))
 }
 
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let answer = do_challenge(&input_file);
     println!("The answer to the challenge is {:?}", answer);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]

@@ -10,7 +10,6 @@ use std::fs;
 
 const INPUT_FILENAME: &str = "2020_day10_input.txt";
 
-
 /// Convert a string containing one unsigned integer per line into a vector of integers.
 fn parse_str_to_nums(input: &str) -> Vec<i32> {
     let mut result = Vec::new();
@@ -25,7 +24,6 @@ fn parse_str_to_nums(input: &str) -> Vec<i32> {
     result
 }
 
-
 /// The challenge requires integers of 0 and 3 greater than the highest integer in the input file
 /// to be added to the vector of integers.
 fn add_outlet_and_device(v: &mut Vec<i32>) {
@@ -34,7 +32,6 @@ fn add_outlet_and_device(v: &mut Vec<i32>) {
 
     v.push(last_val + 3);
 }
-
 
 /// Returns a vector representing the difference between every pair of numbers in `v`. For example,
 /// if `v` is 2, 4 and 7, a new vector containing 2 and 3 is returned.
@@ -52,7 +49,6 @@ fn generate_pair_deltas(v: &Vec<i32>) -> Vec<i32> {
     result
 }
 
-
 /// Returns a HashMap whose keys are the integers in `v` and whose associated values are totals of
 /// the number of occurrences. For example, if `v` contains ten instances of the integer '3', the
 /// HashMap returned will contain a key of 3 with value 10.
@@ -67,28 +63,23 @@ fn count_occurrences(v: &Vec<i32>) -> HashMap<&i32, u16> {
     counts
 }
 
-
 /// Performs the steps specified in the challenge, including the final multiplication.
 fn do_challenge(input_str: &str) -> i32 {
-        let mut input = parse_str_to_nums(&input_str);
-        input.sort_unstable();
-        add_outlet_and_device(&mut input);
-        let deltas = generate_pair_deltas(&input);
-        let totals = count_occurrences(&deltas);
+    let mut input = parse_str_to_nums(&input_str);
+    input.sort_unstable();
+    add_outlet_and_device(&mut input);
+    let deltas = generate_pair_deltas(&input);
+    let totals = count_occurrences(&deltas);
 
-        (totals[&1] * totals[&3]).into()
+    (totals[&1] * totals[&3]).into()
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let result = do_challenge(&input_file);
     println!("The answer to the challenge is {}", result);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -141,8 +132,6 @@ mod tests {
 10
 3";
 
-
-
     #[test]
     fn test_0() {
         let mut input = parse_str_to_nums(&TEST_INPUT_0);
@@ -159,7 +148,6 @@ mod tests {
         assert_eq!(totals[&1], 7);
         assert_eq!(totals[&3], 5);
     }
-
 
     #[test]
     fn test_1() {
@@ -178,15 +166,16 @@ mod tests {
         assert_eq!(totals[&3], 10);
     }
 
-
     #[test]
     fn test_parse_str_to_nums() {
-        let mut input = parse_str_to_nums("\
+        let mut input = parse_str_to_nums(
+            "\
 13
 
 7
 79
-");
+",
+        );
 
         input.sort_unstable();
         assert_eq!(input[0], 7);
@@ -194,12 +183,13 @@ mod tests {
         assert_eq!(input[2], 79);
     }
 
-
     #[test]
     fn test_add_outlet_and_device() {
-        let mut input = parse_str_to_nums("\
+        let mut input = parse_str_to_nums(
+            "\
 17
-55");
+55",
+        );
 
         input.sort_unstable();
         add_outlet_and_device(&mut input);

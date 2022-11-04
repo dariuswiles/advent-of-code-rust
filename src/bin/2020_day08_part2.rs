@@ -6,7 +6,7 @@
 //! Parse a program in a simple language, and execute it to determine the point at which it runs an
 //! instruction twice, indicating the beginning of an infinite loop. When this happens, stop and
 //! examine all the instructions executed to see which instruction can be changed to allow the
-//! program to terminate without entering an infinite loop. The execute the modified program to
+//! program to terminate without entering an infinite loop. Then execute the modified program to
 //! determine its output.
 
 use std::fs;

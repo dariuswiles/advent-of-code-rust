@@ -4,8 +4,7 @@
 //! Challenge part 2
 //!
 //! Given an input file listing foods with ingredient and incomplete allergen information,
-//! determine the number of times ingredients which are free from all allergens appear in the list
-//! of foods.
+//! determine the mapping between ingredients and allergens.
 
 use std::collections::{HashMap, HashSet};
 use std::fs;
@@ -19,7 +18,7 @@ type Allergen<'a> = &'a str;
 
 #[derive(Clone, Debug, PartialEq)]
 struct TokenizedInput<'a> {
-    foods: Vec<(HashSet<Ingredient<'a>>, HashSet<Allergen<'a>>)>
+    foods: Vec<(HashSet<Ingredient<'a>>, HashSet<Allergen<'a>>)>,
 }
 
 impl<'a> TokenizedInput<'a> {
@@ -37,12 +36,18 @@ impl<'a> TokenizedInput<'a> {
             let ingredients_allergens: Vec<&str> = row.split(INPUT_DELIMITER).collect();
 
             if ingredients_allergens.len() != 2 {
-                panic!("Row lacks expected delimiter between ingredients and allergens: {}", &row);
+                panic!(
+                    "Row lacks expected delimiter between ingredients and allergens: {}",
+                    &row
+                );
             }
 
             let ingredients: HashSet<&str> = ingredients_allergens[0].split(' ').collect();
-            let allergens: HashSet<&str> = ingredients_allergens[1].strip_suffix(')').unwrap()
-                .split(", ").collect();
+            let allergens: HashSet<&str> = ingredients_allergens[1]
+                .strip_suffix(')')
+                .unwrap()
+                .split(", ")
+                .collect();
 
             foods.push((ingredients, allergens));
         }
@@ -51,12 +56,11 @@ impl<'a> TokenizedInput<'a> {
     }
 }
 
-
 /// An `IngredientSets` object represents all the data in a challenge input file, but organized
 /// so that allergens are the primary key. This allows is to simplify subsequent processing.
 #[derive(Clone, Debug, PartialEq)]
 struct IngredientSets<'a> {
-    sets: HashMap<&'a str, Vec<HashSet<&'a str>>>
+    sets: HashMap<&'a str, Vec<HashSet<&'a str>>>,
 }
 
 impl<'a> IngredientSets<'a> {
@@ -77,10 +81,11 @@ impl<'a> IngredientSets<'a> {
             }
         }
 
-        Self { sets: allergens_to_ingredients }
+        Self {
+            sets: allergens_to_ingredients,
+        }
     }
 }
-
 
 /// An `AllergenMapTransition` is a transition object used to determine the unique mapping between
 /// each allergen and the one ingredient that contains it. The object maps each allergen to the set
@@ -88,7 +93,7 @@ impl<'a> IngredientSets<'a> {
 /// each allergen maps to exactly one ingredient.
 #[derive(Clone, Debug, PartialEq)]
 struct AllergenMapTransition<'a> {
-    map: HashMap<&'a str, HashSet<&'a str>>
+    map: HashMap<&'a str, HashSet<&'a str>>,
 }
 
 impl<'a> AllergenMapTransition<'a> {
@@ -96,11 +101,17 @@ impl<'a> AllergenMapTransition<'a> {
     /// could be in.
     fn new(ingredient_sets: &'a IngredientSets) -> Self {
         let mut map = HashMap::new();
-            for (allergen, ingredients) in &ingredient_sets.sets {
-                map.insert(*allergen, ingredients.clone().iter().fold(ingredients[0].clone(),
-                    |acc, hs| acc.intersection(hs).cloned().collect::<HashSet<&str>>()
-                ));
-            }
+        for (allergen, ingredients) in &ingredient_sets.sets {
+            map.insert(
+                *allergen,
+                ingredients
+                    .clone()
+                    .iter()
+                    .fold(ingredients[0].clone(), |acc, hs| {
+                        acc.intersection(hs).cloned().collect::<HashSet<&str>>()
+                    }),
+            );
+        }
 
         Self { map }
     }
@@ -130,13 +141,20 @@ impl<'a> AllergenMapTransition<'a> {
                 }
             }
 
-            assert!(solved_this_turn.len() != 0, "Could not uniquely map allergens to ingredients");
+            assert!(
+                solved_this_turn.len() != 0,
+                "Could not uniquely map allergens to ingredients"
+            );
 
             for (allergen, ingredients) in self.map.clone() {
+                let new_ingredients: HashSet<&str> = HashSet::from_iter(
+                    ingredients
+                        .difference(&solved_this_turn)
+                        .cloned()
+                        .collect::<Vec<&str>>(),
+                );
 
-                let new_ingredients: HashSet<&str> = HashSet::from_iter(ingredients.difference(&solved_this_turn).cloned().collect::<Vec<&str>>());
-
-//                 println!("new_ingredients for allergen {} are\n{:#?}", &allergen, &new_ingredients);
+                // println!("new_ingredients for allergen {} are\n{:#?}", &allergen, &new_ingredients);
 
                 let tmp = self.map.get_mut(allergen).unwrap();
                 *tmp = new_ingredients;
@@ -146,7 +164,6 @@ impl<'a> AllergenMapTransition<'a> {
     }
 }
 
-
 fn do_challenge(input: &str) -> String {
     let foods = TokenizedInput::parse_input(input);
     let ing_sets = IngredientSets::map_allergens(&foods);
@@ -155,21 +172,23 @@ fn do_challenge(input: &str) -> String {
 
     let mut allergens_ingredients: Vec<(&str, &str)> = mapping.clone().into_iter().collect();
     allergens_ingredients.sort();
-    allergens_ingredients.iter().map(|(_, ingredient)| *ingredient).collect::<Vec<&str>>()
+    allergens_ingredients
+        .iter()
+        .map(|(_, ingredient)| *ingredient)
+        .collect::<Vec<&str>>()
         .join(&",")
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let answer = do_challenge(&input_file);
 
-    println!("Ingredients with allergens in order required by challenge: {}", answer);
+    println!(
+        "Ingredients with allergens in order required by challenge: {}",
+        answer
+    );
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -187,20 +206,38 @@ sqjhc mxmxvkd sbzzf (contains fish)";
         let foods = TokenizedInput::parse_input(&TEST_INPUT);
         let ing_sets = IngredientSets::map_allergens(&foods);
 
-        assert_eq!(ing_sets.sets["dairy"][0], ["mxmxvkd", "kfcds", "sqjhc", "nhms"].iter().cloned()
-            .collect::<HashSet<_>>()
+        assert_eq!(
+            ing_sets.sets["dairy"][0],
+            ["mxmxvkd", "kfcds", "sqjhc", "nhms"]
+                .iter()
+                .cloned()
+                .collect::<HashSet<_>>()
         );
-        assert_eq!(ing_sets.sets["dairy"][1], ["trh", "fvjkl", "sbzzf", "mxmxvkd"].iter().cloned()
-            .collect::<HashSet<_>>()
+        assert_eq!(
+            ing_sets.sets["dairy"][1],
+            ["trh", "fvjkl", "sbzzf", "mxmxvkd"]
+                .iter()
+                .cloned()
+                .collect::<HashSet<_>>()
         );
-        assert_eq!(ing_sets.sets["fish"][0], ["mxmxvkd", "kfcds", "sqjhc", "nhms"].iter().cloned()
-            .collect::<HashSet<_>>()
+        assert_eq!(
+            ing_sets.sets["fish"][0],
+            ["mxmxvkd", "kfcds", "sqjhc", "nhms"]
+                .iter()
+                .cloned()
+                .collect::<HashSet<_>>()
         );
-        assert_eq!(ing_sets.sets["fish"][1], ["sqjhc", "mxmxvkd", "sbzzf"].iter().cloned()
-            .collect::<HashSet<_>>()
+        assert_eq!(
+            ing_sets.sets["fish"][1],
+            ["sqjhc", "mxmxvkd", "sbzzf"]
+                .iter()
+                .cloned()
+                .collect::<HashSet<_>>()
         );
-        assert_eq!(ing_sets.sets["soy"][0], ["sqjhc", "fvjkl"].iter().cloned()
-            .collect::<HashSet<_>>());
+        assert_eq!(
+            ing_sets.sets["soy"][0],
+            ["sqjhc", "fvjkl"].iter().cloned().collect::<HashSet<_>>()
+        );
     }
 
     #[test]
@@ -211,12 +248,18 @@ sqjhc mxmxvkd sbzzf (contains fish)";
 
         println!("{:#?}", initial_mapping);
 
-        assert_eq!(initial_mapping.map["soy"], ["fvjkl", "sqjhc"].iter().cloned()
-            .collect::<HashSet<_>>());
-        assert_eq!(initial_mapping.map["dairy"], ["mxmxvkd"].iter().cloned()
-            .collect::<HashSet<_>>());
-        assert_eq!(initial_mapping.map["fish"], ["sqjhc", "mxmxvkd"].iter().cloned()
-            .collect::<HashSet<_>>());
+        assert_eq!(
+            initial_mapping.map["soy"],
+            ["fvjkl", "sqjhc"].iter().cloned().collect::<HashSet<_>>()
+        );
+        assert_eq!(
+            initial_mapping.map["dairy"],
+            ["mxmxvkd"].iter().cloned().collect::<HashSet<_>>()
+        );
+        assert_eq!(
+            initial_mapping.map["fish"],
+            ["sqjhc", "mxmxvkd"].iter().cloned().collect::<HashSet<_>>()
+        );
     }
 
     #[test]

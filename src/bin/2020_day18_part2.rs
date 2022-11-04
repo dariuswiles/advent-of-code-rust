@@ -17,7 +17,6 @@ enum Token {
     SubExpression(Box<Vec<Token>>),
 }
 
-
 fn tokenize(chars: &mut Vec<char>) -> Vec<Token> {
     let mut output = Vec::new();
 
@@ -52,7 +51,6 @@ fn tokenize(chars: &mut Vec<char>) -> Vec<Token> {
     }
 }
 
-
 // To simulate the operator precedence specified in the challenge, evaluate the vector of tokens in
 // multiple passes.
 fn evaluate_tokens(tokens: &mut Vec<Token>) -> u64 {
@@ -68,9 +66,9 @@ fn evaluate_tokens(tokens: &mut Vec<Token>) -> u64 {
     let mut i = 0;
     while i < tokens.len() {
         if let Token::Add = &tokens[i] {
-            if let Token::Number(left) = tokens[i-1] {
-                if let Token::Number(right) = tokens[i+1] {
-                    tokens.splice(i-1..=i+1, vec![Token::Number(left + right)]);
+            if let Token::Number(left) = tokens[i - 1] {
+                if let Token::Number(right) = tokens[i + 1] {
+                    tokens.splice(i - 1..=i + 1, vec![Token::Number(left + right)]);
                     i -= 1;
                 }
             }
@@ -79,40 +77,34 @@ fn evaluate_tokens(tokens: &mut Vec<Token>) -> u64 {
     }
 
     // Pass 3 - evaluate '*'.
-    tokens.iter().fold(1, |acc, t| {
-        match t {
-            Token::Number(num) => { acc * num }
-            Token::Multiply => { acc }
-            _ => { panic!("Unexpected token found during last evaluation pass"); }
+    tokens.iter().fold(1, |acc, t| match t {
+        Token::Number(num) => acc * num,
+        Token::Multiply => acc,
+        _ => {
+            panic!("Unexpected token found during last evaluation pass");
         }
     })
 }
-
 
 fn evaluate(expression: &str) -> u64 {
     let mut c = expression.chars().collect();
     let tokens = tokenize(&mut c);
 
-//     println!("{:#?}", &tokens);
+    // println!("{:#?}", &tokens);
 
     evaluate_tokens(&mut tokens.clone())
 }
-
 
 fn do_challenge(input: &str) -> u64 {
     input.lines().fold(0, |acc, line| acc + evaluate(line))
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let answer = do_challenge(&input_file);
     println!("The answer to the challenge is {:?}", answer);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]

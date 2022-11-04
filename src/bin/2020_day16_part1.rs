@@ -3,8 +3,9 @@
 //!
 //! Challenge part 1
 //!
-//! Sum all invalid fields of "nearby" tickets. A field is invalid if its value is outside the
-//! range of every field.
+//! Given a set of ticket fields and their associated valid ranges, sum the invalid fields of all
+//! "nearby" tickets provided in the input data that have data that is outside the ranges of all
+//! fields.
 
 use std::collections::HashSet;
 use std::fs;

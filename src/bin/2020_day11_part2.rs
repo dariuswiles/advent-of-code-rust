@@ -15,7 +15,7 @@ const INPUT_FILENAME: &str = "2020_day11_input.txt";
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum SeatState {
     Empty,
-    Occupied
+    Occupied,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -24,7 +24,6 @@ enum Cell {
     Seat(SeatState),
 }
 
-
 /// A structure to store and manipulate a grid of seats. The top-left seat has co-ordinates
 /// row = 0 and col = 0.
 #[derive(Debug)]
@@ -32,7 +31,7 @@ struct SeatingGrid {
     seats: Vec<Vec<Cell>>,
 }
 
-impl Clone for SeatingGrid  {
+impl Clone for SeatingGrid {
     fn clone(&self) -> Self {
         let mut new_seats = Vec::new();
 
@@ -45,7 +44,7 @@ impl Clone for SeatingGrid  {
 }
 
 impl PartialEq for SeatingGrid {
-    fn eq(&self, other: &Self) -> bool{
+    fn eq(&self, other: &Self) -> bool {
         if self.seats.len() != other.seats.len() {
             return false;
         }
@@ -58,7 +57,6 @@ impl PartialEq for SeatingGrid {
         true
     }
 }
-
 
 impl SeatingGrid {
     fn from_str(input: &str) -> Self {
@@ -100,12 +98,14 @@ impl SeatingGrid {
         let col_range = 0..self.seats[0].len() as i32;
 
         for row_delta in -1..=1 {
-//             println!("row_delta = {}", row_delta);
+            // println!("row_delta = {}", row_delta);
 
             for col_delta in -1..=1 {
-//                 println!("\tcol_delta = {}", col_delta);
+                // println!("\tcol_delta = {}", col_delta);
 
-                if (row_delta == 0) && (col_delta == 0) { continue; }
+                if (row_delta == 0) && (col_delta == 0) {
+                    continue;
+                }
 
                 let mut r = row as i32;
                 let mut c = col as i32;
@@ -113,22 +113,22 @@ impl SeatingGrid {
                     r += row_delta;
                     c += col_delta;
 
-//                     println!("\t\tChecking ({},{})", r, c);
+                    // println!("\t\tChecking ({},{})", r, c);
 
                     if !(row_range.contains(&r) && col_range.contains(&c)) {
                         break;
                     }
 
                     match self.seats[r as usize][c as usize] {
-                        Cell::Floor => { }
+                        Cell::Floor => {}
                         Cell::Seat(SeatState::Empty) => {
-//                             println!("\t\t\tFound empty seat at ({},{}). ", r, c);
+                            // println!("\t\t\tFound empty seat at ({},{}). ", r, c);
                             break;
                         }
                         Cell::Seat(SeatState::Occupied) => {
                             occupied_total += 1;
-//                             print!("\t\t\tFound occupied seat at ({},{}). ", r, c);
-//                             println!("Total now {}", occupied_total);
+                            // print!("\t\t\tFound occupied seat at ({},{}). ", r, c);
+                            // println!("Total now {}", occupied_total);
                             break;
                         }
                     }
@@ -144,7 +144,7 @@ impl SeatingGrid {
         for r in 0..self.seats.len() {
             for c in 0..self.seats[0].len() {
                 if let Cell::Seat(SeatState::Occupied) = self.seats[r][c] {
-                        occupied_total += 1;
+                    occupied_total += 1;
                 }
             }
         }
@@ -152,18 +152,18 @@ impl SeatingGrid {
     }
 
     /// Apply the rules specified in the challenge, which are:
-    ///   - If a seat is empty and there are no occupied seats visible to it, the seat becomes
-    ///     occupied.
-    ///   - If a seat is occupied and five or more seats visible to it are also occupied, the
-    ///     seat becomes empty.
-    ///   - Otherwise, the seat's state does not change.
+    /// - If a seat is empty (L) and there are no occupied seats adjacent to it, the seat becomes
+    ///   occupied.
+    /// - If a seat is occupied (#) and four or more seats adjacent to it are also occupied, the
+    ///   seat becomes empty.
+    /// - Otherwise, the seat's state does not change.
     fn apply_rules_once(&self) -> SeatingGrid {
         let mut new_grid = self.clone();
 
         for r in 0..self.seats.len() {
             for c in 0..self.seats[r].len() {
                 match self.seats[r][c] {
-                    Cell::Floor => { }
+                    Cell::Floor => {}
                     Cell::Seat(SeatState::Empty) => {
                         if self.occupied_visible_seats(r, c) == 0 {
                             new_grid.seats[r][c] = Cell::Seat(SeatState::Occupied);
@@ -195,18 +195,14 @@ impl SeatingGrid {
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mut sg = SeatingGrid::from_str(&input_file);
     let result = sg.apply_rules_until_stable();
 
     println!("The answer to the challenge is {}", result);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -322,7 +318,6 @@ LLL###LLL#
 #.LLLLL#.L
 #.L#LL#.L#";
 
-
     #[test]
     fn test_0() {
         let sg = SeatingGrid::from_str(&TEST_INPUT_0);
@@ -362,7 +357,10 @@ LLL###LLL#
     #[test]
     fn test_4() {
         let sg = SeatingGrid::from_str(&TEST_INPUT_0);
-        let sg_round_4 = sg.apply_rules_once().apply_rules_once().apply_rules_once()
+        let sg_round_4 = sg
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once()
             .apply_rules_once();
 
         let sg_expected_4 = SeatingGrid::from_str(&TEST_INPUT_4);
@@ -372,8 +370,12 @@ LLL###LLL#
     #[test]
     fn test_5() {
         let sg = SeatingGrid::from_str(&TEST_INPUT_0);
-        let sg_round_5 = sg.apply_rules_once().apply_rules_once().apply_rules_once()
-            .apply_rules_once().apply_rules_once();
+        let sg_round_5 = sg
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once();
 
         let sg_expected_5 = SeatingGrid::from_str(&TEST_INPUT_5);
         assert_eq!(&sg_round_5, &sg_expected_5);
@@ -382,8 +384,13 @@ LLL###LLL#
     #[test]
     fn test_6() {
         let sg = SeatingGrid::from_str(&TEST_INPUT_0);
-        let sg_round_6 = sg.apply_rules_once().apply_rules_once().apply_rules_once()
-            .apply_rules_once().apply_rules_once().apply_rules_once();
+        let sg_round_6 = sg
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once();
 
         let sg_expected_6 = SeatingGrid::from_str(&TEST_INPUT_6);
         assert_eq!(&sg_round_6, &sg_expected_6);
@@ -392,8 +399,14 @@ LLL###LLL#
     #[test]
     fn test_7() {
         let sg = SeatingGrid::from_str(&TEST_INPUT_0);
-        let sg_round_7 = sg.apply_rules_once().apply_rules_once().apply_rules_once()
-            .apply_rules_once().apply_rules_once().apply_rules_once().apply_rules_once();
+        let sg_round_7 = sg
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once()
+            .apply_rules_once();
 
         // Round 7 is expected to be unchanged from round 6
         let sg_expected_6 = SeatingGrid::from_str(&TEST_INPUT_6);

@@ -6,7 +6,6 @@
 //! Parse a set of rules that define whether a string is valid, then validate all the strings in
 //! the input file against these rules. Part 2 adds recursive rules.
 
-
 use std::collections::HashMap;
 use std::fs;
 use std::iter;
@@ -26,14 +25,13 @@ enum Rule {
 type RuleSet = HashMap<Id, Rule>;
 type Id = u32;
 
-
 fn build_ruleset(lines: &Vec<&str>) -> RuleSet {
     let mut ruleset = HashMap::new();
 
     for line in lines.iter() {
         let new_rule;
 
-//         println!("Ruleset processing line\t{}", &line);
+        // println!("Ruleset processing line\t{}", &line);
 
         let id_and_rule: Vec<&str> = line.split(": ").collect();
 
@@ -52,10 +50,7 @@ fn build_ruleset(lines: &Vec<&str>) -> RuleSet {
                 }
             }
 
-            new_rule = Rule::Choice(
-                Box::new(Rule::List(left)),
-                Box::new(Rule::List(right)),
-            );
+            new_rule = Rule::Choice(Box::new(Rule::List(left)), Box::new(Rule::List(right)));
         } else {
             let mut child_rules = Vec::new();
             for cr in id_and_rule[1].split(' ') {
@@ -65,36 +60,43 @@ fn build_ruleset(lines: &Vec<&str>) -> RuleSet {
             new_rule = Rule::List(child_rules);
         }
 
-//         println!("Adding new rule\t{:?} - {:?}", id_and_rule[0].parse::<u32>().unwrap(), &new_rule);
+        // println!("Adding new rule\t{:?} - {:?}", id_and_rule[0].parse::<u32>().unwrap(), &new_rule);
         ruleset.insert(id_and_rule[0].parse().unwrap(), new_rule);
     }
     ruleset
 }
 
-
 /// Part 2 of the challenge requires two changes to the ruleset given in the input file. Rather
 /// than create a modified version of the given input file, this function makes the two changes
 /// to the `ruleset` passed.
 fn patch_ruleset_for_part2(ruleset: &mut RuleSet) {
-    ruleset.insert(8, Rule::ChoiceRecursive(
-                Box::new(Rule::List(vec![42])),
-                Box::new(Rule::List(vec![42, 8])),
-    ));
+    ruleset.insert(
+        8,
+        Rule::ChoiceRecursive(
+            Box::new(Rule::List(vec![42])),
+            Box::new(Rule::List(vec![42, 8])),
+        ),
+    );
 
-    ruleset.insert(11, Rule::ChoiceRecursive(
-                Box::new(Rule::List(vec![42, 31])),
-                Box::new(Rule::List(vec![42, 11, 31])),
-    ));
+    ruleset.insert(
+        11,
+        Rule::ChoiceRecursive(
+            Box::new(Rule::List(vec![42, 31])),
+            Box::new(Rule::List(vec![42, 11, 31])),
+        ),
+    );
 }
-
 
 /// Validates a ruleset `List`, which is a vector of rules, all of which must be met in the order
 /// they appear. If any rule does not match, 0 is immediately returned to indicate the List doesn't
 /// match. Otherwise, the number of characters in `msg` that are matched by all the rules is
 /// returned.
-fn validate_list(ruleset: &RuleSet, msg: &str, child_rules: &Vec<Id>, recurse: &HashMap<Id, usize>)
-    -> usize
-{
+fn validate_list(
+    ruleset: &RuleSet,
+    msg: &str,
+    child_rules: &Vec<Id>,
+    recurse: &HashMap<Id, usize>,
+) -> usize {
     let mut matched_so_far = 0;
     for cr in child_rules {
         let matched = validate_message(ruleset, &msg[matched_so_far..], *cr, recurse);
@@ -108,13 +110,15 @@ fn validate_list(ruleset: &RuleSet, msg: &str, child_rules: &Vec<Id>, recurse: &
     return matched_so_far;
 }
 
-
 /// The rule with id `rule_id` is looked up in `ruleset`, and is evaluated based on its type. If it
 /// matches the leftmost character or characters in `msg`, the number of characters matched is
 /// returned. If the rule doesn't match, 0 is returned.
-fn validate_message(ruleset: &RuleSet, msg: &str, rule_id: Id, recursion: &HashMap<Id, usize>)
-    -> usize
-{
+fn validate_message(
+    ruleset: &RuleSet,
+    msg: &str,
+    rule_id: Id,
+    recursion: &HashMap<Id, usize>,
+) -> usize {
     let rule = &ruleset[&rule_id];
 
     match rule {
@@ -125,13 +129,19 @@ fn validate_message(ruleset: &RuleSet, msg: &str, rule_id: Id, recursion: &HashM
                     return left_result;
                 }
             } else {
-                panic!("Unexpected rule type found on left side of rule {}", rule_id);
+                panic!(
+                    "Unexpected rule type found on left side of rule {}",
+                    rule_id
+                );
             }
 
             if let Rule::List(right_rules) = &**right {
                 return validate_list(ruleset, msg, &right_rules, recursion);
             } else {
-                panic!("Unexpected rule type found on right side of rule {}", rule_id);
+                panic!(
+                    "Unexpected rule type found on right side of rule {}",
+                    rule_id
+                );
             }
         }
         Rule::ChoiceRecursive(left, right) => {
@@ -145,18 +155,20 @@ fn validate_message(ruleset: &RuleSet, msg: &str, rule_id: Id, recursion: &HashM
             if let Rule::List(left_rules) = &**left {
                 left_choice = left_rules.iter().cloned().collect();
             } else {
-                panic!("Unexpected rule type found on left side of rule {}", rule_id);
+                panic!(
+                    "Unexpected rule type found on left side of rule {}",
+                    rule_id
+                );
             }
 
             if let Rule::List(right_rules) = &**right {
-
                 let recursion_position = right_rules.iter().position(|&r| r == rule_id).unwrap();
 
                 let before_recursion: &[Id] = &right_rules[..recursion_position];
 
                 let after_recursion;
                 if right_rules.len() > recursion_position + 1 {
-                    after_recursion = &right_rules[recursion_position+1..];
+                    after_recursion = &right_rules[recursion_position + 1..];
                 } else {
                     after_recursion = &EMPTY_ARRAY;
                 }
@@ -174,19 +186,25 @@ fn validate_message(ruleset: &RuleSet, msg: &str, rule_id: Id, recursion: &HashM
 
                 new_list.append(&mut left_choice);
 
-                new_list.append(&mut iter::repeat(after_recursion)
-                    .take(recursion_level as usize)
-                    .collect::<Vec<&[Id]>>()
-                    .concat()
-                    .to_vec());
+                new_list.append(
+                    &mut iter::repeat(after_recursion)
+                        .take(recursion_level as usize)
+                        .collect::<Vec<&[Id]>>()
+                        .concat()
+                        .to_vec(),
+                );
 
-//                 println!("Rule id {}: Checking for matches with generated recursive rule {:?}",
-//                     rule_id, &new_list);
+                // println!(
+                //     "Rule id {}: Checking for matches with generated recursive rule {:?}",
+                //     rule_id, &new_list
+                // );
 
                 validate_list(ruleset, msg, &new_list, recursion)
-
             } else {
-                panic!("Unexpected rule type found on right side of rule {}", rule_id);
+                panic!(
+                    "Unexpected rule type found on right side of rule {}",
+                    rule_id
+                );
             }
         }
         Rule::Text(s) => {
@@ -196,12 +214,9 @@ fn validate_message(ruleset: &RuleSet, msg: &str, rule_id: Id, recursion: &HashM
                 return 0;
             }
         }
-        Rule::List(child_rules) => {
-            validate_list(ruleset, msg, child_rules, recursion)
-        }
+        Rule::List(child_rules) => validate_list(ruleset, msg, child_rules, recursion),
     }
 }
-
 
 /// Determines if `msg` matches any rules in `ruleset` and returns the result.
 fn is_message_valid(ruleset: &RuleSet, msg: &str) -> bool {
@@ -227,7 +242,7 @@ fn is_message_valid(ruleset: &RuleSet, msg: &str) -> bool {
     // recursion level is defined in MAX_RECURSION_LEVEL.
     let mut complete = false;
     while !complete {
-//         println!("Validate message using recursion values of {:?}", &recursion);
+        // println!("Validate message using recursion values of {:?}", &recursion);
 
         if validate_message(ruleset, msg, 0, &recursion) == msg.len() {
             return true;
@@ -249,7 +264,6 @@ fn is_message_valid(ruleset: &RuleSet, msg: &str) -> bool {
 
     false
 }
-
 
 /// Parse the given `input` and return a tuple containing its `RuleSet` and list of messages that
 /// need to be validated.
@@ -278,46 +292,41 @@ fn parse_input(input: &str) -> (RuleSet, Vec<&str>) {
     (ruleset, messages)
 }
 
-
 fn verify_messages(ruleset: &RuleSet, messages: Vec<&str>) -> u32 {
     let mut valid_messages = 0;
     for msg in messages.iter() {
         if is_message_valid(&ruleset, &msg) {
-//             println!("Valid message '{}'", &msg);
+            // println!("Valid message '{}'", &msg);
             valid_messages += 1;
         } else {
-//             println!("Invalid message '{}'", &msg);
+            // println!("Invalid message '{}'", &msg);
         }
     }
 
     valid_messages
 }
 
-
 fn do_challenge(input: &str) -> u32 {
     let (mut ruleset, messages) = parse_input(input);
     patch_ruleset_for_part2(&mut ruleset);
-//     println!("Ruleset:\n{:?}", &ruleset);
+    // println!("Ruleset:\n{:?}", &ruleset);
 
     verify_messages(&ruleset, messages)
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let answer = do_challenge(&input_file);
     println!("{} messages are valid", answer);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    #[rustfmt::skip]
     const TEST_INPUT_0: &str =
 r#"0: 4 1 5
 1: 2 3 | 3 2
@@ -332,7 +341,7 @@ abbbab
 aaabbb
 aaaabbb"#;
 
-
+    #[rustfmt::skip]
     const TEST_INPUT_1: &str =
 r#"42: 9 14 | 10 1
 9: 14 27 | 1 26
@@ -382,7 +391,6 @@ aaaabbaabbaaaaaaabbbabbbaaabbaabaaa
 babaaabbbaaabaababbaabababaaab
 aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
 
-
     #[test]
     fn validate_test_input_0() {
         assert_eq!(do_challenge(&TEST_INPUT_0), 2);
@@ -401,9 +409,27 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
         let ruleset = build_ruleset(&rules_input);
 
         assert_eq!(ruleset[&0], Rule::List(vec![4, 1, 5]));
-        assert_eq!(ruleset[&1], Rule::Choice(Box::new(Rule::List(vec![2, 3])), Box::new(Rule::List(vec![3, 2]))));
-        assert_eq!(ruleset[&2], Rule::Choice(Box::new(Rule::List(vec![4, 4])), Box::new(Rule::List(vec![5, 5]))));
-        assert_eq!(ruleset[&3], Rule::Choice(Box::new(Rule::List(vec![4, 5])), Box::new(Rule::List(vec![5, 4]))));
+        assert_eq!(
+            ruleset[&1],
+            Rule::Choice(
+                Box::new(Rule::List(vec![2, 3])),
+                Box::new(Rule::List(vec![3, 2]))
+            )
+        );
+        assert_eq!(
+            ruleset[&2],
+            Rule::Choice(
+                Box::new(Rule::List(vec![4, 4])),
+                Box::new(Rule::List(vec![5, 5]))
+            )
+        );
+        assert_eq!(
+            ruleset[&3],
+            Rule::Choice(
+                Box::new(Rule::List(vec![4, 5])),
+                Box::new(Rule::List(vec![5, 4]))
+            )
+        );
         assert_eq!(ruleset[&4], Rule::Text("a".to_string()));
         assert_eq!(ruleset[&5], Rule::Text("b".to_string()));
     }
@@ -437,10 +463,13 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
     #[test]
     fn validate_recursive_list() {
         let mut ruleset = HashMap::new();
-        ruleset.insert(0, Rule::ChoiceRecursive(
-            Box::new(Rule::List(vec![1])),
-            Box::new(Rule::List(vec![1, 0])),
-        ));
+        ruleset.insert(
+            0,
+            Rule::ChoiceRecursive(
+                Box::new(Rule::List(vec![1])),
+                Box::new(Rule::List(vec![1, 0])),
+            ),
+        );
         ruleset.insert(1, Rule::Text("e".to_string()));
 
         assert!(is_message_valid(&ruleset, &"e".to_string()));

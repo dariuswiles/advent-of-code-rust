@@ -7,8 +7,8 @@
 //! which point the answer to the challenge is obtained. Part 2 of the challenge only increases
 //! the number of game turns from 2,020 to 30,000,000.
 //
-// The increase in the number of turns causes the solution for part 1 to run incredibly slow, so
-// the code in this file is completely rewritten to provide a fast solution for even large
+// The increase in the number of turns causes the solution for part 1 to take an unacceptably long
+// time to run, so the code is completely rewritten to provide a fast solution for even large
 // numbers of turns.
 
 use std::collections::HashMap;
@@ -16,11 +16,10 @@ use std::collections::HashMap;
 const CHALLENGE_INPUT: &str = "7,14,0,17,11,1,2";
 const STOP_AT_TURN: usize = 30_000_000;
 
-
 /// The game state consisting of:
-///     `state` - holding the last turn each game value was seen;
-///     `next_num` - the number to added in the next game turn;
-///     `turn` - the turn number (where the first turn is 1).
+/// `state` - holding the last turn each game value was seen;
+/// `next_num` - the number to added in the next game turn;
+/// `turn` - the turn number (where the first turn is 1).
 //
 // The game rules rely on knowing the last turn each value was seen. Rather than recording the game
 // result for every game turn, storing only the last turn each value was seen allows faster lookups
@@ -40,9 +39,12 @@ impl Game {
         let mut state = HashMap::new();
         let mut next_num = 0;
 
-        let nums: Vec<usize> = start_string.split(',').map(|n| n.parse().unwrap()).collect();
+        let nums: Vec<usize> = start_string
+            .split(',')
+            .map(|n| n.parse().unwrap())
+            .collect();
 
-        for (idx, num) in nums[..nums.len()-1].iter().enumerate() {
+        for (idx, num) in nums[..nums.len() - 1].iter().enumerate() {
             state.insert(*num, idx + 1);
         }
 
@@ -52,27 +54,29 @@ impl Game {
 
         state.insert(*nums.last().unwrap(), nums.len());
 
-        Self { state: state, next_num: next_num, turn: nums.len() }
+        Self {
+            state: state,
+            next_num: next_num,
+            turn: nums.len(),
+        }
     }
-
 
     fn play_one_turn(&mut self) {
         let num_to_add = self.next_num;
 
         self.turn += 1;
-//         print!("Turn {}: Adding {} ", &self.turn,& num_to_add);
+        // print!("Turn {}: Adding {} ", &self.turn,& num_to_add);
 
         if let Some(prior_turn) = self.state.get(&num_to_add) {
-//             println!("which was last seen on turn {}.", &prior_turn);
+            // println!("which was last seen on turn {}.", &prior_turn);
             self.next_num = self.turn - prior_turn;
         } else {
-//             println!("which has not been seen before");
+            // println!("which has not been seen before");
             self.next_num = 0;
         }
 
         self.state.insert(num_to_add, self.turn);
     }
-
 
     /// Play the game until the given turn is reached.
     //
@@ -96,7 +100,6 @@ fn main() {
 
     println!("The answer to the challenge is {:?}", result);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]

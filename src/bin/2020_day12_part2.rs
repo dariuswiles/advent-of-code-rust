@@ -3,7 +3,7 @@
 //!
 //! Challenge part 2
 //!
-//! Move the position of a ship based on commands in the input file. Determine the Manhatten
+//! Move the position of a ship based on commands in the input file. Determine the Manhattan
 //! distance to its final position, which is the solution to the challenge. Part 2 differs from
 //! part 1 by introducing a waypoint and modifying the meaning of a few commands.
 
@@ -11,7 +11,6 @@ use std::fs;
 
 const INPUT_FILENAME: &str = "2020_day12_input.txt";
 const ACCEPTABLE_DIRECTION: [u16; 4] = [0, 90, 180, 270];
-
 
 /// A ship, consisting of an absolute position expressed as `latitude` and `longitude`, and a
 /// waypoint that is always relative to the current position of the ship. Positive latitude is
@@ -26,7 +25,12 @@ struct Ship {
 
 impl Ship {
     fn new() -> Self {
-        Self { latitude: 0, longitude: 0, way_latitude: 1, way_longitude: 10, }
+        Self {
+            latitude: 0,
+            longitude: 0,
+            way_latitude: 1,
+            way_longitude: 10,
+        }
     }
 
     fn move_forward(&mut self, iterations: i32) {
@@ -36,7 +40,7 @@ impl Ship {
 
     fn turn_left(&mut self, degrees: u16) {
         if ACCEPTABLE_DIRECTION.contains(&degrees) {
-            for _ in 0..degrees/90 {
+            for _ in 0..degrees / 90 {
                 let tmp = self.way_longitude;
                 self.way_longitude = -self.way_latitude;
                 self.way_latitude = tmp;
@@ -48,7 +52,7 @@ impl Ship {
 
     fn turn_right(&mut self, degrees: u16) {
         if ACCEPTABLE_DIRECTION.contains(&degrees) {
-            for _ in 0..degrees/90 {
+            for _ in 0..degrees / 90 {
                 let tmp = self.way_latitude;
                 self.way_latitude = -self.way_longitude;
                 self.way_longitude = tmp;
@@ -65,60 +69,78 @@ impl Ship {
 
             match &command {
                 'N' => {
-                    let distance: i32 = command_chars[1..].iter().collect::<String>().parse()
+                    let distance: i32 = command_chars[1..]
+                        .iter()
+                        .collect::<String>()
+                        .parse()
                         .unwrap();
 
                     self.way_latitude += distance;
-//                     print!("Shifting waypoint north {} units.", distance);
-//                     println!("Position is now ({}, {})", self.way_latitude, self.way_longitude);
+                    // print!("Shifting waypoint north {} units.", distance);
+                    // println!("Position is now ({}, {})", self.way_latitude, self.way_longitude);
                 }
                 'S' => {
-                    let distance: i32 = command_chars[1..].iter().collect::<String>().parse()
+                    let distance: i32 = command_chars[1..]
+                        .iter()
+                        .collect::<String>()
+                        .parse()
                         .unwrap();
 
                     self.way_latitude -= distance;
-//                     print!("Shifting waypoint south {} units.", distance);
-//                     println!("Position is now ({}, {})", self.way_latitude, self.way_longitude);
+                    // print!("Shifting waypoint south {} units.", distance);
+                    // println!("Position is now ({}, {})", self.way_latitude, self.way_longitude);
                 }
                 'E' => {
-                    let distance: i32 = command_chars[1..].iter().collect::<String>().parse()
+                    let distance: i32 = command_chars[1..]
+                        .iter()
+                        .collect::<String>()
+                        .parse()
                         .unwrap();
 
                     self.way_longitude += distance;
-//                     print!("Shifting waypoint east {} units.", distance);
-//                     println!("Position is now ({}, {})", self.way_latitude, self.way_longitude);
+                    // print!("Shifting waypoint east {} units.", distance);
+                    // println!("Position is now ({}, {})", self.way_latitude, self.way_longitude);
                 }
                 'W' => {
-                    let distance: i32 = command_chars[1..].iter().collect::<String>().parse()
+                    let distance: i32 = command_chars[1..]
+                        .iter()
+                        .collect::<String>()
+                        .parse()
                         .unwrap();
 
                     self.way_longitude -= distance;
-//                     print!("Shifting waypoint west {} units.", distance);
-//                     println!("Position is now ({}, {})", self.way_latitude, self.way_longitude);
+                    // print!("Shifting waypoint west {} units.", distance);
+                    // println!("Position is now ({}, {})", self.way_latitude, self.way_longitude);
                 }
                 'F' => {
-                    let distance: i32 = command_chars[1..].iter().collect::<String>().parse()
+                    let distance: i32 = command_chars[1..]
+                        .iter()
+                        .collect::<String>()
+                        .parse()
                         .unwrap();
                     self.move_forward(distance);
-
-//                     print!("Moving forward {} units.", distance);
-//                     println!("Position is now ({}, {})", self.latitude, self.longitude);
+                    // print!("Moving forward {} units.", distance);
+                    // println!("Position is now ({}, {})", self.latitude, self.longitude);
                 }
                 'L' => {
-                    let rotation: u16 = command_chars[1..].iter().collect::<String>().parse()
+                    let rotation: u16 = command_chars[1..]
+                        .iter()
+                        .collect::<String>()
+                        .parse()
                         .unwrap();
                     self.turn_left(rotation);
-
-//                     print!("Rotating left {} units.", rotation);
-//                     println!("Ship is now facing {} degrees", self.facing);
+                    // print!("Rotating left {} units.", rotation);
+                    // println!("Ship is now facing {} degrees", self.facing);
                 }
                 'R' => {
-                    let rotation: u16 = command_chars[1..].iter().collect::<String>().parse()
+                    let rotation: u16 = command_chars[1..]
+                        .iter()
+                        .collect::<String>()
+                        .parse()
                         .unwrap();
                     self.turn_right(rotation);
-
-//                     print!("Rotating right {} units.", rotation);
-//                     println!("Ship is now facing {} degrees", self.facing);
+                    // print!("Rotating right {} units.", rotation);
+                    // println!("Ship is now facing {} degrees", self.facing);
                 }
                 _ => {
                     panic!("Unrecognized command {}", &command);
@@ -126,7 +148,6 @@ impl Ship {
             }
         }
     }
-
 
     fn execute_multiple_commands(&mut self, commands: &str) {
         for cmd in commands.lines() {
@@ -141,19 +162,18 @@ impl Ship {
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mut ship = Ship::new();
 
     ship.execute_multiple_commands(&input_file);
 
-    println!("The answer to the challenge is {}", ship.manhatten_distance());
+    println!(
+        "The answer to the challenge is {}",
+        ship.manhatten_distance()
+    );
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -166,7 +186,6 @@ N3
 F7
 R90
 F11";
-
 
     #[test]
     fn test_0() {

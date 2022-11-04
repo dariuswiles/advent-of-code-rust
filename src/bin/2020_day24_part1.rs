@@ -12,10 +12,8 @@
 // north-east is x+1 and y+1. Some grid positions are invalid as tile locations, e.g., x=0, y=1,
 // and are not used.
 
-
 use std::collections::HashSet;
 use std::fs;
-
 
 const INPUT_FILENAME: &str = "2020_day24_input.txt";
 
@@ -26,7 +24,6 @@ struct Position {
     x: i16,
     y: i16,
 }
-
 
 fn parse_input(input: &str) -> FlippedTileGrid {
     let mut grid = FlippedTileGrid::new();
@@ -40,7 +37,6 @@ fn parse_input(input: &str) -> FlippedTileGrid {
     }
     grid
 }
-
 
 /// Read one line of input, representing one set of moves, and return the position of the resultant
 /// tile.
@@ -56,18 +52,30 @@ fn parse_one_line(line: &str) -> Position {
             'n' => {
                 y += 1;
                 match input[index + 1] {
-                    'e' => { x += 1; }
-                    'w' => { x -= 1; }
-                    _ => { panic!("Unrecognized input after 'n' of '{}'", &input[index + 1]); }
+                    'e' => {
+                        x += 1;
+                    }
+                    'w' => {
+                        x -= 1;
+                    }
+                    _ => {
+                        panic!("Unrecognized input after 'n' of '{}'", &input[index + 1]);
+                    }
                 }
                 index += 2;
             }
             's' => {
                 y -= 1;
                 match input[index + 1] {
-                    'e' => { x += 1; }
-                    'w' => { x -= 1; }
-                    _ => { panic!("Unrecognized input after 's' of '{}'", &input[index + 1]); }
+                    'e' => {
+                        x += 1;
+                    }
+                    'w' => {
+                        x -= 1;
+                    }
+                    _ => {
+                        panic!("Unrecognized input after 's' of '{}'", &input[index + 1]);
+                    }
                 }
                 index += 2;
             }
@@ -79,14 +87,15 @@ fn parse_one_line(line: &str) -> Position {
                 x -= 2;
                 index += 1;
             }
-            _ => { panic!("Unrecognized input '{}'", &input[index]); }
+            _ => {
+                panic!("Unrecognized input '{}'", &input[index]);
+            }
         }
     }
 
-//     println!("parse_one_line returning position ({}, {})", x, y);
+    // println!("parse_one_line returning position ({}, {})", x, y);
     Position { x, y }
 }
-
 
 /// Flips the tile at position `pos` within `grid`. If the tile is already present in `grid`,
 /// this flip will return it to its starting orientation, and it is therefore removed from `grid`.
@@ -98,17 +107,13 @@ fn flip_tile(grid: &mut FlippedTileGrid, pos: &Position) {
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-        let grid = parse_input(&input_file);
+    let grid = parse_input(&input_file);
 
-        println!("Challenge answer is {}", grid.len());
+    println!("Challenge answer is {}", grid.len());
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -137,21 +142,21 @@ eneswnwswnwsenenwnwnwwseeswneewsenese
 neswnwewnwnwseenwseesewsenwsweewe
 wseweeenwnesenwwwswnew";
 
-
     #[test]
     fn test_parse_one_line() {
         assert_eq!(Position { x: 1, y: -1 }, parse_one_line(&"esew"));
         assert_eq!(Position { x: 0, y: 0 }, parse_one_line(&"nwwswee"));
 
-        assert_eq!(Position { x: -4, y: -2 }, parse_one_line(
-            &"sesenwnenenewseeswwswswwnenewsewsw")
+        assert_eq!(
+            Position { x: -4, y: -2 },
+            parse_one_line(&"sesenwnenenewseeswwswswwnenewsewsw")
         );
 
-        assert_eq!(Position { x: -1, y: 3 }, parse_one_line(
-            &"neeenesenwnwwswnenewnwwsewnenwseswesw")
+        assert_eq!(
+            Position { x: -1, y: 3 },
+            parse_one_line(&"neeenesenwnwwswnenewnwwsewnenwseswesw")
         );
     }
-
 
     #[test]
     fn test_parse_file() {

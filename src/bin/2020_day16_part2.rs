@@ -58,7 +58,10 @@ impl ChallengeData {
 
             let name_then_ranges: Vec<&str> = line.split(": ").collect();
             if name_then_ranges.len() != 2 {
-                panic!("Missing colon separating name from ranges in string: '{}'", line);
+                panic!(
+                    "Missing colon separating name from ranges in string: '{}'",
+                    line
+                );
             }
             let name = name_then_ranges[0].to_string();
 
@@ -67,19 +70,14 @@ impl ChallengeData {
                 panic!("Malformed ranges in string: '{}'", line);
             }
 
-            let range0: Vec<u32> = tokens[0].split('-')
-                .map(|n| n.parse().unwrap())
-                .collect();
-            let range1: Vec<u32> = tokens[1].split('-')
-                .map(|n| n.parse().unwrap())
-                .collect();
+            let range0: Vec<u32> = tokens[0].split('-').map(|n| n.parse().unwrap()).collect();
+            let range1: Vec<u32> = tokens[1].split('-').map(|n| n.parse().unwrap()).collect();
 
             defns.push(TicketField {
                 name: name,
                 range0: range0[0]..=range0[1],
                 range1: range1[0]..=range1[1],
             });
-
         }
 
         defns
@@ -132,7 +130,6 @@ impl ChallengeData {
     }
 }
 
-
 /// Return an updated version of the `ChallengeData` passed in where all invalid 'nearby' tickets
 /// have been removed.
 fn discard_invalid_tickets(data: &mut ChallengeData) {
@@ -144,7 +141,7 @@ fn discard_invalid_tickets(data: &mut ChallengeData) {
         for val in ticket {
             if !all_ranges.contains(val) {
                 valid = false;
-//                 println!("Invalid field value {} in ticket: {:?}", val, ticket);
+                // println!("Invalid field value {} in ticket: {:?}", val, ticket);
             }
         }
 
@@ -155,14 +152,12 @@ fn discard_invalid_tickets(data: &mut ChallengeData) {
     data.nearby_tickets = valid_tickets;
 }
 
-
-
 /// Compares all values column index `column` in the 'nearby' tickets data to field definitions in
 /// `data` and returns a vector of only the definitions whose allowed ranges are valid for all
 /// values. For example, if a field has ranges 0..3 and 7..9 and the 'nearby' ticket values are
 /// 8, 3 and 1, the field will be included in the vector returned.
-fn map_one_ticket_field(data: &ChallengeData, column: usize) -> Vec<&TicketField>{
-//     println!("Attempting to map column {} in 'nearby' tickets to a field definition.", column);
+fn map_one_ticket_field(data: &ChallengeData, column: usize) -> Vec<&TicketField> {
+    // println!("Attempting to map column {} in 'nearby' tickets to a field definition.", column);
     let mut possibilities = Vec::new();
     for field in &data.field_definitions {
         possibilities.push(field);
@@ -171,15 +166,15 @@ fn map_one_ticket_field(data: &ChallengeData, column: usize) -> Vec<&TicketField
     for ticket in &data.nearby_tickets {
         let mut remaining_possibilities = Vec::new();
         let ticket_val = ticket[column];
-//         println!("Checking ticket value {}", ticket_val);
+        // println!("Checking ticket value {}", ticket_val);
 
         for p in &possibilities {
-//             print!("\tChecking against possibility: {:?}. ", p);
+            // print!("\tChecking against possibility: {:?}. ", p);
             if p.range0.contains(&ticket_val) || p.range1.contains(&ticket_val) {
-//                 println!("\tStill a possibility.");
+                // println!("\tStill a possibility.");
                 remaining_possibilities.push(*p);
-//             } else {
-//                 println!("\tNot possible - discarding.");
+                // } else {
+                // println!("\tNot possible - discarding.");
             }
         }
 
@@ -190,7 +185,6 @@ fn map_one_ticket_field(data: &ChallengeData, column: usize) -> Vec<&TicketField
     }
     possibilities
 }
-
 
 /// Returns the field definition associated with each column of data in the 'nearby' tickets. The
 /// return vector lists the definitions in the same order as the columns of data.
@@ -205,9 +199,9 @@ fn map_one_ticket_field(data: &ChallengeData, column: usize) -> Vec<&TicketField
 // where this is not the case but a solution can still be found. This happens when a field
 // definition is only listed in one column's remaining possibilities, but no column has only one
 // possibility. For example:
-//      Column 0 possibilities: class, row
-//      Column 1 possibilities: duration, row
-//      Column 2 possibilities: duration, row, train
+// Column 0 possibilities: class, row
+// Column 1 possibilities: duration, row
+// Column 2 possibilities: duration, row, train
 //
 // All columns have multiple possibilities, but it can be seen that 'class' only appears once, for
 // column 0, and 'train' for column 2. Thus, a solution can be found. The following code could be
@@ -223,10 +217,9 @@ fn map_all_ticket_fields(data: &ChallengeData) -> Vec<&TicketField> {
     let mut column_verified = Vec::new();
     column_verified.resize(num_of_fields, false);
 
-
     let mut verified_columns_total = usize::MAX;
     loop {
-//         println!("column_verified at loop start {:#?}", column_verified);
+        // println!("column_verified at loop start {:#?}", column_verified);
 
         for col in 0..num_of_fields {
             // Skip columns that already have mappings.
@@ -245,7 +238,8 @@ fn map_all_ticket_fields(data: &ChallengeData) -> Vec<&TicketField> {
                         continue;
                     }
 
-                    if let Some(idx_to_remove) = possibilities[other_col].iter()
+                    if let Some(idx_to_remove) = possibilities[other_col]
+                        .iter()
                         .position(|&i| i == possibilities[col][0])
                     {
                         possibilities[other_col].remove(idx_to_remove);
@@ -267,7 +261,6 @@ fn map_all_ticket_fields(data: &ChallengeData) -> Vec<&TicketField> {
     possibilities.iter().map(|v| v[0]).collect()
 }
 
-
 fn perform_work(input: &str) -> u64 {
     let mut data = ChallengeData::from_string(input);
     discard_invalid_tickets(&mut data);
@@ -286,16 +279,12 @@ fn perform_work(input: &str) -> u64 {
     answer
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let answer = perform_work(&input_file);
     println!("The answer to the challenge is {:?}", answer);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -316,7 +305,7 @@ nearby tickets:
 55,2,20
 38,6,12";
 
-const TEST_INPUT_1: &str = "\
+    const TEST_INPUT_1: &str = "\
 class: 0-1 or 4-19
 row: 0-5 or 8-19
 seat: 0-13 or 16-19
@@ -339,8 +328,10 @@ nearby tickets:
 
         assert_eq!(all_ranges.len(), 48);
 
-        for c in &[1,2,3,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,
-            31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50
+        for c in &[
+            1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+            27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
+            49, 50,
         ] {
             if !all_ranges.contains(c) {
                 panic!("Aggregate range should contain {} but does not.", c);
@@ -367,43 +358,50 @@ nearby tickets:
             results.push(map_one_ticket_field(&data, col));
         }
 
-        assert_eq!(results[0], vec![
-            &TicketField {
+        assert_eq!(
+            results[0],
+            vec![&TicketField {
                 name: "row".to_string(),
                 range0: 0..=5,
                 range1: 8..=19,
-            },
-        ]);
+            },]
+        );
 
-        assert_eq!(results[1], vec![
-            &TicketField {
-                name: "class".to_string(),
-                range0: 0..=1,
-                range1: 4..=19,
-            },
-            &TicketField {
-                name: "row".to_string(),
-                range0: 0..=5,
-                range1: 8..=19,
-            },
-        ]);
+        assert_eq!(
+            results[1],
+            vec![
+                &TicketField {
+                    name: "class".to_string(),
+                    range0: 0..=1,
+                    range1: 4..=19,
+                },
+                &TicketField {
+                    name: "row".to_string(),
+                    range0: 0..=5,
+                    range1: 8..=19,
+                },
+            ]
+        );
 
-        assert_eq!(results[2], vec![
-            &TicketField {
-                name: "class".to_string(),
-                range0: 0..=1,
-                range1: 4..=19,
-            },
-            &TicketField {
-                name: "row".to_string(),
-                range0: 0..=5,
-                range1: 8..=19,
-            },
-            &TicketField {
-                name: "seat".to_string(),
-                range0: 0..=13,
-                range1: 16..=19,
-            },
-        ]);
+        assert_eq!(
+            results[2],
+            vec![
+                &TicketField {
+                    name: "class".to_string(),
+                    range0: 0..=1,
+                    range1: 4..=19,
+                },
+                &TicketField {
+                    name: "row".to_string(),
+                    range0: 0..=5,
+                    range1: 8..=19,
+                },
+                &TicketField {
+                    name: "seat".to_string(),
+                    range0: 0..=13,
+                    range1: 16..=19,
+                },
+            ]
+        );
     }
 }

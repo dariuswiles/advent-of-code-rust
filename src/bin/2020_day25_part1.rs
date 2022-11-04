@@ -18,7 +18,6 @@ type CardPK = PublicKey;
 type DoorPK = PublicKey;
 type LoopSize = u64;
 
-
 /// Extracts the public keys for the card and door from `input`, and returns them in a tuple. These
 /// must be provided one per line, card first, in `input`.
 ///
@@ -32,7 +31,6 @@ fn read_keys(input: &str) -> (CardPK, DoorPK) {
 
     (card_pk, door_pk)
 }
-
 
 /// Given a public key, `modulus` and `subject_number`, find the number of loops of the algorithm
 /// given in the challenge that generate the public key.
@@ -50,7 +48,6 @@ fn find_loop_size(pk: PublicKey, modulus: u64, subject_number: u64) -> LoopSize 
     panic!("Maximum number of iterations reached while searching for public key loop size");
 }
 
-
 /// Given the `pk` of one device (either the card or the door), and the `loop_size` of the *other*
 /// device, returns the encryption key both devices are using. As the encryption key is shared,
 /// the result will be the same regardless of which way round the data is provided.
@@ -64,19 +61,15 @@ fn generate_encryption_key(subject_number: u64, loop_size: LoopSize, modulus: u6
     ek
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-        let (card_pk, door_pk) = read_keys(&input_file);
-        let card_loop_size = find_loop_size(card_pk, MODULUS, SUBJECT_NUMBER);
-        let card_ek = generate_encryption_key(door_pk, card_loop_size, MODULUS);
+    let (card_pk, door_pk) = read_keys(&input_file);
+    let card_loop_size = find_loop_size(card_pk, MODULUS, SUBJECT_NUMBER);
+    let card_ek = generate_encryption_key(door_pk, card_loop_size, MODULUS);
 
-        println!("Shared encryption key is {}", card_ek);
+    println!("Shared encryption key is {}", card_ek);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]

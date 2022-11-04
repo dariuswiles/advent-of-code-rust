@@ -11,7 +11,6 @@ const STOP_AT_ROUND: usize = 2020;
 
 type GameState = Vec<u32>;
 
-
 /// Searches backwards through vector `gs` for up to two occurrences of `num`. If not found,
 /// returns (None, None). If two occurrences are found, both are returned, with the one with the
 /// lowest vector index returned first. If only one occurrence is found, returns 'None' and the
@@ -25,15 +24,16 @@ fn rsearch_for_number(gs: &GameState, num: u32) -> (Option<usize>, Option<usize>
         earlier = gs[..pos].iter().rposition(|n| *n == num);
     }
 
-//     println!("\tSearching {} in vec {:?} returns ({:?}, {:?})", num, gs, earlier, later);
+    // println!("\tSearching {} in vec {:?} returns ({:?}, {:?})", num, gs, earlier, later);
     (earlier, later)
 }
 
-
-fn initialize_game(start_string: &str) -> GameState{
-    start_string.split(',').map(|n| n.parse().unwrap()).collect()
+fn initialize_game(start_string: &str) -> GameState {
+    start_string
+        .split(',')
+        .map(|n| n.parse().unwrap())
+        .collect()
 }
-
 
 fn play_one_round(game: &mut GameState) {
     let last_number = game.last().unwrap();
@@ -49,20 +49,17 @@ fn play_one_round(game: &mut GameState) {
     }
 }
 
-
 fn play_game(game: &mut GameState, play_until_round: usize) {
     while game.len() < play_until_round {
         play_one_round(game);
     }
 }
 
-
 fn main() {
     let mut game = initialize_game(CHALLENGE_INPUT);
     play_game(&mut game, STOP_AT_ROUND);
     println!("The answer to the challenge is {:?}", game.last().unwrap());
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -135,16 +132,25 @@ mod tests {
 
     #[test]
     fn test_rsearch_for_number_0() {
-        assert_eq!(rsearch_for_number(&vec![16, 26, 16, 7, 9, 0, 16, 44], 99), (None, None));
+        assert_eq!(
+            rsearch_for_number(&vec![16, 26, 16, 7, 9, 0, 16, 44], 99),
+            (None, None)
+        );
     }
 
     #[test]
     fn test_rsearch_for_number_1() {
-        assert_eq!(rsearch_for_number(&vec![16, 26, 16, 7, 9, 0, 16, 44], 26), (None, Some(1)));
+        assert_eq!(
+            rsearch_for_number(&vec![16, 26, 16, 7, 9, 0, 16, 44], 26),
+            (None, Some(1))
+        );
     }
 
     #[test]
     fn test_rsearch_for_number_2() {
-        assert_eq!(rsearch_for_number(&vec![16, 26, 16, 7, 9, 0, 16, 44], 16), (Some(2), Some(6)));
+        assert_eq!(
+            rsearch_for_number(&vec![16, 26, 16, 7, 9, 0, 16, 44], 16),
+            (Some(2), Some(6))
+        );
     }
 }

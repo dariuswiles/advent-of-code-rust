@@ -9,7 +9,7 @@
 use std::fs;
 
 const INPUT_FILENAME: &str = "2020_day22_input.txt";
-const PLAYER_KEYWORD: &str = "Player ";  // The string immediately preceding the player's id
+const PLAYER_KEYWORD: &str = "Player "; // The string immediately preceding the player's id
 const MAX_GAME_ROUNDS: u32 = 1000;
 
 type Card = u16;
@@ -38,8 +38,10 @@ impl Game {
                 let mut expected_first_line = PLAYER_KEYWORD.to_string();
                 expected_first_line.push('1');
 
-                assert!(line != expected_first_line,
-                    "Input begins with unexpected line: {}", line
+                assert!(
+                    line != expected_first_line,
+                    "Input begins with unexpected line: {}",
+                    line
                 );
 
                 loading_player_id = 1;
@@ -79,7 +81,9 @@ impl Game {
         let p1_card = self.player1.remove(0);
         let p2_card = self.player2.remove(0);
 
-        assert!(p1_card != p2_card, "Error: both players are trying to play the same card {}",
+        assert!(
+            p1_card != p2_card,
+            "Error: both players are trying to play the same card {}",
             p1_card
         );
 
@@ -96,7 +100,7 @@ impl Game {
             return Some(2);
         }
 
-        if self.player2.len() == 0  {
+        if self.player2.len() == 0 {
             return Some(1);
         }
 
@@ -145,20 +149,20 @@ impl Game {
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mut game = Game::load_game(&input_file);
     if let Some(winner) = game.play_game(MAX_GAME_ROUNDS) {
-        println!("Player {} won and their score is {}.", winner, game.score_player(winner));
+        println!(
+            "Player {} won and their score is {}.",
+            winner,
+            game.score_player(winner)
+        );
     } else {
         println!("Reached the maximum number of game rounds without finding a winner");
     }
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]

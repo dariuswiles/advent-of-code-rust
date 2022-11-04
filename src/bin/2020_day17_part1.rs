@@ -3,7 +3,7 @@
 //!
 //! Challenge part 1
 //!
-//! Update a grid of active and inactive cubes following the rules in the challenge. Count the
+//! Update a 3D grid of active and inactive cubes following the rules in the challenge. Count the
 //! number of active cubes after 6 iterations of the rules to get the answer.
 
 use std::collections::HashSet;
@@ -23,7 +23,7 @@ struct Position {
 
 #[derive(Clone, Debug, Default)]
 struct CubeGrid {
-    active_cubes: HashSet<Position>
+    active_cubes: HashSet<Position>,
 }
 
 impl PartialEq for CubeGrid {
@@ -46,7 +46,12 @@ impl Eq for CubeGrid {}
 impl fmt::Display for CubeGrid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let active_box = self.get_grid_limits();
-        writeln!(f, "Top-left corner is x={} and y={}\n", active_box.0.x, active_box.0.y).unwrap();
+        writeln!(
+            f,
+            "Top-left corner is x={} and y={}\n",
+            active_box.0.x, active_box.0.y
+        )
+        .unwrap();
 
         for z in active_box.0.z..=active_box.1.z {
             writeln!(f, "z={}", z).unwrap();
@@ -66,7 +71,6 @@ impl fmt::Display for CubeGrid {
         writeln!(f, "")
     }
 }
-
 
 impl CubeGrid {
     // Create a new `CubeGrid` from a string representing a 2D grid of cube states. `z`=0 for all
@@ -90,7 +94,7 @@ impl CubeGrid {
 
                 for c in line.chars() {
                     if c == STATE_ACTIVE {
-                        active_cubes.insert(Position {x, y, z} );
+                        active_cubes.insert(Position { x, y, z });
                     }
                     x += 1;
                 }
@@ -102,7 +106,9 @@ impl CubeGrid {
             z += 1;
         }
 
-        CubeGrid { active_cubes: active_cubes }
+        CubeGrid {
+            active_cubes: active_cubes,
+        }
     }
 
     // Returns a tuple containing two `Position`s. The first contains the minimum `x`, `y` and `z`
@@ -125,17 +131,28 @@ impl CubeGrid {
             z_max = i32::max(z_max, p.z);
         }
 
-        ((Position { x: x_min, y: y_min, z: z_min }), (Position { x: x_max, y: y_max, z: z_max }))
+        (
+            (Position {
+                x: x_min,
+                y: y_min,
+                z: z_min,
+            }),
+            (Position {
+                x: x_max,
+                y: y_max,
+                z: z_max,
+            }),
+        )
     }
 
     /// Returns how many of the 26 cubes adjacent to the given cube are active.
     fn active_adjacent_cubes(&self, p: &Position) -> u32 {
         let mut active_total = 0;
-        for z in p.z-1..=p.z+1 {
-            for y in p.y-1..=p.y+1 {
-                for x in p.x-1..=p.x+1 {
+        for z in p.z - 1..=p.z + 1 {
+            for y in p.y - 1..=p.y + 1 {
+                for x in p.x - 1..=p.x + 1 {
                     if !((x == p.x) && (y == p.y) && (z == p.z)) {
-                        if self.active_cubes.contains(&Position {x: x, y: y, z: z}) {
+                        if self.active_cubes.contains(&Position { x: x, y: y, z: z }) {
                             active_total += 1;
                         }
                     }
@@ -150,27 +167,27 @@ impl CubeGrid {
         // Bounding box containing all active cubes.
         let active_box = self.get_grid_limits();
 
-//         println!("Bounding box == {:?}", &active_box);
+        // println!("Bounding box == {:?}", &active_box);
 
         let mut new_state = HashSet::new();
-        for z in active_box.0.z-1..=active_box.1.z+1 {
-            for y in active_box.0.y-1..=active_box.1.y+1 {
-                for x in active_box.0.x-1..=active_box.1.x+1 {
-                    let p = Position {x: x, y: y, z: z};
+        for z in active_box.0.z - 1..=active_box.1.z + 1 {
+            for y in active_box.0.y - 1..=active_box.1.y + 1 {
+                for x in active_box.0.x - 1..=active_box.1.x + 1 {
+                    let p = Position { x: x, y: y, z: z };
                     let currently_active = self.active_cubes.contains(&p);
                     let active_adjacent = self.active_adjacent_cubes(&p);
 
-//                     println!("{:?} is active == {}. Active adjacent = {}", &p, currently_active,
-//                         active_adjacent);
+                    // println!("{:?} is active == {}. Active adjacent = {}", &p, currently_active,
+                    // active_adjacent);
 
                     if currently_active {
                         if (active_adjacent == 2) || (active_adjacent == 3) {
-//                             println!("{:?} is active and remains so.", &p);
+                            // println!("{:?} is active and remains so.", &p);
                             new_state.insert(p);
                         }
                     } else {
                         if active_adjacent == 3 {
-//                             println!("{:?} is inactive but becomes active.", &p);
+                            // println!("{:?} is inactive but becomes active.", &p);
                             new_state.insert(p);
                         }
                     }
@@ -187,18 +204,17 @@ impl CubeGrid {
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mut grid = CubeGrid::from_str(&[&input_file]);
     grid.cycle_states(6);
 
-    println!("The answer to the challenge is {:?}", grid.active_cubes.len());
+    println!(
+        "The answer to the challenge is {:?}",
+        grid.active_cubes.len()
+    );
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -211,51 +227,56 @@ mod tests {
 .###.
 ....."];
 
-    const TEST_INPUT_ROUND_1: [&str; 3] = ["\
+    const TEST_INPUT_ROUND_1: [&str; 3] = [
+        "\
 #..
 ..#
 .#.",
-"\
+        "\
 #.#
 .##
 .#.",
-"\
+        "\
 #..
 ..#
-.#."];
+.#.",
+    ];
 
-    const TEST_INPUT_ROUND_2: [&str; 5] = ["\
+    const TEST_INPUT_ROUND_2: [&str; 5] = [
+        "\
 .....
 .....
 ..#..
 .....
 .....",
-"\
+        "\
 ..#..
 .#..#
 ....#
 .#...
 .....",
-"\
+        "\
 ##...
 ##...
 #....
 ....#
 .###.",
-"\
+        "\
 ..#..
 .#..#
 ....#
 .#...
 .....",
-"\
+        "\
 .....
 .....
 ..#..
 .....
-....."];
+.....",
+    ];
 
-    const TEST_INPUT_ROUND_3: [&str; 5] = ["\
+    const TEST_INPUT_ROUND_3: [&str; 5] = [
+        "\
 .......
 .......
 ..##...
@@ -263,7 +284,7 @@ mod tests {
 .......
 .......
 .......",
-"\
+        "\
 ..#....
 ...#...
 #......
@@ -271,7 +292,7 @@ mod tests {
 .#...#.
 ..#.#..
 ...#...",
-"\
+        "\
 ...#...
 .......
 #......
@@ -279,7 +300,7 @@ mod tests {
 .....##
 .##.#..
 ...#...",
-"\
+        "\
 ..#....
 ...#...
 #......
@@ -287,15 +308,15 @@ mod tests {
 .#...#.
 ..#.#..
 ...#...",
-"\
+        "\
 .......
 .......
 ..##...
 ..###..
 .......
 .......
-......."];
-
+.......",
+    ];
 
     #[test]
     fn initialize_grid() {
@@ -303,11 +324,11 @@ mod tests {
         println!("Result\n{}", &grid);
 
         assert_eq!(grid.active_cubes.len(), 5);
-        assert!(grid.active_cubes.contains(&Position {x: -1, y: 0, z: 0}));
-        assert!(grid.active_cubes.contains(&Position {x: 0, y: -2, z: 0}));
-        assert!(grid.active_cubes.contains(&Position {x: 0, y: 0, z: 0}));
-        assert!(grid.active_cubes.contains(&Position {x: 1, y: -1, z: 0}));
-        assert!(grid.active_cubes.contains(&Position {x: 1, y: 0, z: 0}));
+        assert!(grid.active_cubes.contains(&Position { x: -1, y: 0, z: 0 }));
+        assert!(grid.active_cubes.contains(&Position { x: 0, y: -2, z: 0 }));
+        assert!(grid.active_cubes.contains(&Position { x: 0, y: 0, z: 0 }));
+        assert!(grid.active_cubes.contains(&Position { x: 1, y: -1, z: 0 }));
+        assert!(grid.active_cubes.contains(&Position { x: 1, y: 0, z: 0 }));
     }
 
     #[test]
@@ -316,7 +337,11 @@ mod tests {
         println!("Result\n{}", &grid);
 
         assert_eq!(grid.active_cubes.len(), 11);
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: -1 }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: -1
+        }));
         assert!(grid.active_cubes.contains(&Position { x: 1, y: 0, z: -1 }));
         assert!(grid.active_cubes.contains(&Position { x: 0, y: 1, z: -1 }));
         assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: 0 }));
@@ -380,13 +405,13 @@ mod tests {
 
         println!("Result\n{}", &grid0);
 
-        h.insert(Position {x: -1, y: 0, z: 0});
-        h.insert(Position {x: 0, y: -2, z: 0});
-        h.insert(Position {x: 0, y: 0, z: 0});
-        h.insert(Position {x: 1, y: -1, z: 0});
-        h.insert(Position {x: 1, y: 0, z: 0});
+        h.insert(Position { x: -1, y: 0, z: 0 });
+        h.insert(Position { x: 0, y: -2, z: 0 });
+        h.insert(Position { x: 0, y: 0, z: 0 });
+        h.insert(Position { x: 1, y: -1, z: 0 });
+        h.insert(Position { x: 1, y: 0, z: 0 });
 
-        assert_eq!(grid0, CubeGrid { active_cubes: h } );
+        assert_eq!(grid0, CubeGrid { active_cubes: h });
     }
 
     #[test]
@@ -394,13 +419,13 @@ mod tests {
         let grid0 = CubeGrid::from_str(&TEST_INPUT);
         let mut h = HashSet::new();
 
-        h.insert(Position {x: -1, y: 1, z: 0});
-        h.insert(Position {x: 0, y: -1, z: 0});
-        h.insert(Position {x: 0, y: 1, z: 0});
-        h.insert(Position {x: 1, y: 0, z: 0});
-        h.insert(Position {x: 1, y: 1, z: 999});
+        h.insert(Position { x: -1, y: 1, z: 0 });
+        h.insert(Position { x: 0, y: -1, z: 0 });
+        h.insert(Position { x: 0, y: 1, z: 0 });
+        h.insert(Position { x: 1, y: 0, z: 0 });
+        h.insert(Position { x: 1, y: 1, z: 999 });
 
-        assert_ne!(grid0, CubeGrid { active_cubes: h } );
+        assert_ne!(grid0, CubeGrid { active_cubes: h });
     }
 
     #[test]
@@ -408,11 +433,11 @@ mod tests {
         let grid0 = CubeGrid::from_str(&TEST_INPUT);
         let mut h = HashSet::new();
 
-        h.insert(Position {x: -1, y: 1, z: 0});
-        h.insert(Position {x: 0, y: -1, z: 0});
-        h.insert(Position {x: 0, y: 1, z: 0});
-        h.insert(Position {x: 1, y: 0, z: 0});
+        h.insert(Position { x: -1, y: 1, z: 0 });
+        h.insert(Position { x: 0, y: -1, z: 0 });
+        h.insert(Position { x: 0, y: 1, z: 0 });
+        h.insert(Position { x: 1, y: 0, z: 0 });
 
-        assert_ne!(grid0, CubeGrid { active_cubes: h } );
+        assert_ne!(grid0, CubeGrid { active_cubes: h });
     }
 }

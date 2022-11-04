@@ -16,7 +16,6 @@
 use std::collections::HashSet;
 use std::fs;
 
-
 const INPUT_FILENAME: &str = "2020_day24_input.txt";
 
 type FlippedTileGrid = HashSet<Position>;
@@ -26,7 +25,6 @@ struct Position {
     x: i16,
     y: i16,
 }
-
 
 fn parse_input(input: &str) -> FlippedTileGrid {
     let mut grid = FlippedTileGrid::new();
@@ -40,7 +38,6 @@ fn parse_input(input: &str) -> FlippedTileGrid {
     }
     grid
 }
-
 
 /// Read one line of input, representing one set of moves, and return the position of the resultant
 /// tile.
@@ -56,18 +53,30 @@ fn parse_one_line(line: &str) -> Position {
             'n' => {
                 y += 1;
                 match input[index + 1] {
-                    'e' => { x += 1; }
-                    'w' => { x -= 1; }
-                    _ => { panic!("Unrecognized input after 'n' of '{}'", &input[index + 1]); }
+                    'e' => {
+                        x += 1;
+                    }
+                    'w' => {
+                        x -= 1;
+                    }
+                    _ => {
+                        panic!("Unrecognized input after 'n' of '{}'", &input[index + 1]);
+                    }
                 }
                 index += 2;
             }
             's' => {
                 y -= 1;
                 match input[index + 1] {
-                    'e' => { x += 1; }
-                    'w' => { x -= 1; }
-                    _ => { panic!("Unrecognized input after 's' of '{}'", &input[index + 1]); }
+                    'e' => {
+                        x += 1;
+                    }
+                    'w' => {
+                        x -= 1;
+                    }
+                    _ => {
+                        panic!("Unrecognized input after 's' of '{}'", &input[index + 1]);
+                    }
                 }
                 index += 2;
             }
@@ -79,14 +88,15 @@ fn parse_one_line(line: &str) -> Position {
                 x -= 2;
                 index += 1;
             }
-            _ => { panic!("Unrecognized input '{}'", &input[index]); }
+            _ => {
+                panic!("Unrecognized input '{}'", &input[index]);
+            }
         }
     }
 
-//     println!("parse_one_line returning position ({}, {})", x, y);
+    // println!("parse_one_line returning position ({}, {})", x, y);
     Position { x, y }
 }
-
 
 /// Flips the tile at position `pos` within `grid`. If the tile is already present in `grid`,
 /// this flip will return it to its starting orientation, and it is therefore removed from `grid`.
@@ -98,43 +108,65 @@ fn flip_tile(grid: &mut FlippedTileGrid, pos: &Position) {
     }
 }
 
-
 /// Return how many of the tiles in the six adjacent to the tile at `p` are flipped.
 fn count_adjacent_flipped(grid: &FlippedTileGrid, p: &Position) -> u8 {
     let mut count = 0;
 
-    if grid.contains(&Position { x: p.x - 2, y: p.y }) { count += 1; }
-    if grid.contains(&Position { x: p.x + 2, y: p.y }) { count += 1; }
-    if grid.contains(&Position { x: p.x - 1, y: p.y - 1 }) { count += 1; }
-    if grid.contains(&Position { x: p.x - 1, y: p.y + 1 }) { count += 1; }
-    if grid.contains(&Position { x: p.x + 1, y: p.y - 1 }) { count += 1; }
-    if grid.contains(&Position { x: p.x + 1, y: p.y + 1 }) { count += 1; }
+    if grid.contains(&Position { x: p.x - 2, y: p.y }) {
+        count += 1;
+    }
+    if grid.contains(&Position { x: p.x + 2, y: p.y }) {
+        count += 1;
+    }
+    if grid.contains(&Position {
+        x: p.x - 1,
+        y: p.y - 1,
+    }) {
+        count += 1;
+    }
+    if grid.contains(&Position {
+        x: p.x - 1,
+        y: p.y + 1,
+    }) {
+        count += 1;
+    }
+    if grid.contains(&Position {
+        x: p.x + 1,
+        y: p.y - 1,
+    }) {
+        count += 1;
+    }
+    if grid.contains(&Position {
+        x: p.x + 1,
+        y: p.y + 1,
+    }) {
+        count += 1;
+    }
 
     count
 }
-
 
 /// Examine every tile to see if it should be flipped according to the following challenge rules:
 ///     - a flipped tile with zero, or more than 2, flipped tiles immediately adjacent to it is
 ///       unflipped.
 ///     - Any unflipped tile with exactly 2 flipped tiles immediately adjacent to it is flipped.
 fn perform_day_flip(grid: &mut FlippedTileGrid) {
-    let flipped_list_x = grid.iter().map(|Position {x, y: _}| x);
+    let flipped_list_x = grid.iter().map(|Position { x, y: _ }| x);
     let flipped_min_x = flipped_list_x.clone().min().unwrap();
     let flipped_max_x = flipped_list_x.max().unwrap();
 
-    let flipped_list_y = grid.iter().map(|Position {x: _, y}| y);
+    let flipped_list_y = grid.iter().map(|Position { x: _, y }| y);
     let flipped_min_y = flipped_list_y.clone().min().unwrap();
     let flipped_max_y = flipped_list_y.max().unwrap();
 
-//     println!("x ranges from {} to {} and y ranges from {} to {}", flipped_min_x, flipped_max_x,
-//         flipped_min_y, flipped_max_y
-//     );
+    // println!("x ranges from {} to {} and y ranges from {} to {}", flipped_min_x, flipped_max_x,
+    //     flipped_min_y, flipped_max_y
+    // );
 
     let mut flip = Vec::new();
     let mut unflip = Vec::new();
-    for y in flipped_min_y-2..=flipped_max_y+2 {
-        for x in flipped_min_x-2..=flipped_max_x+2 {
+    for y in flipped_min_y - 2..=flipped_max_y + 2 {
+        for x in flipped_min_x - 2..=flipped_max_x + 2 {
             // Coordinates are only valid if both `x` and `y` are odd, or both are even.
             if (x + y) % 2 != 0 {
                 continue;
@@ -155,17 +187,16 @@ fn perform_day_flip(grid: &mut FlippedTileGrid) {
         }
     }
 
-//     println!("Unflipped (white) tiles to flip to black: {:?}", &flip);
+    // println!("Unflipped (white) tiles to flip to black: {:?}", &flip);
     for f in flip {
         grid.insert(f);
     }
 
-//     println!("Flipped (black) tiles to unflip to white: {:?}", &unflip);
+    // println!("Flipped (black) tiles to unflip to white: {:?}", &unflip);
     for uf in unflip {
         grid.remove(&uf);
     }
 }
-
 
 fn perform_multiple_day_flips(grid: &mut FlippedTileGrid, days: usize) {
     for _ in 0..days {
@@ -173,19 +204,15 @@ fn perform_multiple_day_flips(grid: &mut FlippedTileGrid, days: usize) {
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-        let mut grid = parse_input(&input_file);
+    let mut grid = parse_input(&input_file);
 
-        perform_multiple_day_flips(&mut grid, 100);
+    perform_multiple_day_flips(&mut grid, 100);
 
-        println!("Challenge answer is {}", grid.len());
+    println!("Challenge answer is {}", grid.len());
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -214,50 +241,91 @@ eneswnwswnwsenenwnwnwwseeswneewsenese
 neswnwewnwnwseenwseesewsenwsweewe
 wseweeenwnesenwwwswnew";
 
-
     #[test]
     fn test_parse_one_line() {
         assert_eq!(Position { x: 1, y: -1 }, parse_one_line(&"esew"));
         assert_eq!(Position { x: 0, y: 0 }, parse_one_line(&"nwwswee"));
 
-        assert_eq!(Position { x: -4, y: -2 }, parse_one_line(
-            &"sesenwnenenewseeswwswswwnenewsewsw")
+        assert_eq!(
+            Position { x: -4, y: -2 },
+            parse_one_line(&"sesenwnenenewseeswwswswwnenewsewsw")
         );
-        assert_eq!(Position { x: -1, y: 3 }, parse_one_line(
-            &"neeenesenwnwwswnenewnwwsewnenwseswesw")
+        assert_eq!(
+            Position { x: -1, y: 3 },
+            parse_one_line(&"neeenesenwnwwswnenewnwwsewnenwseswesw")
         );
-        assert_eq!(Position { x: -3, y: -3 }, parse_one_line(&"seswneswswsenwwnwse"));
-        assert_eq!(Position { x: 2, y: 2 }, parse_one_line(
-            &"nwnwneseeswswnenewneswwnewseswneseene")
+        assert_eq!(
+            Position { x: -3, y: -3 },
+            parse_one_line(&"seswneswswsenwwnwse")
         );
-        assert_eq!(Position { x: 0, y: 2 }, parse_one_line(&"swweswneswnenwsewnwneneseenw"));
-        assert_eq!(Position { x: -2, y: 0 }, parse_one_line(&"eesenwseswswnenwswnwnwsewwnwsene"));
-        assert_eq!(Position { x: -1, y: 3 }, parse_one_line(&"sewnenenenesenwsewnenwwwse"));
-        assert_eq!(Position { x: -4, y: 0 }, parse_one_line(&"wenwwweseeeweswwwnwwe"));
-        assert_eq!(Position { x: -1, y: 1 }, parse_one_line(
-            &"wsweesenenewnwwnwsenewsenwwsesesenwne")
+        assert_eq!(
+            Position { x: 2, y: 2 },
+            parse_one_line(&"nwnwneseeswswnenewneswwnewseswneseene")
         );
-        assert_eq!(Position { x: -3, y: -1 }, parse_one_line(&"neeswseenwwswnwswswnw"));
-        assert_eq!(Position { x: -2, y: 2 }, parse_one_line(
-            &"nenwswwsewswnenenewsenwsenwnesesenew")
+        assert_eq!(
+            Position { x: 0, y: 2 },
+            parse_one_line(&"swweswneswnenwsewnwneneseenw")
         );
-        assert_eq!(Position { x: -2, y: 2 }, parse_one_line(
-            &"enewnwewneswsewnwswenweswnenwsenwsw")
+        assert_eq!(
+            Position { x: -2, y: 0 },
+            parse_one_line(&"eesenwseswswnenwswnwnwsewwnwsene")
         );
-        assert_eq!(Position { x: 3, y: 3 }, parse_one_line(
-            &"sweneswneswneneenwnewenewwneswswnese")
+        assert_eq!(
+            Position { x: -1, y: 3 },
+            parse_one_line(&"sewnenenenesenwsewnenwwwse")
         );
-        assert_eq!(Position { x: -2, y: 0 }, parse_one_line(&"swwesenesewenwneswnwwneseswwne"));
-        assert_eq!(Position { x: 2, y: -2 }, parse_one_line(
-            &"enesenwswwswneneswsenwnewswseenwsese")
+        assert_eq!(
+            Position { x: -4, y: 0 },
+            parse_one_line(&"wenwwweseeeweswwwnwwe")
         );
-        assert_eq!(Position { x: 0, y: 0 }, parse_one_line(&"wnwnesenesenenwwnenwsewesewsesesew"));
-        assert_eq!(Position { x: 0, y: 2 }, parse_one_line(&"nenewswnwewswnenesenwnesewesw"));
-        assert_eq!(Position { x: 2, y: 2 }, parse_one_line(
-            &"eneswnwswnwsenenwnwnwwseeswneewsenese")
+        assert_eq!(
+            Position { x: -1, y: 1 },
+            parse_one_line(&"wsweesenenewnwwnwsenewsenwwsesesenwne")
         );
-        assert_eq!(Position { x: 4, y: 0 }, parse_one_line(&"neswnwewnwnwseenwseesewsenwsweewe"));
-        assert_eq!(Position { x: -3, y: 1 }, parse_one_line(&"wseweeenwnesenwwwswnew"));
+        assert_eq!(
+            Position { x: -3, y: -1 },
+            parse_one_line(&"neeswseenwwswnwswswnw")
+        );
+        assert_eq!(
+            Position { x: -2, y: 2 },
+            parse_one_line(&"nenwswwsewswnenenewsenwsenwnesesenew")
+        );
+        assert_eq!(
+            Position { x: -2, y: 2 },
+            parse_one_line(&"enewnwewneswsewnwswenweswnenwsenwsw")
+        );
+        assert_eq!(
+            Position { x: 3, y: 3 },
+            parse_one_line(&"sweneswneswneneenwnewenewwneswswnese")
+        );
+        assert_eq!(
+            Position { x: -2, y: 0 },
+            parse_one_line(&"swwesenesewenwneswnwwneseswwne")
+        );
+        assert_eq!(
+            Position { x: 2, y: -2 },
+            parse_one_line(&"enesenwswwswneneswsenwnewswseenwsese")
+        );
+        assert_eq!(
+            Position { x: 0, y: 0 },
+            parse_one_line(&"wnwnesenesenenwwnenwsewesewsesesew")
+        );
+        assert_eq!(
+            Position { x: 0, y: 2 },
+            parse_one_line(&"nenewswnwewswnenesenwnesewesw")
+        );
+        assert_eq!(
+            Position { x: 2, y: 2 },
+            parse_one_line(&"eneswnwswnwsenenwnwnwwseeswneewsenese")
+        );
+        assert_eq!(
+            Position { x: 4, y: 0 },
+            parse_one_line(&"neswnwewnwnwseenwseesewsenwsweewe")
+        );
+        assert_eq!(
+            Position { x: -3, y: 1 },
+            parse_one_line(&"wseweeenwnesenwwwswnew")
+        );
     }
 
     #[test]

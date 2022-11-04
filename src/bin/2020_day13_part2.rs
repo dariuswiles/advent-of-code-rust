@@ -30,15 +30,18 @@ impl Buses {
     /// it contains the timestamp, which is not used for this part of the challenge.
     fn from_input(input: &str) -> Self {
         let mut lines = input.lines();
-        let _ = lines.next();  // Discard line containing timestamp.
+        let _ = lines.next(); // Discard line containing timestamp.
 
         let mut buses = Vec::new();
         let tokens = lines.next().unwrap().split(',');
 
         for (i, t) in tokens.enumerate() {
-//             println!("Index {} contains bus id: {}", i, &t);
+            // println!("Index {} contains bus id: {}", i, &t);
             if t != "x" {
-                buses.push(Bus { id: t.parse::<u64>().unwrap(), delay: i as u64});
+                buses.push(Bus {
+                    id: t.parse::<u64>().unwrap(),
+                    delay: i as u64,
+                });
             }
         }
 
@@ -51,8 +54,6 @@ impl Buses {
         self.buses.reverse();
     }
 }
-
-
 
 /// Given a vector of buses sorted by bus `id`, largest first, returns a timestamp that meets the
 /// challenge criteria, namely that each bus departs `delay` minutes after the timestamp. For
@@ -72,36 +73,28 @@ impl Buses {
 // eliminates needing to loop over timestamps from 0-889, 891-1789, etc., that would be wasted
 // work.
 fn find_challenge_answer(buses: &Buses) -> u64 {
-//     println!("Sorted list of buses: {:#?}", buses);
+    // println!("Sorted list of buses: {:#?}", buses);
 
     let loop_bus = &buses.buses[0];
     let buses_without_first = &buses.buses[1..];
     let mut t = loop_bus.id - (loop_bus.delay % loop_bus.id);
     'outer: loop {
-//         print!("t = {}", t);
-
-        // DE-BUG
-//         if t > 2000000 { panic!("DEBUG: Hit loop limit"); }
-
-
+        // print!("t = {}", t);
 
         for b in buses_without_first {
             if (t + b.delay) % b.id != 0 {
-//                 println!("\tCriteria not met for bus {} with delay {}", b.id, b.delay);
+                // println!("\tCriteria not met for bus {} with delay {}", b.id, b.delay);
                 t += loop_bus.id;
                 continue 'outer;
             }
         }
-//         println!("Solution found! {}");
+        // println!("Solution found! {}");
         return t;
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mut buses = Buses::from_input(&input_file);
     buses.sort_descending();
@@ -109,7 +102,6 @@ fn main() {
     let answer = find_challenge_answer(&buses);
     println!("The answer to the challenge is {}", answer);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -139,7 +131,6 @@ mod tests {
     const TEST_INPUT_5: &str = "\
 0
 1789,37,47,1889";
-
 
     #[test]
     fn test_0() {
@@ -199,13 +190,18 @@ mod tests {
     fn bus_parse() {
         let buses = Buses::from_input(&TEST_INPUT_0);
 
-        assert_eq!(buses, Buses { buses: vec!(
-            Bus { id: 7, delay: 0 },
-            Bus { id: 13, delay: 1 },
-            Bus { id: 59, delay: 4 },
-            Bus { id: 31, delay: 6 },
-            Bus { id: 19, delay: 7 },
-        )});
+        assert_eq!(
+            buses,
+            Buses {
+                buses: vec!(
+                    Bus { id: 7, delay: 0 },
+                    Bus { id: 13, delay: 1 },
+                    Bus { id: 59, delay: 4 },
+                    Bus { id: 31, delay: 6 },
+                    Bus { id: 19, delay: 7 },
+                )
+            }
+        );
     }
 
     #[test]
@@ -213,12 +209,17 @@ mod tests {
         let mut buses = Buses::from_input(&TEST_INPUT_0);
         buses.sort_descending();
 
-        assert_eq!(buses, Buses { buses: vec!(
-            Bus { id: 59, delay: 4 },
-            Bus { id: 31, delay: 6 },
-            Bus { id: 19, delay: 7 },
-            Bus { id: 13, delay: 1 },
-            Bus { id: 7, delay: 0 },
-        )});
+        assert_eq!(
+            buses,
+            Buses {
+                buses: vec!(
+                    Bus { id: 59, delay: 4 },
+                    Bus { id: 31, delay: 6 },
+                    Bus { id: 19, delay: 7 },
+                    Bus { id: 13, delay: 1 },
+                    Bus { id: 7, delay: 0 },
+                )
+            }
+        );
     }
 }

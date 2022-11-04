@@ -8,21 +8,18 @@
 //! complete, multiply the ids of the four corner tiles together to determine the answer to the
 //! challenge.
 
-
 use std::collections::HashMap;
 use std::fs;
 
 const INPUT_FILENAME: &str = "2020_day20_input.txt";
 const TILE_SIZE: usize = 10;
-const TILE_INPUT_KEYWORD: &str = "Tile ";  // The string immediately preceding the tile id
+const TILE_INPUT_KEYWORD: &str = "Tile "; // The string immediately preceding the tile id
 const TOP: usize = 0;
 const RIGHT: usize = 1;
 const BOTTOM: usize = 2;
 const LEFT: usize = 3;
 
-
 type Id = u16;
-
 
 /// A `Tile` stores a single tile, which is a square with a pre-determined, constant length. For
 /// efficient searching of matching tiles the borders of the tile are stored in `borders`, and
@@ -50,7 +47,8 @@ impl Tile {
         let id = id_line
             .trim_start_matches(TILE_INPUT_KEYWORD)
             .trim_end_matches(':')
-            .parse().unwrap();
+            .parse()
+            .unwrap();
 
         let mut cells = Vec::new();
         let mut lines_read = 0;
@@ -95,7 +93,12 @@ impl Tile {
             borders[LEFT].chars().rev().collect(),
         ];
 
-        Self { id, cells, borders, borders_flipped }
+        Self {
+            id,
+            cells,
+            borders,
+            borders_flipped,
+        }
     }
 
     /// Attempts to match all four borders of the current object with non-flipped and flipped
@@ -115,9 +118,9 @@ impl Tile {
                 // other, e.g., "####......" matches "......####". If a match like this is found,
                 // it is the simple case where neither of the tiles needs to be flipped.
                 if self.borders[self_border_idx] == other.borders_flipped[other_border_idx] {
-//                     println!("\tMatched tile {} border {} with tile {} border {}",
-//                         self.id, self_border_idx, other.id, other_border_idx
-//                     );
+                    // println!("\tMatched tile {} border {} with tile {} border {}",
+                    //     self.id, self_border_idx, other.id, other_border_idx
+                    // );
 
                     return Some((self_border_idx, other_border_idx, false));
                 }
@@ -125,9 +128,9 @@ impl Tile {
                 // As above, but this time look for *identical* borders. These still match, but
                 // only if one of the tiles is flipped.
                 if self.borders[self_border_idx] == other.borders[other_border_idx] {
-//                     println!("\tMatched tile {} border {} with *flipped* tile {} border {}",
-//                         self.id, self_border_idx, other.id, other_border_idx
-//                     );
+                    // println!("\tMatched tile {} border {} with *flipped* tile {} border {}",
+                    //     self.id, self_border_idx, other.id, other_border_idx
+                    // );
 
                     return Some((self_border_idx, other_border_idx, true));
                 }
@@ -138,23 +141,21 @@ impl Tile {
     }
 }
 
-
 fn parse_input(input: &str) -> Vec<Tile> {
-//     println!("parse_input called with data \n{}", &input);
+    // println!("parse_input called with data \n{}", &input);
     let lines: Vec<&str> = input.lines().collect();
 
     let mut tiles = Vec::new();
     let mut tile_start = 0;
     for i in 0..lines.len() {
-
         if lines[i].starts_with(TILE_INPUT_KEYWORD) {
             tile_start = i;
-//             println!("tile_start = {}", tile_start);
+            // println!("tile_start = {}", tile_start);
         }
 
         if lines[i] == "" {
             let tile_block = lines[tile_start..i].join("\n");
-//             println!("parse_input about to call from_string with data\n{:#?}", &tile_block);
+            // println!("parse_input about to call from_string with data\n{:#?}", &tile_block);
 
             tiles.push(Tile::from_string(&tile_block));
         }
@@ -162,15 +163,14 @@ fn parse_input(input: &str) -> Vec<Tile> {
 
     if tile_start + TILE_SIZE + 1 == lines.len() {
         let tile_block = lines[tile_start..lines.len()].join("\n");
-//         println!("parse_input calling from_string with final block of data\n{:#?}", &tile_block);
+        // println!("parse_input calling from_string with final block of data\n{:#?}", &tile_block);
 
         tiles.push(Tile::from_string(&tile_block));
     }
 
-//     println!("parse_input returning\n{:#?}", &tiles);
+    // println!("parse_input returning\n{:#?}", &tiles);
     tiles
 }
-
 
 fn find_tile_matches(tiles: &Vec<Tile>) -> HashMap<Id, Vec<Id>> {
     let mut matches = HashMap::new();
@@ -184,16 +184,17 @@ fn find_tile_matches(tiles: &Vec<Tile>) -> HashMap<Id, Vec<Id>> {
             }
 
             if let Some(_) = tiles[t0].find_matching_border(&tiles[t1]) {
-                matches.entry(tiles[t0].id).or_insert_with(Vec::new).push(tiles[t1].id);
+                matches
+                    .entry(tiles[t0].id)
+                    .or_insert_with(Vec::new)
+                    .push(tiles[t1].id);
                 continue;
             }
-
         }
     }
 
     matches
 }
-
 
 /// Load tiles from input file, find matching borders and return the product of the ids of the four
 /// corner tiles.
@@ -201,27 +202,26 @@ fn do_challenge(input: &str) -> u64 {
     let tiles = parse_input(input);
 
     let tile_matches = find_tile_matches(&tiles);
-//     println!("List of all matching borders\n{:?}", &tile_matches);
+    // println!("List of all matching borders\n{:?}", &tile_matches);
 
-    let corners: HashMap<_,_> = tile_matches.iter().filter(|tm| tm.1.len() == 2).collect();
+    let corners: HashMap<_, _> = tile_matches.iter().filter(|tm| tm.1.len() == 2).collect();
 
     if corners.len() != 4 {
-        panic!("Expecting four corners to be found, but found {}", corners.len());
+        panic!(
+            "Expecting four corners to be found, but found {}",
+            corners.len()
+        );
     }
 
     corners.iter().fold(1, |acc, x| acc * **x.0 as u64)
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let answer = do_challenge(&input_file);
     println!("The product of the ids of the corner tiles is {}", answer);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -337,7 +337,6 @@ Tile 3079:
 ..#.......
 ..#.###...";
 
-
     const TEST_SINGLE_TILE: &str = "\
 Tile 2311:
 ..##.#..#.
@@ -350,7 +349,6 @@ Tile 2311:
 ..#....#..
 ###...#.#.
 ..###..###";
-
 
     const TEST_TWO_TILES: &str = "\
 Tile 5555:
@@ -376,7 +374,6 @@ Tile 7777:
 #.........
 #.........
 ......##..";
-
 
     #[test]
     fn solve_test_puzzle() {

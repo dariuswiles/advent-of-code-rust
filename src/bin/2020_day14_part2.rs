@@ -31,7 +31,7 @@ impl Bitmask {
                     wildcard.push(BITMASK_LENGTH - i - 1);
                 }
                 '0' => {
-                   continue;
+                    continue;
                 }
                 '1' => {
                     let new_mask_bit = 1 << (BITMASK_LENGTH - i - 1);
@@ -42,13 +42,16 @@ impl Bitmask {
                 }
             }
         }
-//         println!("Bitmask created from string '{:0>64}'", s);
-//         println!("`always_set` mask i         '{:0>64b}'", set);
-//         println!("Positions of wildcard bits are '{:#?}'", &wildcard);
+        // println!("Bitmask created from string '{:0>64}'", s);
+        // println!("`always_set` mask i         '{:0>64b}'", set);
+        // println!("Positions of wildcard bits are '{:#?}'", &wildcard);
 
         wildcard.sort_unstable();
 
-        Self { always_set: set, wildcard: wildcard, }
+        Self {
+            always_set: set,
+            wildcard: wildcard,
+        }
     }
 
     /// Applies this bitmask to the given memory `location` and returns one or more resultant
@@ -59,8 +62,6 @@ impl Bitmask {
         let mut locs = Vec::new();
         let wildcard_len = self.wildcard.len();
 
-
-
         // To generate all wildcard combinations, an outer loop iterates through enough integers to
         // cover all possible wildcard permutations. An inner loop isolates each bit in the outer
         // loop counter and uses it to modify a bit in the memory `location` passed.
@@ -68,46 +69,51 @@ impl Bitmask {
             let mut wildcard_bit_flips = 0u64;
 
             for (mem_index, wildcard_position) in self.wildcard.iter().enumerate() {
-//                 print!("control_bits={:3}; mem_index={}; wildcard_position={:4}; ",
-//                 control_bits, mem_index, wildcard_position);
+                // print!("control_bits={:3}; mem_index={}; wildcard_position={:4}; ",
+                // control_bits, mem_index, wildcard_position);
 
-                let mut control_bit = control_bits & 1<<mem_index;
+                let mut control_bit = control_bits & 1 << mem_index;
 
                 control_bit <<= wildcard_position - mem_index;
 
                 wildcard_bit_flips |= control_bit;
 
-//                 println!("\tcontrol_bit={:0>36b}; wildcard_bit_flips={:0>36b}", control_bit,
-//                     wildcard_bit_flips);
+                // println!(
+                //     "\tcontrol_bit={:0>36b}; wildcard_bit_flips={:0>36b}",
+                //     control_bit,
+                //     wildcard_bit_flips,
+                // );
             }
 
-//             println!("              Applying wildcard_bit_flips {:0>36b}", wildcard_bit_flips);
-//             println!("    to location with `always_set` applied {:0>36b}", loc_set);
-//             println!("                                   giving {:0>36b}", loc_set ^
-//                 wildcard_bit_flips as usize);
+            // println!("              Applying wildcard_bit_flips {:0>36b}", wildcard_bit_flips);
+            // println!("    to location with `always_set` applied {:0>36b}", loc_set);
+            // println!(
+            //     "                                   giving {:0>36b}",
+            //     loc_set ^ wildcard_bit_flips as usize
+            // );
 
             locs.push(loc_set ^ wildcard_bit_flips as usize);
-
         }
 
         locs
     }
 }
 
-
 /// Parse the `location` and `value` strings representing a command to save a value to a location
 /// in memory, and return a pair of values representing validated numeric equivalents.
 fn parse_mem_command(location: &str, value: &str) -> (usize, u64) {
-//     println!("Entered update_memory with location='{}' and value='{}'", location, value);
+    // println!("Entered update_memory with location='{}' and value='{}'", location, value);
 
     let loc_str: Vec<&str> = location.strip_suffix(']').unwrap().split("[").collect();
     if loc_str.len() != 2 {
         panic!("Unrecognized format of command '{}'", location);
     }
 
-    (loc_str[1].parse::<usize>().unwrap(), value.parse::<u64>().unwrap())
+    (
+        loc_str[1].parse::<usize>().unwrap(),
+        value.parse::<u64>().unwrap(),
+    )
 }
-
 
 /// Reads each line of the input string and executes the commands found. Returns a `HashMap`
 /// containing the memory locations and values set as a result of executing the commands.
@@ -116,7 +122,9 @@ fn execute_input(input: &str) -> HashMap<usize, u64> {
     let mut memory = HashMap::new();
 
     for line in input.lines() {
-        if line == "" { continue; }
+        if line == "" {
+            continue;
+        }
 
         let token: Vec<&str> = line.split(" = ").collect();
         if token.len() != 2 {
@@ -132,9 +140,8 @@ fn execute_input(input: &str) -> HashMap<usize, u64> {
 
             for loc in masked_locations {
                 memory.insert(loc as usize, loc_val.1);
-//                 println!("Set memory location {} to value {}", loc, loc_val.1);
+                // println!("Set memory location {} to value {}", loc, loc_val.1);
             }
-
         } else {
             panic!("Unrecognized command '{}'", &token[0]);
         }
@@ -143,12 +150,8 @@ fn execute_input(input: &str) -> HashMap<usize, u64> {
     memory
 }
 
-
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mem = execute_input(&input_file);
 
@@ -156,7 +159,6 @@ fn main() {
 
     println!("The answer to the challenge is {}", answer);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]

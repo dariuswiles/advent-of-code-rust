@@ -3,9 +3,8 @@
 //!
 //! Challenge part 2
 //!
-//! Update a grid of active and inactive cubes following the rules in the challenge. Count the
-//! number of active cubes after 6 iterations of the rules to get the answer. Part 2 of the
-//! challenge changes the grid from 3D to 4D.
+//! Update a 4D grid of active and inactive cubes following the rules in the challenge. Count the
+//! number of active cubes after 6 iterations of the rules to get the answer.
 
 use std::collections::HashSet;
 use std::fmt;
@@ -25,7 +24,7 @@ struct Position {
 
 #[derive(Clone, Debug, Default)]
 struct CubeGrid {
-    active_cubes: HashSet<Position>
+    active_cubes: HashSet<Position>,
 }
 
 impl PartialEq for CubeGrid {
@@ -48,7 +47,12 @@ impl Eq for CubeGrid {}
 impl fmt::Display for CubeGrid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let active_box = self.get_grid_limits();
-        writeln!(f, "Top-left corner is x={} and y={}\n", active_box.0.x, active_box.0.y).unwrap();
+        writeln!(
+            f,
+            "Top-left corner is x={} and y={}\n",
+            active_box.0.x, active_box.0.y
+        )
+        .unwrap();
 
         for w in active_box.0.w..=active_box.1.w {
             for z in active_box.0.z..=active_box.1.z {
@@ -56,7 +60,12 @@ impl fmt::Display for CubeGrid {
                 for y in active_box.0.y..=active_box.1.y {
                     let mut output = Vec::new();
                     for x in active_box.0.x..=active_box.1.x {
-                        if self.active_cubes.contains(&Position { x: x, y: y, z: z, w: w }) {
+                        if self.active_cubes.contains(&Position {
+                            x: x,
+                            y: y,
+                            z: z,
+                            w: w,
+                        }) {
                             output.push(STATE_ACTIVE);
                         } else {
                             output.push(STATE_INACTIVE);
@@ -70,7 +79,6 @@ impl fmt::Display for CubeGrid {
         writeln!(f, "")
     }
 }
-
 
 impl CubeGrid {
     // Create a new `CubeGrid` from a string representing a 2D grid of cube states. `w`=0 for all
@@ -94,7 +102,7 @@ impl CubeGrid {
 
                 for c in line.chars() {
                     if c == STATE_ACTIVE {
-                        active_cubes.insert(Position {x, y, z, w: 0} );
+                        active_cubes.insert(Position { x, y, z, w: 0 });
                     }
                     x += 1;
                 }
@@ -106,7 +114,9 @@ impl CubeGrid {
             z += 1;
         }
 
-        CubeGrid { active_cubes: active_cubes }
+        CubeGrid {
+            active_cubes: active_cubes,
+        }
     }
 
     // Returns a tuple containing two `Position`s. The first contains the minimum `x`, `y` and `z`
@@ -133,20 +143,31 @@ impl CubeGrid {
             w_max = i32::max(w_max, p.w);
         }
 
-        ((Position { x: x_min, y: y_min, z: z_min, w: w_min }),
-            (Position { x: x_max, y: y_max, z: z_max, w: w_max })
+        (
+            (Position {
+                x: x_min,
+                y: y_min,
+                z: z_min,
+                w: w_min,
+            }),
+            (Position {
+                x: x_max,
+                y: y_max,
+                z: z_max,
+                w: w_max,
+            }),
         )
     }
 
     /// Returns how many of the 80 cubes adjacent to the given cube are active.
     fn active_adjacent_cubes(&self, p: &Position) -> u32 {
         let mut active_total = 0;
-        for w in p.w-1..=p.w+1 {
-            for z in p.z-1..=p.z+1 {
-                for y in p.y-1..=p.y+1 {
-                    for x in p.x-1..=p.x+1 {
+        for w in p.w - 1..=p.w + 1 {
+            for z in p.z - 1..=p.z + 1 {
+                for y in p.y - 1..=p.y + 1 {
+                    for x in p.x - 1..=p.x + 1 {
                         if !((x == p.x) && (y == p.y) && (z == p.z) && (w == p.w)) {
-                            if self.active_cubes.contains(&Position {x, y, z, w}) {
+                            if self.active_cubes.contains(&Position { x, y, z, w }) {
                                 active_total += 1;
                             }
                         }
@@ -162,28 +183,28 @@ impl CubeGrid {
         // Bounding box containing all active cubes.
         let active_box = self.get_grid_limits();
 
-//         println!("Bounding box == {:?}", &active_box);
+        // println!("Bounding box == {:?}", &active_box);
 
         let mut new_state = HashSet::new();
-        for w in active_box.0.w-1..=active_box.1.w+1 {
-            for z in active_box.0.z-1..=active_box.1.z+1 {
-                for y in active_box.0.y-1..=active_box.1.y+1 {
-                    for x in active_box.0.x-1..=active_box.1.x+1 {
-                        let p = Position {x, y, z, w};
+        for w in active_box.0.w - 1..=active_box.1.w + 1 {
+            for z in active_box.0.z - 1..=active_box.1.z + 1 {
+                for y in active_box.0.y - 1..=active_box.1.y + 1 {
+                    for x in active_box.0.x - 1..=active_box.1.x + 1 {
+                        let p = Position { x, y, z, w };
                         let currently_active = self.active_cubes.contains(&p);
                         let active_adjacent = self.active_adjacent_cubes(&p);
 
-    //                     println!("{:?} is active == {}. Active adjacent = {}", &p, currently_active,
-    //                         active_adjacent);
+                        // println!("{:?} is active == {}. Active adjacent = {}", &p, currently_active,
+                        // active_adjacent);
 
                         if currently_active {
                             if (active_adjacent == 2) || (active_adjacent == 3) {
-    //                             println!("{:?} is active and remains so.", &p);
+                                // println!("{:?} is active and remains so.", &p);
                                 new_state.insert(p);
                             }
                         } else {
                             if active_adjacent == 3 {
-    //                             println!("{:?} is inactive but becomes active.", &p);
+                                // println!("{:?} is inactive but becomes active.", &p);
                                 new_state.insert(p);
                             }
                         }
@@ -201,18 +222,17 @@ impl CubeGrid {
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mut grid = CubeGrid::from_str(&[&input_file]);
     grid.cycle_states(6);
 
-    println!("The answer to the challenge is {:?}", grid.active_cubes.len());
+    println!(
+        "The answer to the challenge is {:?}",
+        grid.active_cubes.len()
+    );
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -225,18 +245,42 @@ mod tests {
 .###.
 ....."];
 
-
     #[test]
     fn initialize_grid() {
         let grid = CubeGrid::from_str(&TEST_INPUT);
         println!("Result\n{}", &grid);
 
         assert_eq!(grid.active_cubes.len(), 5);
-        assert!(grid.active_cubes.contains(&Position {x: -1, y: 0, z: 0, w: 0}));
-        assert!(grid.active_cubes.contains(&Position {x: 0, y: -2, z: 0, w: 0}));
-        assert!(grid.active_cubes.contains(&Position {x: 0, y: 0, z: 0, w: 0}));
-        assert!(grid.active_cubes.contains(&Position {x: 1, y: -1, z: 0, w: 0}));
-        assert!(grid.active_cubes.contains(&Position {x: 1, y: 0, z: 0, w: 0}));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: 0,
+            z: 0,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: -2,
+            z: 0,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 0,
+            z: 0,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: -1,
+            z: 0,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 0,
+            z: 0,
+            w: 0
+        }));
     }
 
     #[test]
@@ -245,37 +289,182 @@ mod tests {
         grid.cycle_state_once();
 
         assert_eq!(grid.active_cubes.len(), 29);
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: -1, w: -1}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 0, z: -1, w: -1}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 1, z: -1, w: -1}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: 0, w: -1}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 0, z: 0, w: -1}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 1, z: 0, w: -1}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: 1, w: -1}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 0, z: 1, w: -1}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 1, z: 1, w: -1}));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: -1,
+            w: -1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 0,
+            z: -1,
+            w: -1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 1,
+            z: -1,
+            w: -1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: 0,
+            w: -1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 0,
+            z: 0,
+            w: -1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 1,
+            z: 0,
+            w: -1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: 1,
+            w: -1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 0,
+            z: 1,
+            w: -1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 1,
+            z: 1,
+            w: -1
+        }));
 
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: -1, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 0, z: -1, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 1, z: -1, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: 0, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: -1, z: 0, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 0, z: 0, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 0, z: 0, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 1, z: 0, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: 1, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 0, z: 1, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 1, z: 1, w: 0}));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: -1,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 0,
+            z: -1,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 1,
+            z: -1,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: 0,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: -1,
+            z: 0,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 0,
+            z: 0,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 0,
+            z: 0,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 1,
+            z: 0,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: 1,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 0,
+            z: 1,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 1,
+            z: 1,
+            w: 0
+        }));
 
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: -1, w: 1}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 0, z: -1, w: 1}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 1, z: -1, w: 1}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: 0, w: 1}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 0, z: 0, w: 1}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 1, z: 0, w: 1}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: 1, w: 1}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 0, z: 1, w: 1}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 1, z: 1, w: 1}));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: -1,
+            w: 1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 0,
+            z: -1,
+            w: 1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 1,
+            z: -1,
+            w: 1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: 0,
+            w: 1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 0,
+            z: 0,
+            w: 1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 1,
+            z: 0,
+            w: 1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: 1,
+            w: 1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 0,
+            z: 1,
+            w: 1
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 1,
+            z: 1,
+            w: 1
+        }));
     }
 
     #[test]
@@ -284,66 +473,366 @@ mod tests {
         grid.cycle_states(2);
 
         assert_eq!(grid.active_cubes.len(), 60);
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 0, z: -2, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: -2, y: -2, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -2, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: -2, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: -2, y: -1, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: -1, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: 2, y: -1, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: -2, y: 0, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: 2, y: 0, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: 1, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: 2, y: 1, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: 2, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 2, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 2, z: 0, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 0, z: 2, w: -2}));
-        assert!(grid.active_cubes.contains(&Position { x: -2, y: -2, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -2, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: -2, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -2, y: -1, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: -1, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 2, y: -1, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -2, y: 0, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 2, y: 0, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: 1, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 2, y: 1, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: 2, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 2, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 2, z: -2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -2, y: -2, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -2, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: -2, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -2, y: -1, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: -1, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 2, y: -1, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -2, y: 0, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 2, y: 0, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: 1, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 2, y: 1, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: 2, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 2, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 2, z: 2, w: 0}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 0, z: -2, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: -2, y: -2, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -2, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: -2, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: -2, y: -1, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: -1, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: -1, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: 2, y: -1, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: -2, y: 0, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: 2, y: 0, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: 1, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: 2, y: 1, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: -1, y: 2, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 2, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: 1, y: 2, z: 0, w: 2}));
-        assert!(grid.active_cubes.contains(&Position { x: 0, y: 0, z: 2, w: 2}));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 0,
+            z: -2,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -2,
+            y: -2,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -2,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: -2,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -2,
+            y: -1,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: -1,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 2,
+            y: -1,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -2,
+            y: 0,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 2,
+            y: 0,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: 1,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 2,
+            y: 1,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: 2,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 2,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 2,
+            z: 0,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 0,
+            z: 2,
+            w: -2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -2,
+            y: -2,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -2,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: -2,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -2,
+            y: -1,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: -1,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 2,
+            y: -1,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -2,
+            y: 0,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 2,
+            y: 0,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: 1,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 2,
+            y: 1,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: 2,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 2,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 2,
+            z: -2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -2,
+            y: -2,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -2,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: -2,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -2,
+            y: -1,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: -1,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 2,
+            y: -1,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -2,
+            y: 0,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 2,
+            y: 0,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: 1,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 2,
+            y: 1,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: 2,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 2,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 2,
+            z: 2,
+            w: 0
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 0,
+            z: -2,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -2,
+            y: -2,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -2,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: -2,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -2,
+            y: -1,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: -1,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: -1,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 2,
+            y: -1,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -2,
+            y: 0,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 2,
+            y: 0,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: 1,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 2,
+            y: 1,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: -1,
+            y: 2,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 2,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 1,
+            y: 2,
+            z: 0,
+            w: 2
+        }));
+        assert!(grid.active_cubes.contains(&Position {
+            x: 0,
+            y: 0,
+            z: 2,
+            w: 2
+        }));
     }
 
     #[test]
@@ -361,13 +850,38 @@ mod tests {
 
         println!("Result\n{}", &grid0);
 
-        h.insert(Position {x: -1, y: 0, z: 0, w: 0});
-        h.insert(Position {x: 0, y: -2, z: 0, w: 0});
-        h.insert(Position {x: 0, y: 0, z: 0, w: 0});
-        h.insert(Position {x: 1, y: -1, z: 0, w: 0});
-        h.insert(Position {x: 1, y: 0, z: 0, w: 0});
+        h.insert(Position {
+            x: -1,
+            y: 0,
+            z: 0,
+            w: 0,
+        });
+        h.insert(Position {
+            x: 0,
+            y: -2,
+            z: 0,
+            w: 0,
+        });
+        h.insert(Position {
+            x: 0,
+            y: 0,
+            z: 0,
+            w: 0,
+        });
+        h.insert(Position {
+            x: 1,
+            y: -1,
+            z: 0,
+            w: 0,
+        });
+        h.insert(Position {
+            x: 1,
+            y: 0,
+            z: 0,
+            w: 0,
+        });
 
-        assert_eq!(grid0, CubeGrid { active_cubes: h } );
+        assert_eq!(grid0, CubeGrid { active_cubes: h });
     }
 
     #[test]
@@ -375,13 +889,38 @@ mod tests {
         let grid0 = CubeGrid::from_str(&TEST_INPUT);
         let mut h = HashSet::new();
 
-        h.insert(Position {x: -1, y: 1, z: 0, w: 0});
-        h.insert(Position {x: 0, y: -1, z: 0, w: 0});
-        h.insert(Position {x: 0, y: 1, z: 0, w: 0});
-        h.insert(Position {x: 1, y: 0, z: 0, w: 0});
-        h.insert(Position {x: 1, y: 1, z: 0, w: 999});
+        h.insert(Position {
+            x: -1,
+            y: 1,
+            z: 0,
+            w: 0,
+        });
+        h.insert(Position {
+            x: 0,
+            y: -1,
+            z: 0,
+            w: 0,
+        });
+        h.insert(Position {
+            x: 0,
+            y: 1,
+            z: 0,
+            w: 0,
+        });
+        h.insert(Position {
+            x: 1,
+            y: 0,
+            z: 0,
+            w: 0,
+        });
+        h.insert(Position {
+            x: 1,
+            y: 1,
+            z: 0,
+            w: 999,
+        });
 
-        assert_ne!(grid0, CubeGrid { active_cubes: h } );
+        assert_ne!(grid0, CubeGrid { active_cubes: h });
     }
 
     #[test]
@@ -389,11 +928,31 @@ mod tests {
         let grid0 = CubeGrid::from_str(&TEST_INPUT);
         let mut h = HashSet::new();
 
-        h.insert(Position {x: -1, y: 1, z: 0, w: 0});
-        h.insert(Position {x: 0, y: -1, z: 0, w: 0});
-        h.insert(Position {x: 0, y: 1, z: 0, w: 0});
-        h.insert(Position {x: 1, y: 0, z: 0, w: 0});
+        h.insert(Position {
+            x: -1,
+            y: 1,
+            z: 0,
+            w: 0,
+        });
+        h.insert(Position {
+            x: 0,
+            y: -1,
+            z: 0,
+            w: 0,
+        });
+        h.insert(Position {
+            x: 0,
+            y: 1,
+            z: 0,
+            w: 0,
+        });
+        h.insert(Position {
+            x: 1,
+            y: 0,
+            z: 0,
+            w: 0,
+        });
 
-        assert_ne!(grid0, CubeGrid { active_cubes: h } );
+        assert_ne!(grid0, CubeGrid { active_cubes: h });
     }
 }

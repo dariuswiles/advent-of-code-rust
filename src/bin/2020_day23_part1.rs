@@ -14,7 +14,6 @@ const GAME_ROUNDS: usize = 100;
 
 type Cup = u8;
 
-
 /// `Game` holds the state of a game. The `cups` `Vec` lists the cups in a clockwise order. The
 /// challenge refers to the cups based on their position, where the first cup is cup 1, whereas
 /// this is stored in position 0 in the `Vec`, following standard Rust convention. This leads to
@@ -64,7 +63,7 @@ impl Game {
     ///
     /// # Panics
     ///
-    /// Panics if `value` is not a valid Cup id.
+    /// Panics if `value` is not a valid `Cup` id.
     fn restore_current_cup_value_position(&mut self, value: Cup) {
         let cups_len = self.cups.len();
         let bad_pos = self.cups.iter().position(|&x| x == value).unwrap();
@@ -75,7 +74,7 @@ impl Game {
     }
 
     /// Performs `moves` moves of the game.
-    fn play_game(&mut self, moves: usize){
+    fn play_game(&mut self, moves: usize) {
         for _ in 0..moves {
             self.perform_one_move();
         }
@@ -93,9 +92,7 @@ impl Game {
 
         result.iter().map(|x| x.to_string()).collect()
     }
-
 }
-
 
 /// Remove and return three elements from `v`, starting at `position`. If `position` is such that
 /// the end of `v` is reached, the elements at the beginning of `v` are removed instead. For
@@ -110,7 +107,7 @@ fn remove_three<T>(v: &mut Vec<T>, position: usize) -> Vec<T> {
 
     let mut pos = position;
     if position < (v.len() - 3) {
-        return  v.splice(pos..pos+3, iter::empty()).collect::<Vec<T>>();
+        return v.splice(pos..pos + 3, iter::empty()).collect::<Vec<T>>();
     } else {
         let mut result = Vec::new();
 
@@ -124,7 +121,6 @@ fn remove_three<T>(v: &mut Vec<T>, position: usize) -> Vec<T> {
         return result;
     }
 }
-
 
 /// Inserts the three elements in `elements` into `v`, starting at the index one *after* `position`.
 /// The elements are moved, not copied, so `elements` is emptied during this process.
@@ -143,18 +139,14 @@ fn insert_three<T: Clone>(v: &mut Vec<T>, position: usize, elements: &mut Vec<T>
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-        let mut game = Game::load_game(&input_file);
+    let mut game = Game::load_game(&input_file);
 
-        game.play_game(GAME_ROUNDS);
-        println!("Challenge answer is {}", game.get_challenge_answer());
+    game.play_game(GAME_ROUNDS);
+    println!("Challenge answer is {}", game.get_challenge_answer());
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -167,11 +159,13 @@ mod tests {
     fn test_load_game() {
         let game = Game::load_game(&TEST_INPUT);
 
-        let expected = Game { cups: vec![3, 8, 9, 1, 2, 5, 4, 6, 7], current_cup_index: 0 };
+        let expected = Game {
+            cups: vec![3, 8, 9, 1, 2, 5, 4, 6, 7],
+            current_cup_index: 0,
+        };
 
         assert_eq!(expected, game);
     }
-
 
     #[test]
     fn test_remove_three() {
@@ -225,25 +219,85 @@ mod tests {
         let mut game = Game::load_game(&TEST_INPUT);
 
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![3, 2, 8, 9, 1, 5, 4, 6, 7], current_cup_index: 1 }, game);
+        assert_eq!(
+            Game {
+                cups: vec![3, 2, 8, 9, 1, 5, 4, 6, 7],
+                current_cup_index: 1
+            },
+            game
+        );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![3, 2, 5, 4, 6, 7, 8, 9, 1], current_cup_index: 2 }, game);
+        assert_eq!(
+            Game {
+                cups: vec![3, 2, 5, 4, 6, 7, 8, 9, 1],
+                current_cup_index: 2
+            },
+            game
+        );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![7, 2, 5, 8, 9, 1, 3, 4, 6], current_cup_index: 3 }, game);
+        assert_eq!(
+            Game {
+                cups: vec![7, 2, 5, 8, 9, 1, 3, 4, 6],
+                current_cup_index: 3
+            },
+            game
+        );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![3, 2, 5, 8, 4, 6, 7, 9, 1], current_cup_index: 4 }, game);
+        assert_eq!(
+            Game {
+                cups: vec![3, 2, 5, 8, 4, 6, 7, 9, 1],
+                current_cup_index: 4
+            },
+            game
+        );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![9, 2, 5, 8, 4, 1, 3, 6, 7], current_cup_index: 5 }, game);
+        assert_eq!(
+            Game {
+                cups: vec![9, 2, 5, 8, 4, 1, 3, 6, 7],
+                current_cup_index: 5
+            },
+            game
+        );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![7, 2, 5, 8, 4, 1, 9, 3, 6], current_cup_index: 6 }, game);
+        assert_eq!(
+            Game {
+                cups: vec![7, 2, 5, 8, 4, 1, 9, 3, 6],
+                current_cup_index: 6
+            },
+            game
+        );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![8, 3, 6, 7, 4, 1, 9, 2, 5], current_cup_index: 7 }, game);
+        assert_eq!(
+            Game {
+                cups: vec![8, 3, 6, 7, 4, 1, 9, 2, 5],
+                current_cup_index: 7
+            },
+            game
+        );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![7, 4, 1, 5, 8, 3, 9, 2, 6], current_cup_index: 8 }, game);
+        assert_eq!(
+            Game {
+                cups: vec![7, 4, 1, 5, 8, 3, 9, 2, 6],
+                current_cup_index: 8
+            },
+            game
+        );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![5, 7, 4, 1, 8, 3, 9, 2, 6], current_cup_index: 0 }, game);
+        assert_eq!(
+            Game {
+                cups: vec![5, 7, 4, 1, 8, 3, 9, 2, 6],
+                current_cup_index: 0
+            },
+            game
+        );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![5, 8, 3, 7, 4, 1, 9, 2, 6], current_cup_index: 1 }, game);
+        assert_eq!(
+            Game {
+                cups: vec![5, 8, 3, 7, 4, 1, 9, 2, 6],
+                current_cup_index: 1
+            },
+            game
+        );
     }
 
     #[test]

@@ -15,16 +15,15 @@ use std::fs;
 
 const INPUT_FILENAME: &str = "2020_day20_input.txt";
 const TILE_SIZE: usize = 10;
-const TILE_INPUT_KEYWORD: &str = "Tile ";  // The string immediately preceding the tile id
+const TILE_INPUT_KEYWORD: &str = "Tile "; // The string immediately preceding the tile id
 
-
-type Direction = usize;  // Direction is used for tiles
+type Direction = usize; // Direction is used for tiles
 const TOP: Direction = 0;
 const RIGHT: Direction = 1;
 const BOTTOM: Direction = 2;
 const LEFT: Direction = 3;
 
-type CompassDir = usize;  // CompassDir is used for grids
+type CompassDir = usize; // CompassDir is used for grids
 const NORTH: CompassDir = 0;
 const EAST: CompassDir = 1;
 const SOUTH: CompassDir = 2;
@@ -33,7 +32,7 @@ const WEST: CompassDir = 3;
 
 type Id = u16;
 type Rotation = usize;
-type Flipped = bool;  // Indicates the tile is flipped *horizontally*
+type Flipped = bool; // Indicates the tile is flipped *horizontally*
 type Tiles = HashMap<Id, Tile>;
 type TileMatches = HashMap<(Id, Direction), (Id, Direction, bool)>;
 
@@ -48,7 +47,6 @@ struct Position {
     x: usize,
     y: usize,
 }
-
 
 /// A `Tile` stores a single tile, which is a square with a predetermined, constant length. For
 /// efficient searching of matching tiles the borders of the tile are stored in `borders`, and
@@ -76,7 +74,8 @@ impl Tile {
         let id = id_line
             .trim_start_matches(TILE_INPUT_KEYWORD)
             .trim_end_matches(':')
-            .parse().unwrap();
+            .parse()
+            .unwrap();
 
         let mut cells = Vec::new();
         let mut lines_read = 0;
@@ -121,7 +120,12 @@ impl Tile {
             borders[LEFT].chars().rev().collect(),
         ];
 
-        Self { id, cells, borders, borders_flipped }
+        Self {
+            id,
+            cells,
+            borders,
+            borders_flipped,
+        }
     }
 
     /// Attempts to match all four borders of the current object with non-flipped and flipped
@@ -141,9 +145,9 @@ impl Tile {
                 // other, e.g., "####......" matches "......####". If a match like this is found,
                 // it is the simple case where neither of the tiles needs to be flipped.
                 if self.borders[self_border_idx] == other.borders_flipped[other_border_idx] {
-//                     println!("\tMatched tile {} border {} with tile {} border {}",
-//                         self.id, self_border_idx, other.id, other_border_idx
-//                     );
+                    // println!("\tMatched tile {} border {} with tile {} border {}",
+                    //     self.id, self_border_idx, other.id, other_border_idx
+                    // );
 
                     return Some((self_border_idx, other_border_idx, false));
                 }
@@ -151,9 +155,9 @@ impl Tile {
                 // As above, but this time look for *identical* borders. These still match, but
                 // only if one of the tiles is flipped.
                 if self.borders[self_border_idx] == other.borders[other_border_idx] {
-//                     println!("\tMatched tile {} border {} with *flipped* tile {} border {}",
-//                         self.id, self_border_idx, other.id, other_border_idx
-//                     );
+                    // println!("\tMatched tile {} border {} with *flipped* tile {} border {}",
+                    //     self.id, self_border_idx, other.id, other_border_idx
+                    // );
 
                     return Some((self_border_idx, other_border_idx, true));
                 }
@@ -174,7 +178,6 @@ impl Tile {
         result.iter().collect()
     }
 }
-
 
 /// A `GridTile` contains the information required to correctly orient a given tile within a grid
 /// of tiles. The tile is first rotated clockwise 90° `rotation` times, then flipped horizontally
@@ -208,7 +211,11 @@ impl GridTile {
                 if self.flip {
                     r = max_index - r;
                 }
-                return tiles[&self.tile_id].cells[r].chars().rev().collect::<String>().to_string();
+                return tiles[&self.tile_id].cells[r]
+                    .chars()
+                    .rev()
+                    .collect::<String>()
+                    .to_string();
             }
             1 => {
                 let mut col = row;
@@ -216,8 +223,12 @@ impl GridTile {
                 if self.flip {
                     col = max_index - col;
                 }
-                return tiles[&self.tile_id].column_to_string(col).chars().rev()
-                    .collect::<String>().to_string();
+                return tiles[&self.tile_id]
+                    .column_to_string(col)
+                    .chars()
+                    .rev()
+                    .collect::<String>()
+                    .to_string();
             }
             3 => {
                 let mut col = max_index - row;
@@ -233,7 +244,6 @@ impl GridTile {
         }
     }
 }
-
 
 /// A `Grid` contains a 2D layout of `GridTile`s, such that the adjacent borders of all `GridTile`s
 /// match. The `Grid` is created empty and provides methods to determine the correct tile for each
@@ -261,24 +271,39 @@ impl Grid {
         let corner_left_connects = tile_matches.get(&(corner_tile_id, LEFT)) != None;
 
         let mut rotation = usize::MAX;
-        if corner_right_connects && corner_bottom_connects { rotation = 0; };
-        if corner_top_connects && corner_right_connects { rotation = 1; };
-        if corner_left_connects && corner_top_connects { rotation = 2; };
-        if corner_bottom_connects && corner_left_connects { rotation = 3; };
+        if corner_right_connects && corner_bottom_connects {
+            rotation = 0;
+        };
+        if corner_top_connects && corner_right_connects {
+            rotation = 1;
+        };
+        if corner_left_connects && corner_top_connects {
+            rotation = 2;
+        };
+        if corner_bottom_connects && corner_left_connects {
+            rotation = 3;
+        };
 
-        assert!(rotation < usize::MAX, "Grid::new() was passed a tile that is not a corner tile");
+        assert!(
+            rotation < usize::MAX,
+            "Grid::new() was passed a tile that is not a corner tile"
+        );
 
         let mut tile_grid = HashMap::new();
         tile_grid.insert(
             Position { x: 0, y: 0 },
-            GridTile { tile_id: corner_tile_id, rotation, flip: false });
+            GridTile {
+                tile_id: corner_tile_id,
+                rotation,
+                flip: false,
+            },
+        );
 
-//         print!("New Grid created with top-left tile set to corner tile passed. ");
-//         println!("Contents of new Grid:\n{:?}", &tile_grid);
+        // print!("New Grid created with top-left tile set to corner tile passed. ");
+        // println!("Contents of new Grid:\n{:?}", &tile_grid);
 
         Self { tile_grid }
     }
-
 
     /// Returns which border of the tile at `Position` is at `CompassDir` in this `Grid`. If the
     /// input is (0,0) and EAST, for example, the output could be LEFT because the tile has been
@@ -294,12 +319,11 @@ impl Grid {
         let mut result = (dir as usize + 4 - grid_tile.rotation as usize) % 4;
 
         if grid_tile.flip && (dir == NORTH || dir == SOUTH) {
-            result = (result+ 2) % 4;
+            result = (result + 2) % 4;
         }
 
         result as Direction
     }
-
 
     /// Determines the `Id` of the tile that should be placed in a position determined by the `x`
     /// and `y` coordinates passed, and adds it. The determination is performed based on grid tiles
@@ -310,16 +334,15 @@ impl Grid {
     /// Panics if:
     ///     - there is already a tile at the `x` and `y` coordinates passed.
     ///     - the algorithm fails to find a tile to place at the `x` and `y` coordinates
-    ///          passed, or if the tile found does not fit with all tiles in existing grid
-    ///          positions.
+    ///       passed, or if the tile found does not fit with all tiles in existing grid
+    ///       positions.
     ///     - the `x` and `y` coordinates are 0, 0.
-    fn add_tile_to_grid(
-        &mut self,
-        tile_matches: &TileMatches,
-        pos: &Position,
-    ) {
-        assert!(self.tile_grid.get(&Position { x: pos.x, y: pos.y } ) == None,
-            "Cannot add tile to grid because position ({}, {}) is occupied", pos.x, pos.y
+    fn add_tile_to_grid(&mut self, tile_matches: &TileMatches, pos: &Position) {
+        assert!(
+            self.tile_grid.get(&Position { x: pos.x, y: pos.y }) == None,
+            "Cannot add tile to grid because position ({}, {}) is occupied",
+            pos.x,
+            pos.y
         );
 
         let mut grid_tile_based_on_tile_west = None;
@@ -328,29 +351,35 @@ impl Grid {
         if pos.x > 0 {
             grid_tile_based_on_tile_west = self.determine_adjacent_tile(
                 tile_matches,
-                &Position { x: pos.x - 1, y: pos.y },
-                EAST
+                &Position {
+                    x: pos.x - 1,
+                    y: pos.y,
+                },
+                EAST,
             );
         }
 
         if pos.y > 0 {
             grid_tile_based_on_tile_north = self.determine_adjacent_tile(
                 tile_matches,
-                &Position { x: pos.x, y: pos.y - 1 },
+                &Position {
+                    x: pos.x,
+                    y: pos.y - 1,
+                },
                 SOUTH,
             );
         }
-
 
         if let Some(tile_west) = grid_tile_based_on_tile_west {
             if let Some(tile_north) = grid_tile_based_on_tile_north {
                 if tile_west == tile_north {
                     self.tile_grid.insert(*pos, tile_west);
                 } else {
-                    panic!("Cannot determine tile at position ({}, {}) because the tile \
+                    panic!(
+                        "Cannot determine tile at position ({}, {}) because the tile \
                             to the left joins to:\n{:#?}\n\
                             but the tile above instead joins to \n{:#?}",
-                            pos.x, pos.y, tile_west, tile_north
+                        pos.x, pos.y, tile_west, tile_north
                     );
                 }
             } else {
@@ -360,18 +389,17 @@ impl Grid {
             if let Some(tile_north) = grid_tile_based_on_tile_north {
                 self.tile_grid.insert(*pos, tile_north);
             } else {
-                panic!("Cannot determine tile at position ({}, {}) from adjacent tiles",
+                panic!(
+                    "Cannot determine tile at position ({}, {}) from adjacent tiles",
                     pos.x, pos.y
                 );
             }
         }
 
-//         println!("Contents of Grid with addition of tile at ({}, {}):\n{:?}", pos.x, pos.y,
-//             &self.tile_grid
-//         );
-
+        // println!("Contents of Grid with addition of tile at ({}, {}):\n{:?}", pos.x, pos.y,
+        //     &self.tile_grid
+        // );
     }
-
 
     /// Based on the tile at the given `Position` (`pos`), determine which tile is in the
     /// adjacent tile in the given `compass` direction. `compass` can be one of NORTH, EAST, SOUTH
@@ -382,12 +410,11 @@ impl Grid {
         tile_matches: &TileMatches,
         pos: &Position,
         compass_dir: CompassDir,
-    ) -> Option<GridTile>
-    {
+    ) -> Option<GridTile> {
         if let Some(grid_tile) = self.tile_grid.get(pos) {
-//             println!("determine_adjacent_tile called with pos = ({},{}) and compass_dir = {}",
-//                 pos.x, pos.y, compass_dir
-//             );
+            // println!("determine_adjacent_tile called with pos = ({},{}) and compass_dir = {}",
+            //     pos.x, pos.y, compass_dir
+            // );
 
             // Determine which border of the tile located at `Position` `pos` is in `compass_dir`.
             let border_in_direction = self.get_border_for_pos(pos, compass_dir);
@@ -436,7 +463,6 @@ impl Grid {
         }
     }
 
-
     /// Returns a `Vec` of `Strings` containing the contents of the `Grid` in string form, where
     /// each tile is correctly rotated and flipped. `with_borders` determines whether the output
     /// includes the borders of each tile (plus a space between them to improve readability), or
@@ -451,7 +477,10 @@ impl Grid {
                 for tile_y in 0..TILE_SIZE {
                     let mut row_string = "".to_string();
                     for grid_x in 0..grid_size {
-                        if let Some(t) = self.tile_grid.get(&Position { x: grid_x, y: grid_y }) {
+                        if let Some(t) = self.tile_grid.get(&Position {
+                            x: grid_x,
+                            y: grid_y,
+                        }) {
                             row_string += &(t.row_to_string(tiles, tile_y).to_owned() + " ");
                         } else {
                             row_string += &blank_tile_string;
@@ -462,14 +491,17 @@ impl Grid {
                 result.push("".to_string());
             }
         } else {
-            let blank_tile_string = "____________________"[..TILE_SIZE-2].to_string();
+            let blank_tile_string = "____________________"[..TILE_SIZE - 2].to_string();
 
             for grid_y in 0..grid_size {
-                for tile_y in 1..TILE_SIZE-1 {
+                for tile_y in 1..TILE_SIZE - 1 {
                     let mut row_string = "".to_string();
                     for grid_x in 0..grid_size {
-                        if let Some(t) = self.tile_grid.get(&Position { x: grid_x, y: grid_y }) {
-                            row_string += &(t.row_to_string(tiles, tile_y)[1..TILE_SIZE-1]);
+                        if let Some(t) = self.tile_grid.get(&Position {
+                            x: grid_x,
+                            y: grid_y,
+                        }) {
+                            row_string += &(t.row_to_string(tiles, tile_y)[1..TILE_SIZE - 1]);
                         } else {
                             row_string += &blank_tile_string;
                         }
@@ -482,7 +514,6 @@ impl Grid {
         result
     }
 }
-
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 struct Image {
@@ -517,18 +548,18 @@ impl Image {
         let image_width = self.image[0].len();
         let image_height = self.image.len();
 
-        for i_y in 0..=image_height-pattern_height {
-            'outer: for i_x in 0..=image_width-pattern_width {
+        for i_y in 0..=image_height - pattern_height {
+            'outer: for i_x in 0..=image_width - pattern_width {
                 for p_y in 0..pattern_height {
                     for p_x in 0..pattern_width {
-                        if pattern.pattern[p_y][p_x] == '#' &&
-                            self.image[i_y + p_y][i_x + p_x] != '#'
+                        if pattern.pattern[p_y][p_x] == '#'
+                            && self.image[i_y + p_y][i_x + p_x] != '#'
                         {
                             continue 'outer;
                         }
                     }
                 }
-                result.push(Position { x: i_x, y: i_y } );
+                result.push(Position { x: i_x, y: i_y });
             }
         }
 
@@ -538,10 +569,14 @@ impl Image {
     /// Return the number of hash characters in this `Pattern` that have not been exclude by
     /// `mask`. A hash is excluded if its position within `mask` is true.
     fn count_hashes_not_in_mask(&self, mask: &ImageMask) -> u64 {
-        assert_eq!(self.image.len(), mask.mask.len(),
+        assert_eq!(
+            self.image.len(),
+            mask.mask.len(),
             "Pattern and ImageMask heights must match"
         );
-        assert_eq!(self.image[0].len(), mask.mask[0].len(),
+        assert_eq!(
+            self.image[0].len(),
+            mask.mask[0].len(),
             "Pattern and ImageMask widths must match"
         );
 
@@ -557,7 +592,6 @@ impl Image {
         hash_count
     }
 }
-
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 struct ImageMask {
@@ -607,7 +641,6 @@ impl ImageMask {
     }
 }
 
-
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 struct Pattern {
     pattern: Vec<Vec<char>>,
@@ -652,23 +685,21 @@ impl Pattern {
     }
 }
 
-
 fn parse_input(input: &str) -> HashMap<Id, Tile> {
-//     println!("parse_input called with data \n{}", &input);
+    // println!("parse_input called with data \n{}", &input);
     let lines: Vec<&str> = input.lines().collect();
 
     let mut tiles = HashMap::new();
     let mut tile_start = 0;
     for i in 0..lines.len() {
-
         if lines[i].starts_with(TILE_INPUT_KEYWORD) {
             tile_start = i;
-//             println!("tile_start = {}", tile_start);
+            // println!("tile_start = {}", tile_start);
         }
 
         if lines[i] == "" {
             let tile_block = lines[tile_start..i].join("\n");
-//             println!("parse_input about to call from_string with data\n{:#?}", &tile_block);
+            // println!("parse_input about to call from_string with data\n{:#?}", &tile_block);
 
             let tile = Tile::from_string(&tile_block);
             tiles.insert(tile.id, tile);
@@ -677,16 +708,15 @@ fn parse_input(input: &str) -> HashMap<Id, Tile> {
 
     if tile_start + TILE_SIZE + 1 == lines.len() {
         let tile_block = lines[tile_start..lines.len()].join("\n");
-//         println!("parse_input calling from_string with final block of data\n{:#?}", &tile_block);
+        // println!("parse_input calling from_string with final block of data\n{:#?}", &tile_block);
 
         let tile = Tile::from_string(&tile_block);
         tiles.insert(tile.id, tile);
     }
 
-//     println!("parse_input returning\n{:#?}", &tiles);
+    // println!("parse_input returning\n{:#?}", &tiles);
     tiles
 }
-
 
 /// Returns a `HashMap` containing tile border matches, with the key being the tile `Id` of one
 /// matching tile, and `HashMap` value of:
@@ -724,47 +754,55 @@ fn find_tile_matches(tiles: &HashMap<Id, Tile>) -> TileMatches {
     matches
 }
 
-
 /// Load tiles from input file, find matching borders and return the product of the ids of the four
 /// corner tiles.
 fn construct_image(input: &str) -> Image {
     let tiles = parse_input(input);
     let grid_length_f32 = f32::sqrt(tiles.len() as f32);
     if f32::fract(grid_length_f32) > f32::EPSILON * 100.0 {
-        panic!("Found {} tiles, which is not a square number so cannot form a square grid",
+        panic!(
+            "Found {} tiles, which is not a square number so cannot form a square grid",
             tiles.len()
         );
     }
     let grid_length = grid_length_f32 as usize;
 
     let tile_matches = find_tile_matches(&tiles);
-//     println!("List of all matching borders\n{:?}", &tile_matches);
+    // println!("List of all matching borders\n{:?}", &tile_matches);
 
-    let tile_match_counts = tile_matches.keys().fold(HashMap::<Id, usize>::new(),
-        |mut hm, (id, _)| {
-            *hm.entry(*id).or_default() += 1;
-            hm
-        }
-    );
+    let tile_match_counts =
+        tile_matches
+            .keys()
+            .fold(HashMap::<Id, usize>::new(), |mut hm, (id, _)| {
+                *hm.entry(*id).or_default() += 1;
+                hm
+            });
 
-    let corners: Vec<Id> = tile_match_counts.iter().filter(|(_, &tot)| tot == 2).map(|(&id, _)| id)
+    let corners: Vec<Id> = tile_match_counts
+        .iter()
+        .filter(|(_, &tot)| tot == 2)
+        .map(|(&id, _)| id)
         .collect();
     if corners.len() != 4 {
         panic!("Expecting four corners, but found {}", corners.len());
     }
-//     println!("Ids of corner tiles are: {:?}", corners);
+    // println!("Ids of corner tiles are: {:?}", corners);
 
-
-    let edges: Vec<Id> = tile_match_counts.iter().filter(|(_, &tot)| tot == 3).map(|(&id, _)| id)
+    let edges: Vec<Id> = tile_match_counts
+        .iter()
+        .filter(|(_, &tot)| tot == 3)
+        .map(|(&id, _)| id)
         .collect();
     if edges.len() != (grid_length - 2) * 4 {
-        panic!("Found {} edge tiles (excluding corners), rather than the {} expected",
-            edges.len(), (grid_length - 2) * 4
+        panic!(
+            "Found {} edge tiles (excluding corners), rather than the {} expected",
+            edges.len(),
+            (grid_length - 2) * 4
         );
     }
 
     let lowest_corner_tile_id = corners.iter().min().unwrap();
-//     println!("Lowest tile id of all corners is {:#?}", lowest_corner_tile_id);
+    // println!("Lowest tile id of all corners is {:#?}", lowest_corner_tile_id);
 
     let mut grid = Grid::new(&tile_matches, *lowest_corner_tile_id);
 
@@ -774,7 +812,9 @@ fn construct_image(input: &str) -> Image {
 
     for y in 0..grid_length {
         for x in 0..grid_length {
-            if (x == 0) && (y == 0) { continue; }
+            if (x == 0) && (y == 0) {
+                continue;
+            }
 
             grid.add_tile_to_grid(&tile_matches, &Position { x, y });
         }
@@ -782,7 +822,6 @@ fn construct_image(input: &str) -> Image {
 
     Image::new(grid.to_strings(&tiles, grid_length, false))
 }
-
 
 fn find_monsters(sea: &Image, pattern: &[&str]) -> ImageMask {
     let mut mask = ImageMask::new(sea.image[0].len());
@@ -801,32 +840,29 @@ fn find_monsters(sea: &Image, pattern: &[&str]) -> ImageMask {
     mask
 }
 
-
 /// Perform the steps required by the challenge.
 fn do_challenge(input: &str, pattern: &[&str]) -> u64 {
     let sea = construct_image(input);
 
-//     for row in sea.image.iter() {
-//         println!("{:?}", &row.iter().collect::<String>());
-//     }
+    // for row in sea.image.iter() {
+    // println!("{:?}", &row.iter().collect::<String>());
+    // }
 
     let monster_mask = find_monsters(&sea, pattern);
 
     sea.count_hashes_not_in_mask(&monster_mask)
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let answer = do_challenge(&input_file, &SEA_MONSTER);
-    println!("The number of hash signs in the combined set of tiles that are *not* part of a sea \
-        monster is {}", answer
+    println!(
+        "The number of hash signs in the combined set of tiles that are *not* part of a sea \
+        monster is {}",
+        answer
     );
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -942,7 +978,6 @@ Tile 3079:
 ..#.......
 ..#.###...";
 
-
     const TEST_SINGLE_TILE: &str = "\
 Tile 2311:
 ..##.#..#.
@@ -955,7 +990,6 @@ Tile 2311:
 ..#....#..
 ###...#.#.
 ..###..###";
-
 
     const TEST_TWO_TILES: &str = "\
 Tile 5555:
@@ -981,7 +1015,6 @@ Tile 7777:
 #.........
 #.........
 ......##..";
-
 
     #[test]
     fn tile_creation() {
@@ -1038,14 +1071,46 @@ Tile 7777:
     #[test]
     fn grid_tile_row_to_string() {
         let tile = parse_input(TEST_SINGLE_TILE);
-        let gt_rot0 = GridTile { tile_id: 2311, rotation: 0, flip: false };
-        let gt_rot1 = GridTile { tile_id: 2311, rotation: 1, flip: false };
-        let gt_rot2 = GridTile { tile_id: 2311, rotation: 2, flip: false };
-        let gt_rot3 = GridTile { tile_id: 2311, rotation: 3, flip: false };
-        let gt_rot0_f = GridTile { tile_id: 2311, rotation: 0, flip: true };
-        let gt_rot1_f = GridTile { tile_id: 2311, rotation: 1, flip: true };
-        let gt_rot2_f = GridTile { tile_id: 2311, rotation: 2, flip: true };
-        let gt_rot3_f = GridTile { tile_id: 2311, rotation: 3, flip: true };
+        let gt_rot0 = GridTile {
+            tile_id: 2311,
+            rotation: 0,
+            flip: false,
+        };
+        let gt_rot1 = GridTile {
+            tile_id: 2311,
+            rotation: 1,
+            flip: false,
+        };
+        let gt_rot2 = GridTile {
+            tile_id: 2311,
+            rotation: 2,
+            flip: false,
+        };
+        let gt_rot3 = GridTile {
+            tile_id: 2311,
+            rotation: 3,
+            flip: false,
+        };
+        let gt_rot0_f = GridTile {
+            tile_id: 2311,
+            rotation: 0,
+            flip: true,
+        };
+        let gt_rot1_f = GridTile {
+            tile_id: 2311,
+            rotation: 1,
+            flip: true,
+        };
+        let gt_rot2_f = GridTile {
+            tile_id: 2311,
+            rotation: 2,
+            flip: true,
+        };
+        let gt_rot3_f = GridTile {
+            tile_id: 2311,
+            rotation: 3,
+            flip: true,
+        };
 
         assert_eq!(gt_rot0.row_to_string(&tile, 3), "####.#...#");
         assert_eq!(gt_rot1.row_to_string(&tile, 2), "###...#..#");
@@ -1062,51 +1127,109 @@ Tile 7777:
     fn get_border_for_pos() {
         let pos = Position { x: 0, y: 0 };
         let grid_tile_grid = HashMap::new();
-        let mut grid = Grid { tile_grid: grid_tile_grid };
+        let mut grid = Grid {
+            tile_grid: grid_tile_grid,
+        };
 
-        grid.tile_grid.insert(pos, GridTile { tile_id: 2311, rotation: 0, flip: false });
+        grid.tile_grid.insert(
+            pos,
+            GridTile {
+                tile_id: 2311,
+                rotation: 0,
+                flip: false,
+            },
+        );
         assert_eq!(grid.get_border_for_pos(&pos, NORTH), TOP);
         assert_eq!(grid.get_border_for_pos(&pos, EAST), RIGHT);
         assert_eq!(grid.get_border_for_pos(&pos, SOUTH), BOTTOM);
         assert_eq!(grid.get_border_for_pos(&pos, WEST), LEFT);
 
-        grid.tile_grid.insert(pos, GridTile { tile_id: 2311, rotation: 1, flip: false });
+        grid.tile_grid.insert(
+            pos,
+            GridTile {
+                tile_id: 2311,
+                rotation: 1,
+                flip: false,
+            },
+        );
         assert_eq!(grid.get_border_for_pos(&pos, NORTH), LEFT);
         assert_eq!(grid.get_border_for_pos(&pos, EAST), TOP);
         assert_eq!(grid.get_border_for_pos(&pos, SOUTH), RIGHT);
         assert_eq!(grid.get_border_for_pos(&pos, WEST), BOTTOM);
 
-        grid.tile_grid.insert(pos, GridTile { tile_id: 2311, rotation: 2, flip: false });
+        grid.tile_grid.insert(
+            pos,
+            GridTile {
+                tile_id: 2311,
+                rotation: 2,
+                flip: false,
+            },
+        );
         assert_eq!(grid.get_border_for_pos(&pos, NORTH), BOTTOM);
         assert_eq!(grid.get_border_for_pos(&pos, EAST), LEFT);
         assert_eq!(grid.get_border_for_pos(&pos, SOUTH), TOP);
         assert_eq!(grid.get_border_for_pos(&pos, WEST), RIGHT);
 
-        grid.tile_grid.insert(pos, GridTile { tile_id: 2311, rotation: 3, flip: false });
+        grid.tile_grid.insert(
+            pos,
+            GridTile {
+                tile_id: 2311,
+                rotation: 3,
+                flip: false,
+            },
+        );
         assert_eq!(grid.get_border_for_pos(&pos, NORTH), RIGHT);
         assert_eq!(grid.get_border_for_pos(&pos, EAST), BOTTOM);
         assert_eq!(grid.get_border_for_pos(&pos, SOUTH), LEFT);
         assert_eq!(grid.get_border_for_pos(&pos, WEST), TOP);
 
-        grid.tile_grid.insert(pos, GridTile { tile_id: 2311, rotation: 0, flip: true });
+        grid.tile_grid.insert(
+            pos,
+            GridTile {
+                tile_id: 2311,
+                rotation: 0,
+                flip: true,
+            },
+        );
         assert_eq!(grid.get_border_for_pos(&pos, NORTH), BOTTOM);
         assert_eq!(grid.get_border_for_pos(&pos, EAST), RIGHT);
         assert_eq!(grid.get_border_for_pos(&pos, SOUTH), TOP);
         assert_eq!(grid.get_border_for_pos(&pos, WEST), LEFT);
 
-        grid.tile_grid.insert(pos, GridTile { tile_id: 2311, rotation: 1, flip: true });
+        grid.tile_grid.insert(
+            pos,
+            GridTile {
+                tile_id: 2311,
+                rotation: 1,
+                flip: true,
+            },
+        );
         assert_eq!(grid.get_border_for_pos(&pos, NORTH), RIGHT);
         assert_eq!(grid.get_border_for_pos(&pos, EAST), TOP);
         assert_eq!(grid.get_border_for_pos(&pos, SOUTH), LEFT);
         assert_eq!(grid.get_border_for_pos(&pos, WEST), BOTTOM);
 
-        grid.tile_grid.insert(pos, GridTile { tile_id: 2311, rotation: 2, flip: true });
+        grid.tile_grid.insert(
+            pos,
+            GridTile {
+                tile_id: 2311,
+                rotation: 2,
+                flip: true,
+            },
+        );
         assert_eq!(grid.get_border_for_pos(&pos, NORTH), TOP);
         assert_eq!(grid.get_border_for_pos(&pos, EAST), LEFT);
         assert_eq!(grid.get_border_for_pos(&pos, SOUTH), BOTTOM);
         assert_eq!(grid.get_border_for_pos(&pos, WEST), RIGHT);
 
-        grid.tile_grid.insert(pos, GridTile { tile_id: 2311, rotation: 3, flip: true });
+        grid.tile_grid.insert(
+            pos,
+            GridTile {
+                tile_id: 2311,
+                rotation: 3,
+                flip: true,
+            },
+        );
         assert_eq!(grid.get_border_for_pos(&pos, NORTH), LEFT);
         assert_eq!(grid.get_border_for_pos(&pos, EAST), BOTTOM);
         assert_eq!(grid.get_border_for_pos(&pos, SOUTH), RIGHT);
@@ -1125,41 +1248,95 @@ Tile 7777:
         let mut grid_tile_grid = HashMap::new();
         grid_tile_grid.insert(
             Position { x: 0, y: 0 },
-            GridTile { tile_id: 1951, rotation: 0, flip: true }
+            GridTile {
+                tile_id: 1951,
+                rotation: 0,
+                flip: true,
+            },
         );
-        let mut grid = Grid { tile_grid: grid_tile_grid };
+        let mut grid = Grid {
+            tile_grid: grid_tile_grid,
+        };
 
         grid.add_tile_to_grid(&matches, &Position { x: 1, y: 0 });
-        assert_eq!(grid.tile_grid[&Position { x: 1, y: 0 }],
-            GridTile { tile_id: 2311, rotation: 0, flip: true });
+        assert_eq!(
+            grid.tile_grid[&Position { x: 1, y: 0 }],
+            GridTile {
+                tile_id: 2311,
+                rotation: 0,
+                flip: true
+            }
+        );
 
         grid.add_tile_to_grid(&matches, &Position { x: 2, y: 0 });
-        assert_eq!(grid.tile_grid[&Position { x: 2, y: 0 }],
-            GridTile { tile_id: 3079, rotation: 0, flip: false });
+        assert_eq!(
+            grid.tile_grid[&Position { x: 2, y: 0 }],
+            GridTile {
+                tile_id: 3079,
+                rotation: 0,
+                flip: false
+            }
+        );
 
         grid.add_tile_to_grid(&matches, &Position { x: 0, y: 1 });
-        assert_eq!(grid.tile_grid[&Position { x: 0, y: 1 }],
-            GridTile { tile_id: 2729, rotation: 0, flip: true });
+        assert_eq!(
+            grid.tile_grid[&Position { x: 0, y: 1 }],
+            GridTile {
+                tile_id: 2729,
+                rotation: 0,
+                flip: true
+            }
+        );
 
         grid.add_tile_to_grid(&matches, &Position { x: 1, y: 1 });
-        assert_eq!(grid.tile_grid[&Position { x: 1, y: 1 }],
-            GridTile { tile_id: 1427, rotation: 0, flip: true });
+        assert_eq!(
+            grid.tile_grid[&Position { x: 1, y: 1 }],
+            GridTile {
+                tile_id: 1427,
+                rotation: 0,
+                flip: true
+            }
+        );
 
         grid.add_tile_to_grid(&matches, &Position { x: 2, y: 1 });
-        assert_eq!(grid.tile_grid[&Position { x: 2, y: 1 }],
-            GridTile { tile_id: 2473, rotation: 1, flip: true });
+        assert_eq!(
+            grid.tile_grid[&Position { x: 2, y: 1 }],
+            GridTile {
+                tile_id: 2473,
+                rotation: 1,
+                flip: true
+            }
+        );
 
         grid.add_tile_to_grid(&matches, &Position { x: 0, y: 2 });
-        assert_eq!(grid.tile_grid[&Position { x: 0, y: 2 }],
-            GridTile { tile_id: 2971, rotation: 0, flip: true });
+        assert_eq!(
+            grid.tile_grid[&Position { x: 0, y: 2 }],
+            GridTile {
+                tile_id: 2971,
+                rotation: 0,
+                flip: true
+            }
+        );
 
         grid.add_tile_to_grid(&matches, &Position { x: 1, y: 2 });
-        assert_eq!(grid.tile_grid[&Position { x: 1, y: 2 }],
-            GridTile { tile_id: 1489, rotation: 0, flip: true });
+        assert_eq!(
+            grid.tile_grid[&Position { x: 1, y: 2 }],
+            GridTile {
+                tile_id: 1489,
+                rotation: 0,
+                flip: true
+            }
+        );
 
         grid.add_tile_to_grid(&matches, &Position { x: 2, y: 2 });
-        assert_eq!(grid.tile_grid[&Position { x: 2, y: 2 }],
-            GridTile { tile_id: 1171, rotation: 2, flip: true });
+        assert_eq!(
+            grid.tile_grid[&Position { x: 2, y: 2 }],
+            GridTile {
+                tile_id: 1171,
+                rotation: 2,
+                flip: true
+            }
+        );
     }
 
     #[test]
@@ -1170,33 +1347,37 @@ Tile 7777:
             "...#.##".to_string(),
         ]);
 
+        #[rustfmt::skip]
         let results1 = my_image.find_pattern(&Pattern::new(&[
             " # ",
             "###",
-            " # ",
+            " # "
         ]));
-        assert_eq!(results1, vec![Position { x: 2, y: 0 }] );
+        assert_eq!(results1, vec![Position { x: 2, y: 0 }]);
 
-        let results2 = my_image.find_pattern(&Pattern::new(&[
-            "#  #",
-        ]));
-        assert_eq!(results2, vec![
-            Position { x: 0, y: 0 },
-            Position { x: 3, y: 0 },
-            Position { x: 1, y: 1 },
-            Position { x: 3, y: 2 }] );
+        let results2 = my_image.find_pattern(&Pattern::new(&["#  #"]));
+        assert_eq!(
+            results2,
+            vec![
+                Position { x: 0, y: 0 },
+                Position { x: 3, y: 0 },
+                Position { x: 1, y: 1 },
+                Position { x: 3, y: 2 }
+            ]
+        );
     }
 
     #[test]
     fn image_mask() {
         let mut image_mask = ImageMask::new(5);
 
+        #[rustfmt::skip]
         let pattern = Pattern::new(&[
             "## ",
             "#  ",
-            "###",
+            "###"
         ]);
-        image_mask.set_pattern(&pattern, &Position { x: 1, y: 2 } );
+        image_mask.set_pattern(&pattern, &Position { x: 1, y: 2 });
 
         assert_eq!(image_mask.mask[0], vec![false, false, false, false, false]);
         assert_eq!(image_mask.mask[1], vec![false, false, false, false, false]);
@@ -1205,12 +1386,14 @@ Tile 7777:
         assert_eq!(image_mask.mask[4], vec![false, true, true, true, false]);
     }
 
+
     #[test]
     fn pattern_flip_horizontally() {
+        #[rustfmt::skip]
         let pat = Pattern::new(&[
             " # ",
             "# #",
-            "###",
+            "###"
         ]);
 
         let flipped = pat.flip_horizontally();
@@ -1221,15 +1404,20 @@ Tile 7777:
 
     #[test]
     fn pattern_rotate() {
+        #[rustfmt::skip]
         let pat = Pattern::new(&[
             "# # ",
             " ###",
-            "  ##",
+            "  ##"
         ]);
 
         let rot = pat.rotate_clockwise();
         assert_eq!(rot.pattern.len(), 4, "Incorrect number of rows");
-        assert_eq!(rot.pattern[0].len(), 3, "Row 0 contains an incorrect number of characters");
+        assert_eq!(
+            rot.pattern[0].len(),
+            3,
+            "Row 0 contains an incorrect number of characters"
+        );
         assert_eq!(rot.pattern[0], vec![' ', ' ', '#']);
         assert_eq!(rot.pattern[1], vec![' ', '#', ' ']);
         assert_eq!(rot.pattern[2], vec!['#', '#', '#']);

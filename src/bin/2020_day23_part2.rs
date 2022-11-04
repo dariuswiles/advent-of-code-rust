@@ -19,7 +19,6 @@ const GAME_ROUNDS: usize = 10_000_000;
 
 type Cup = u32;
 
-
 /// `Game` holds the state of a game. The `cups` `Vec` lists the cups in a clockwise order. The
 /// challenge refers to the cups based on their position, where the first cup is cup 1, whereas
 /// this is stored in position 0 in the `Vec`, following standard Rust convention. This leads to
@@ -39,11 +38,15 @@ impl Game {
 
         let mut cups: Vec<Cup> = l.chars().map(|c| c.to_digit(10).unwrap() as Cup).collect();
 
-        for c in cups.iter().max().unwrap()+1..=cups_len as Cup{
+        for c in cups.iter().max().unwrap() + 1..=cups_len as Cup {
             cups.push(c as Cup);
         }
 
-        Game { cups, cups_len,current_cup_index: 0 }
+        Game {
+            cups,
+            cups_len,
+            current_cup_index: 0,
+        }
     }
 
     /// Perform a single move to reorganize the cups based on the rules described in the challenge.
@@ -63,13 +66,17 @@ impl Game {
         let insert_after_position = self.cups.iter().position(|&x| x == destination_id).unwrap();
         insert_three(&mut self.cups, insert_after_position, &mut picked_up_cups);
 
-        self.current_cup_index = (
-            self.cups.iter().position(|&x| x == value_at_current_cup_index).unwrap() + 1
-        ) % self.cups_len;
+        self.current_cup_index = (self
+            .cups
+            .iter()
+            .position(|&x| x == value_at_current_cup_index)
+            .unwrap()
+            + 1)
+            % self.cups_len;
     }
 
     /// Performs `moves` moves of the game.
-    fn play_game(&mut self, moves: usize){
+    fn play_game(&mut self, moves: usize) {
         for _ in 0..moves {
             self.perform_one_move();
         }
@@ -80,11 +87,10 @@ impl Game {
     fn get_challenge_answer(&self) -> u64 {
         let start_pos = self.cups.iter().position(|&x| x == 1).unwrap();
 
-        self.cups[(start_pos + 1) % self.cups_len] as u64 *
-        self.cups[(start_pos + 2) % self.cups_len] as u64
+        self.cups[(start_pos + 1) % self.cups_len] as u64
+            * self.cups[(start_pos + 2) % self.cups_len] as u64
     }
 }
-
 
 /// Remove and return three elements from `v`, starting at `position`. If `position` is such that
 /// the end of `v` is reached, the elements at the beginning of `v` are removed instead. For
@@ -99,7 +105,7 @@ fn remove_three<T>(v: &mut Vec<T>, position: usize) -> Vec<T> {
 
     let mut pos = position;
     if position < (v.len() - 3) {
-        return v.splice(pos..pos+3, iter::empty()).collect::<Vec<T>>();
+        return v.splice(pos..pos + 3, iter::empty()).collect::<Vec<T>>();
     } else {
         let mut result = Vec::new();
 
@@ -113,7 +119,6 @@ fn remove_three<T>(v: &mut Vec<T>, position: usize) -> Vec<T> {
         return result;
     }
 }
-
 
 /// Inserts the three elements in `elements` into `v`, starting at the index one *after* `position`.
 /// The elements are moved, not copied, so `elements` is emptied during this process.
@@ -132,18 +137,14 @@ fn insert_three<T: Clone>(v: &mut Vec<T>, position: usize, elements: &mut Vec<T>
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-        let mut game = Game::load_game(&input_file, TOTAL_CUPS);
+    let mut game = Game::load_game(&input_file, TOTAL_CUPS);
 
-        game.play_game(GAME_ROUNDS);
-        println!("Challenge answer is {}", game.get_challenge_answer());
+    game.play_game(GAME_ROUNDS);
+    println!("Challenge answer is {}", game.get_challenge_answer());
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -212,16 +213,21 @@ mod tests {
 
     #[test]
     fn get_challenge_answer2() {
-        let game = Game { cups: vec![14, 97, 34, 21, 3, 87, 1, 3], cups_len: 8,
-            current_cup_index: 1
+        let game = Game {
+            cups: vec![14, 97, 34, 21, 3, 87, 1, 3],
+            cups_len: 8,
+            current_cup_index: 1,
         };
         assert_eq!(42, game.get_challenge_answer());
     }
 
     #[test]
     fn get_challenge_answer3() {
-        let game = Game { cups: vec![14, 97, 34, 21, 3, 87, 1], cups_len: 7,
-            current_cup_index: 4 };
+        let game = Game {
+            cups: vec![14, 97, 34, 21, 3, 87, 1],
+            cups_len: 7,
+            current_cup_index: 4,
+        };
         assert_eq!(1358, game.get_challenge_answer());
     }
 
@@ -231,43 +237,93 @@ mod tests {
         let mut game = Game::load_game(&TEST_INPUT, cups_len);
 
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![3, 2, 8, 9, 1, 5, 4, 6, 7], cups_len, current_cup_index: 1 },
+        assert_eq!(
+            Game {
+                cups: vec![3, 2, 8, 9, 1, 5, 4, 6, 7],
+                cups_len,
+                current_cup_index: 1
+            },
             game
         );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![3, 2, 5, 4, 6, 7, 8, 9, 1], cups_len, current_cup_index: 2 },
+        assert_eq!(
+            Game {
+                cups: vec![3, 2, 5, 4, 6, 7, 8, 9, 1],
+                cups_len,
+                current_cup_index: 2
+            },
             game
         );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![3, 4, 6, 7, 2, 5, 8, 9, 1], cups_len, current_cup_index: 6 },
+        assert_eq!(
+            Game {
+                cups: vec![3, 4, 6, 7, 2, 5, 8, 9, 1],
+                cups_len,
+                current_cup_index: 6
+            },
             game
         );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![4, 6, 7, 9, 1, 3, 2, 5, 8], cups_len, current_cup_index: 0 },
+        assert_eq!(
+            Game {
+                cups: vec![4, 6, 7, 9, 1, 3, 2, 5, 8],
+                cups_len,
+                current_cup_index: 0
+            },
             game
         );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![4, 1, 3, 6, 7, 9, 2, 5, 8], cups_len, current_cup_index: 1 },
+        assert_eq!(
+            Game {
+                cups: vec![4, 1, 3, 6, 7, 9, 2, 5, 8],
+                cups_len,
+                current_cup_index: 1
+            },
             game
         );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![4, 1, 9, 3, 6, 7, 2, 5, 8], cups_len, current_cup_index: 2 },
+        assert_eq!(
+            Game {
+                cups: vec![4, 1, 9, 3, 6, 7, 2, 5, 8],
+                cups_len,
+                current_cup_index: 2
+            },
             game
         );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![4, 1, 9, 2, 5, 8, 3, 6, 7], cups_len, current_cup_index: 3 },
+        assert_eq!(
+            Game {
+                cups: vec![4, 1, 9, 2, 5, 8, 3, 6, 7],
+                cups_len,
+                current_cup_index: 3
+            },
             game
         );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![4, 1, 5, 8, 3, 9, 2, 6, 7], cups_len, current_cup_index: 7 },
+        assert_eq!(
+            Game {
+                cups: vec![4, 1, 5, 8, 3, 9, 2, 6, 7],
+                cups_len,
+                current_cup_index: 7
+            },
             game
         );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![5, 7, 4, 1, 8, 3, 9, 2, 6], cups_len, current_cup_index: 0 },
+        assert_eq!(
+            Game {
+                cups: vec![5, 7, 4, 1, 8, 3, 9, 2, 6],
+                cups_len,
+                current_cup_index: 0
+            },
             game
         );
         game.perform_one_move();
-        assert_eq!(Game { cups: vec![5, 8, 3, 7, 4, 1, 9, 2, 6], cups_len, current_cup_index: 1 },
+        assert_eq!(
+            Game {
+                cups: vec![5, 8, 3, 7, 4, 1, 9, 2, 6],
+                cups_len,
+                current_cup_index: 1
+            },
             game
         );
     }
@@ -289,7 +345,12 @@ mod tests {
         let cups_len = 9;
         let mut game = Game::load_game(&TEST_INPUT, cups_len);
         game.play_game(100);
-        assert_eq!(Game { cups: vec![2, 9, 1, 6, 7, 3, 8, 4, 5], cups_len, current_cup_index: 2 },
+        assert_eq!(
+            Game {
+                cups: vec![2, 9, 1, 6, 7, 3, 8, 4, 5],
+                cups_len,
+                current_cup_index: 2
+            },
             game
         );
     }
@@ -299,9 +360,7 @@ mod tests {
         let mut game = Game::load_game(&TEST_INPUT, TOTAL_CUPS);
 
         assert!(game.cups.len() == TOTAL_CUPS);
-//         game.play_game(10_000); // Takes 75s for 1/100 of work required by challenge.
         game.play_game(GAME_ROUNDS);
-
         assert_eq!(149245887792, game.get_challenge_answer());
     }
 }

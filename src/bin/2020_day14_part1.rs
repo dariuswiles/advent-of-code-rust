@@ -27,7 +27,7 @@ impl Bitmask {
         for (i, c) in s.chars().enumerate() {
             match &c {
                 'X' => {
-                   continue;
+                    continue;
                 }
                 '0' => {
                     let new_mask_bit = 1 << (BITMASK_LENGTH - i - 1);
@@ -42,11 +42,14 @@ impl Bitmask {
                 }
             }
         }
-//         println!("Bitmask created from string '{:>64}'", s);
-//         println!("Always clear mask is        '{:64b}'", clear);
-//         println!("Always set mask is          '{:0>64b}'", set);
+        // println!("Bitmask created from string '{:>64}'", s);
+        // println!("Always clear mask is        '{:64b}'", clear);
+        // println!("Always set mask is          '{:0>64b}'", set);
 
-        Self { always_set: set, always_clear: clear, }
+        Self {
+            always_set: set,
+            always_clear: clear,
+        }
     }
 
     fn apply_bitmask(&self, num: u64) -> u64 {
@@ -54,20 +57,21 @@ impl Bitmask {
     }
 }
 
-
 /// Parse the `location` and `value` strings representing a command to save a value to a location
 /// in memory, and return a pair of values representing validation numeric equivalents.
 fn parse_mem_command(location: &str, value: &str) -> (u32, u64) {
-//     println!("Entered update_memory with location='{}' and value='{}'", location, value);
+    // println!("Entered update_memory with location='{}' and value='{}'", location, value);
 
     let loc_str: Vec<&str> = location.strip_suffix(']').unwrap().split("[").collect();
     if loc_str.len() != 2 {
         panic!("Unrecognized format of command '{}'", location);
     }
 
-    (loc_str[1].parse::<u32>().unwrap(), value.parse::<u64>().unwrap())
+    (
+        loc_str[1].parse::<u32>().unwrap(),
+        value.parse::<u64>().unwrap(),
+    )
 }
-
 
 /// Reads each line of the input string and executes the commands found. Returns a `HashMap`
 /// containing the results of executing the commands.
@@ -76,7 +80,9 @@ fn execute_input(input: &str) -> HashMap<u32, u64> {
     let mut memory = HashMap::new();
 
     for line in input.lines() {
-        if line == "" { continue; }
+        if line == "" {
+            continue;
+        }
 
         let token: Vec<&str> = line.split(" = ").collect();
         if token.len() != 2 {
@@ -91,7 +97,7 @@ fn execute_input(input: &str) -> HashMap<u32, u64> {
             let masked_val = mask.apply_bitmask(loc_val.1);
             memory.insert(loc_val.0, masked_val);
 
-//             println!("Set memory location {} to value {}", loc_val.0, masked_val);
+        // println!("Set memory location {} to value {}", loc_val.0, masked_val);
         } else {
             panic!("Unrecognized command '{}'", &token[0]);
         }
@@ -100,12 +106,8 @@ fn execute_input(input: &str) -> HashMap<u32, u64> {
     memory
 }
 
-
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mem = execute_input(&input_file);
 
@@ -113,7 +115,6 @@ fn main() {
 
     println!("The answer to the challenge is {}", answer);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -125,7 +126,6 @@ mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X
 mem[8] = 11
 mem[7] = 101
 mem[8] = 0";
-
 
     #[test]
     fn test_bitmask() {
