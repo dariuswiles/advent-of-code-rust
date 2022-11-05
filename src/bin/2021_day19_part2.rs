@@ -6,7 +6,7 @@
 //! Determines the maximum Manhattan distance between the absolute position of all pairs of
 //! scanners.
 
-use std::collections::{ HashMap, HashSet };
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::str::Lines;
 
@@ -81,9 +81,9 @@ impl Position {
     ///     4. One rotation around the y-axis, then one rotation around the x-axis.
     ///     5. Three rotations around the y-axis, then one rotation around the x-axis.
     ///
-    ///  Calling this function 24 times on the same position with face values between 1 and 6
-    ///  (inclusive), and final rotations between 0 and 3 (inclusive) will yield every orientation
-    ///  that needs to be considered.
+    /// Calling this function 24 times on the same position with face values between 1 and 6
+    /// (inclusive), and final rotations between 0 and 3 (inclusive) will yield every orientation
+    /// that needs to be considered.
     fn orient(&self, face: u8, rotations: u8) -> Self {
         match face {
             0 => {
@@ -117,15 +117,22 @@ impl Position {
 
     /// Returns a new object representing the vector to move from `other` to `self`.
     fn minus(&self, other: &Self) -> Self {
-        Self { x: self.x - other.x, y: self.y - other.y, z: self.z - other.z }
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+        }
     }
 
     /// Returns a new object representing the addition of `self` and `other`.
     fn add(&self, other: &Self) -> Self {
-        Self { x: self.x + other.x, y: self.y + other.y, z: self.z + other.z }
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
     }
 }
-
 
 /// Holds data relating to a scanner. When a scanner is created this is relative only to the
 /// scanner, but once the scanner's absolute position and orientation is determined relative to a
@@ -150,10 +157,10 @@ impl Scanner {
 
         if let Some(line) = input.next() {
             let tokens: Vec<&str> = line.split(' ').collect();
-            if tokens.len() >= 4 &&
-                tokens[0] == SCANNER_INPUT_START_END &&
-                tokens[1] == SCANNER_INPUT_KEYWORD &&
-                tokens[3] == SCANNER_INPUT_START_END
+            if tokens.len() >= 4
+                && tokens[0] == SCANNER_INPUT_START_END
+                && tokens[1] == SCANNER_INPUT_KEYWORD
+                && tokens[3] == SCANNER_INPUT_START_END
             {
                 id = usize::from_str_radix(tokens[2], 10).unwrap();
             } else {
@@ -170,15 +177,22 @@ impl Scanner {
                 if rel_beacons.len() > 0 {
                     break;
                 } else {
-                    panic!("Did not find any beacon coordinates in input for scanner {}", id);
+                    panic!(
+                        "Did not find any beacon coordinates in input for scanner {}",
+                        id
+                    );
                 }
             }
 
             rel_beacons.insert(Position::new(line));
         }
-        Some(Self { id, rel_beacons, abs_position: None, abs_beacons: None })
+        Some(Self {
+            id,
+            rel_beacons,
+            abs_position: None,
+            abs_beacons: None,
+        })
     }
-
 
     /// Searches for an overlap between the beacons of this `Scanner` which must have known,
     /// absolute coordinates, and the beacons of the `other_scanner` passed. The latter's beacons'
@@ -210,14 +224,17 @@ impl Scanner {
 
             for this_beacon in self.abs_beacons.as_ref().unwrap().iter() {
                 for other_beacon in obs.iter() {
-                    let count = candidate_pos_count.entry(this_beacon.minus(other_beacon))
+                    let count = candidate_pos_count
+                        .entry(this_beacon.minus(other_beacon))
                         .or_insert(0);
                     *count += 1;
                 }
             }
 
-            let threshold_met: Vec<(&Position, &usize)> = candidate_pos_count.iter()
-                .filter(|(_, &cnt)| cnt >= MATCH_THRESHOLD).collect();
+            let threshold_met: Vec<(&Position, &usize)> = candidate_pos_count
+                .iter()
+                .filter(|(_, &cnt)| cnt >= MATCH_THRESHOLD)
+                .collect();
 
             match threshold_met.len() {
                 1 => {
@@ -237,13 +254,14 @@ impl Scanner {
 
                     return Some((*other_scanner_position, absolute_beacon_positions));
                 }
-                2 => { panic!("find_overlap found multiple candidate positions for scanner"); }
+                2 => {
+                    panic!("find_overlap found multiple candidate positions for scanner");
+                }
                 _ => {}
             }
         }
         None
     }
-
 
     /// Returns a vector containing 24 sets of `Position`s of this object's beacons, where each set
     /// represents one possible orientation of this scanner. This function must only be called if
@@ -272,7 +290,6 @@ impl Scanner {
     }
 }
 
-
 /// Determines the absolute positions of all scanners and beacons, and updates `scanners` with
 /// this information.
 fn fix_all_scanner_positions(scanners: &mut Vec<Scanner>) {
@@ -293,17 +310,19 @@ fn fix_all_scanner_positions(scanners: &mut Vec<Scanner>) {
             for current_scanner_idx in 1..scanners_len {
                 let current_scanner = &scanners[current_scanner_idx];
 
-                if current_scanner.abs_beacons.is_some() { continue; }
-//                 println!("Looking for an overlap between scanners {} and {}", known_idx,
-//                     current_scanner_idx
-//                 );
+                if current_scanner.abs_beacons.is_some() {
+                    continue;
+                }
+                // println!("Looking for an overlap between scanners {} and {}", known_idx,
+                //     current_scanner_idx
+                // );
 
                 if let Some((overlap_scanner_position, overlap_scanner_beacons)) =
                     scanners[known_idx].find_overlap(current_scanner)
                 {
-//                     println!("    Match found. Scanner {} is at {:?}", current_scanner_idx,
-//                         overlap_scanner_position
-//                     );
+                    // println!("    Match found. Scanner {} is at {:?}", current_scanner_idx,
+                    //     overlap_scanner_position
+                    // );
                     scanners[current_scanner_idx].abs_position = Some(overlap_scanner_position);
                     scanners[current_scanner_idx].abs_beacons = Some(overlap_scanner_beacons);
                 }
@@ -312,15 +331,12 @@ fn fix_all_scanner_positions(scanners: &mut Vec<Scanner>) {
     }
 }
 
-
 /// Returns the Manhattan distance between the pair of `Position`s passed.
 fn manhattan_distance(p0: &Position, p1: &Position) -> u32 {
-    (i32::abs(p0.x as i32 - p1.x as i32) +
-        i32::abs(p0.y as i32 - p1.y as i32) +
-        i32::abs(p0.z as i32 - p1.z as i32)
-    ) as u32
+    (i32::abs(p0.x as i32 - p1.x as i32)
+        + i32::abs(p0.y as i32 - p1.y as i32)
+        + i32::abs(p0.z as i32 - p1.z as i32)) as u32
 }
-
 
 /// Returns the largest Manhattan distance between all pairs of scanners.
 fn max_manhattan_distance(scanners: &Vec<Scanner>) -> u32 {
@@ -333,13 +349,11 @@ fn max_manhattan_distance(scanners: &Vec<Scanner>) -> u32 {
                 &scanners[outer_idx].abs_position.unwrap(),
                 &scanners[inner_idx].abs_position.unwrap(),
             ));
-
         }
     }
 
     result
 }
-
 
 /// Returns the `input` as a vector of `Scanner`s, each containing the set of beacons provided in
 /// the input.
@@ -354,26 +368,24 @@ fn parse_input(input: &str) -> Vec<Scanner> {
     scanners
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mut scanners = parse_input(&input_file);
     fix_all_scanner_positions(&mut scanners);
 
-    println!("The maximum Manhattan distance between any two scanners is {}",
+    println!(
+        "The maximum Manhattan distance between any two scanners is {}",
         max_manhattan_distance(&scanners)
     );
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    #[rustfmt::skip]
     const TEST_INPUT: &str =
 r#"--- scanner 0 ---
 404,-588,-901
@@ -513,7 +525,7 @@ r#"--- scanner 0 ---
 30,-46,-14
 "#;
 
-
+    #[rustfmt::skip]
     const TEST_SINGLE_SCANNER: &str =
 r#"--- scanner 0 ---
 -1,-1,1
@@ -524,10 +536,16 @@ r#"--- scanner 0 ---
 8,0,7
 "#;
 
-
     #[test]
     fn create_position() {
-        assert_eq!(Position::new("11,-22,-33"), Position { x: 11, y: -22, z: -33 });
+        assert_eq!(
+            Position::new("11,-22,-33"),
+            Position {
+                x: 11,
+                y: -22,
+                z: -33
+            }
+        );
     }
 
     #[test]
@@ -554,15 +572,42 @@ r#"--- scanner 0 ---
         assert_eq!(scanners[4].id, 4);
         assert_eq!(scanners[0].rel_beacons.len(), 25);
         assert_eq!(scanners[4].rel_beacons.len(), 26);
-        assert!(scanners[0].rel_beacons.get(&Position::new("-345,-311,381")).is_some());
-        assert!(scanners[1].rel_beacons.get(&Position::new("-345,-311,381")).is_none());
-        assert!(scanners[1].rel_beacons.get(&Position::new("686,422,578")).is_some());
-        assert!(scanners[1].rel_beacons.get(&Position::new("553,889,-390")).is_some());
-        assert!(scanners[2].rel_beacons.get(&Position::new("-675,-892,-343")).is_some());
-        assert!(scanners[2].rel_beacons.get(&Position::new("697,-426,-610")).is_some());
-        assert!(scanners[3].rel_beacons.get(&Position::new("-500,565,-823")).is_some());
-        assert!(scanners[3].rel_beacons.get(&Position::new("595,780,-596")).is_some());
-        assert!(scanners[4].rel_beacons.get(&Position::new("30,-46,-14")).is_some());
+        assert!(scanners[0]
+            .rel_beacons
+            .get(&Position::new("-345,-311,381"))
+            .is_some());
+        assert!(scanners[1]
+            .rel_beacons
+            .get(&Position::new("-345,-311,381"))
+            .is_none());
+        assert!(scanners[1]
+            .rel_beacons
+            .get(&Position::new("686,422,578"))
+            .is_some());
+        assert!(scanners[1]
+            .rel_beacons
+            .get(&Position::new("553,889,-390"))
+            .is_some());
+        assert!(scanners[2]
+            .rel_beacons
+            .get(&Position::new("-675,-892,-343"))
+            .is_some());
+        assert!(scanners[2]
+            .rel_beacons
+            .get(&Position::new("697,-426,-610"))
+            .is_some());
+        assert!(scanners[3]
+            .rel_beacons
+            .get(&Position::new("-500,565,-823"))
+            .is_some());
+        assert!(scanners[3]
+            .rel_beacons
+            .get(&Position::new("595,780,-596"))
+            .is_some());
+        assert!(scanners[4]
+            .rel_beacons
+            .get(&Position::new("30,-46,-14"))
+            .is_some());
     }
 
     #[test]
@@ -594,7 +639,8 @@ r#"--- scanner 0 ---
 
     #[test]
     fn test_minus() {
-        assert_eq!(Position::new("8,0,7").minus(&Position::new("8,-4,9")),
+        assert_eq!(
+            Position::new("8,0,7").minus(&Position::new("8,-4,9")),
             Position::new("0,4,-2")
         );
     }
@@ -602,8 +648,12 @@ r#"--- scanner 0 ---
     #[test]
     fn test_all_scanner0_orientations() {
         let scanners = parse_input(&TEST_INPUT);
-        let results: HashSet<Position> = scanners[0].all_beacon_orientations().iter().cloned()
-            .flatten().collect();
+        let results: HashSet<Position> = scanners[0]
+            .all_beacon_orientations()
+            .iter()
+            .cloned()
+            .flatten()
+            .collect();
 
         assert!(results.get(&Position::new("-618,-824,-621")).is_some());
         assert!(results.get(&Position::new("-537,-823,-458")).is_some());
@@ -622,8 +672,12 @@ r#"--- scanner 0 ---
     #[test]
     fn test_all_scanner1_orientations() {
         let scanners = parse_input(&TEST_INPUT);
-        let results: HashSet<Position> = scanners[1].all_beacon_orientations().iter().cloned()
-            .flatten().collect();
+        let results: HashSet<Position> = scanners[1]
+            .all_beacon_orientations()
+            .iter()
+            .cloned()
+            .flatten()
+            .collect();
 
         assert!(results.get(&Position::new("686,422,578")).is_some());
         assert!(results.get(&Position::new("605,423,415")).is_some());
@@ -697,103 +751,437 @@ r#"--- scanner 0 ---
         fix_all_scanner_positions(&mut scanners);
 
         assert_eq!(scanners[0].abs_position, Some(Position::new("0,0,0")));
-        assert_eq!(scanners[1].abs_position, Some(Position::new("68,-1246,-43")));
-        assert_eq!(scanners[2].abs_position, Some(Position::new("1105,-1205,1229")));
-        assert_eq!(scanners[3].abs_position, Some(Position::new("-92,-2380,-20")));
-        assert_eq!(scanners[4].abs_position, Some(Position::new("-20,-1133,1061")));
+        assert_eq!(
+            scanners[1].abs_position,
+            Some(Position::new("68,-1246,-43"))
+        );
+        assert_eq!(
+            scanners[2].abs_position,
+            Some(Position::new("1105,-1205,1229"))
+        );
+        assert_eq!(
+            scanners[3].abs_position,
+            Some(Position::new("-92,-2380,-20"))
+        );
+        assert_eq!(
+            scanners[4].abs_position,
+            Some(Position::new("-20,-1133,1061"))
+        );
     }
 
     const EXPECTED_ABSOLUTE_BEACON_POSITIONS: [Position; 79] = [
-        Position { x: -892, y: 524, z: 684 },
-        Position { x: -876, y: 649, z: 763 },
-        Position { x: -838, y: 591, z: 734 },
-        Position { x: -789, y: 900, z: -551 },
-        Position { x: -739, y: -1745, z: 668 },
-        Position { x: -706, y: -3180, z: -659 },
-        Position { x: -697, y: -3072, z: -689 },
-        Position { x: -689, y: 845, z: -530 },
-        Position { x: -687, y: -1600, z: 576 },
-        Position { x: -661, y: -816, z: -575 },
-        Position { x: -654, y: -3158, z: -753 },
-        Position { x: -635, y: -1737, z: 486 },
-        Position { x: -631, y: -672, z: 1502 },
-        Position { x: -624, y: -1620, z: 1868 },
-        Position { x: -620, y: -3212, z: 371 },
-        Position { x: -618, y: -824, z: -621 },
-        Position { x: -612, y: -1695, z: 1788 },
-        Position { x: -601, y: -1648, z: -643 },
-        Position { x: -584, y: 868, z: -557 },
-        Position { x: -537, y: -823, z: -458 },
-        Position { x: -532, y: -1715, z: 1894 },
-        Position { x: -518, y: -1681, z: -600 },
-        Position { x: -499, y: -1607, z: -770 },
-        Position { x: -485, y: -357, z: 347 },
-        Position { x: -470, y: -3283, z: 303 },
-        Position { x: -456, y: -621, z: 1527 },
-        Position { x: -447, y: -329, z: 318 },
-        Position { x: -430, y: -3130, z: 366 },
-        Position { x: -413, y: -627, z: 1469 },
-        Position { x: -345, y: -311, z: 381 },
-        Position { x: -36, y: -1284, z: 1171 },
-        Position { x: -27, y: -1108, z: -65 },
-        Position { x: 7, y: -33, z: -71 },
-        Position { x: 12, y: -2351, z: -103 },
-        Position { x: 26, y: -1119, z: 1091 },
-        Position { x: 346, y: -2985, z: 342 },
-        Position { x: 366, y: -3059, z: 397 },
-        Position { x: 377, y: -2827, z: 367 },
-        Position { x: 390, y: -675, z: -793 },
-        Position { x: 396, y: -1931, z: -563 },
-        Position { x: 404, y: -588, z: -901 },
-        Position { x: 408, y: -1815, z: 803 },
-        Position { x: 423, y: -701, z: 434 },
-        Position { x: 432, y: -2009, z: 850 },
-        Position { x: 443, y: 580, z: 662 },
-        Position { x: 455, y: 729, z: 728 },
-        Position { x: 456, y: -540, z: 1869 },
-        Position { x: 459, y: -707, z: 401 },
-        Position { x: 465, y: -695, z: 1988 },
-        Position { x: 474, y: 580, z: 667 },
-        Position { x: 496, y: -1584, z: 1900 },
-        Position { x: 497, y: -1838, z: -617 },
-        Position { x: 527, y: -524, z: 1933 },
-        Position { x: 528, y: -643, z: 409 },
-        Position { x: 534, y: -1912, z: 768 },
-        Position { x: 544, y: -627, z: -890 },
-        Position { x: 553, y: 345, z: -567 },
-        Position { x: 564, y: 392, z: -477 },
-        Position { x: 568, y: -2007, z: -577 },
-        Position { x: 605, y: -1665, z: 1952 },
-        Position { x: 612, y: -1593, z: 1893 },
-        Position { x: 630, y: 319, z: -379 },
-        Position { x: 686, y: -3108, z: -505 },
-        Position { x: 776, y: -3184, z: -501 },
-        Position { x: 846, y: -3110, z: -434 },
-        Position { x: 1135, y: -1161, z: 1235 },
-        Position { x: 1243, y: -1093, z: 1063 },
-        Position { x: 1660, y: -552, z: 429 },
-        Position { x: 1693, y: -557, z: 386 },
-        Position { x: 1735, y: -437, z: 1738 },
-        Position { x: 1749, y: -1800, z: 1813 },
-        Position { x: 1772, y: -405, z: 1572 },
-        Position { x: 1776, y: -675, z: 371 },
-        Position { x: 1779, y: -442, z: 1789 },
-        Position { x: 1780, y: -1548, z: 337 },
-        Position { x: 1786, y: -1538, z: 337 },
-        Position { x: 1847, y: -1591, z: 415 },
-        Position { x: 1889, y: -1729, z: 1762 },
-        Position { x: 1994, y: -1805, z: 1792 },
+        Position {
+            x: -892,
+            y: 524,
+            z: 684,
+        },
+        Position {
+            x: -876,
+            y: 649,
+            z: 763,
+        },
+        Position {
+            x: -838,
+            y: 591,
+            z: 734,
+        },
+        Position {
+            x: -789,
+            y: 900,
+            z: -551,
+        },
+        Position {
+            x: -739,
+            y: -1745,
+            z: 668,
+        },
+        Position {
+            x: -706,
+            y: -3180,
+            z: -659,
+        },
+        Position {
+            x: -697,
+            y: -3072,
+            z: -689,
+        },
+        Position {
+            x: -689,
+            y: 845,
+            z: -530,
+        },
+        Position {
+            x: -687,
+            y: -1600,
+            z: 576,
+        },
+        Position {
+            x: -661,
+            y: -816,
+            z: -575,
+        },
+        Position {
+            x: -654,
+            y: -3158,
+            z: -753,
+        },
+        Position {
+            x: -635,
+            y: -1737,
+            z: 486,
+        },
+        Position {
+            x: -631,
+            y: -672,
+            z: 1502,
+        },
+        Position {
+            x: -624,
+            y: -1620,
+            z: 1868,
+        },
+        Position {
+            x: -620,
+            y: -3212,
+            z: 371,
+        },
+        Position {
+            x: -618,
+            y: -824,
+            z: -621,
+        },
+        Position {
+            x: -612,
+            y: -1695,
+            z: 1788,
+        },
+        Position {
+            x: -601,
+            y: -1648,
+            z: -643,
+        },
+        Position {
+            x: -584,
+            y: 868,
+            z: -557,
+        },
+        Position {
+            x: -537,
+            y: -823,
+            z: -458,
+        },
+        Position {
+            x: -532,
+            y: -1715,
+            z: 1894,
+        },
+        Position {
+            x: -518,
+            y: -1681,
+            z: -600,
+        },
+        Position {
+            x: -499,
+            y: -1607,
+            z: -770,
+        },
+        Position {
+            x: -485,
+            y: -357,
+            z: 347,
+        },
+        Position {
+            x: -470,
+            y: -3283,
+            z: 303,
+        },
+        Position {
+            x: -456,
+            y: -621,
+            z: 1527,
+        },
+        Position {
+            x: -447,
+            y: -329,
+            z: 318,
+        },
+        Position {
+            x: -430,
+            y: -3130,
+            z: 366,
+        },
+        Position {
+            x: -413,
+            y: -627,
+            z: 1469,
+        },
+        Position {
+            x: -345,
+            y: -311,
+            z: 381,
+        },
+        Position {
+            x: -36,
+            y: -1284,
+            z: 1171,
+        },
+        Position {
+            x: -27,
+            y: -1108,
+            z: -65,
+        },
+        Position {
+            x: 7,
+            y: -33,
+            z: -71,
+        },
+        Position {
+            x: 12,
+            y: -2351,
+            z: -103,
+        },
+        Position {
+            x: 26,
+            y: -1119,
+            z: 1091,
+        },
+        Position {
+            x: 346,
+            y: -2985,
+            z: 342,
+        },
+        Position {
+            x: 366,
+            y: -3059,
+            z: 397,
+        },
+        Position {
+            x: 377,
+            y: -2827,
+            z: 367,
+        },
+        Position {
+            x: 390,
+            y: -675,
+            z: -793,
+        },
+        Position {
+            x: 396,
+            y: -1931,
+            z: -563,
+        },
+        Position {
+            x: 404,
+            y: -588,
+            z: -901,
+        },
+        Position {
+            x: 408,
+            y: -1815,
+            z: 803,
+        },
+        Position {
+            x: 423,
+            y: -701,
+            z: 434,
+        },
+        Position {
+            x: 432,
+            y: -2009,
+            z: 850,
+        },
+        Position {
+            x: 443,
+            y: 580,
+            z: 662,
+        },
+        Position {
+            x: 455,
+            y: 729,
+            z: 728,
+        },
+        Position {
+            x: 456,
+            y: -540,
+            z: 1869,
+        },
+        Position {
+            x: 459,
+            y: -707,
+            z: 401,
+        },
+        Position {
+            x: 465,
+            y: -695,
+            z: 1988,
+        },
+        Position {
+            x: 474,
+            y: 580,
+            z: 667,
+        },
+        Position {
+            x: 496,
+            y: -1584,
+            z: 1900,
+        },
+        Position {
+            x: 497,
+            y: -1838,
+            z: -617,
+        },
+        Position {
+            x: 527,
+            y: -524,
+            z: 1933,
+        },
+        Position {
+            x: 528,
+            y: -643,
+            z: 409,
+        },
+        Position {
+            x: 534,
+            y: -1912,
+            z: 768,
+        },
+        Position {
+            x: 544,
+            y: -627,
+            z: -890,
+        },
+        Position {
+            x: 553,
+            y: 345,
+            z: -567,
+        },
+        Position {
+            x: 564,
+            y: 392,
+            z: -477,
+        },
+        Position {
+            x: 568,
+            y: -2007,
+            z: -577,
+        },
+        Position {
+            x: 605,
+            y: -1665,
+            z: 1952,
+        },
+        Position {
+            x: 612,
+            y: -1593,
+            z: 1893,
+        },
+        Position {
+            x: 630,
+            y: 319,
+            z: -379,
+        },
+        Position {
+            x: 686,
+            y: -3108,
+            z: -505,
+        },
+        Position {
+            x: 776,
+            y: -3184,
+            z: -501,
+        },
+        Position {
+            x: 846,
+            y: -3110,
+            z: -434,
+        },
+        Position {
+            x: 1135,
+            y: -1161,
+            z: 1235,
+        },
+        Position {
+            x: 1243,
+            y: -1093,
+            z: 1063,
+        },
+        Position {
+            x: 1660,
+            y: -552,
+            z: 429,
+        },
+        Position {
+            x: 1693,
+            y: -557,
+            z: 386,
+        },
+        Position {
+            x: 1735,
+            y: -437,
+            z: 1738,
+        },
+        Position {
+            x: 1749,
+            y: -1800,
+            z: 1813,
+        },
+        Position {
+            x: 1772,
+            y: -405,
+            z: 1572,
+        },
+        Position {
+            x: 1776,
+            y: -675,
+            z: 371,
+        },
+        Position {
+            x: 1779,
+            y: -442,
+            z: 1789,
+        },
+        Position {
+            x: 1780,
+            y: -1548,
+            z: 337,
+        },
+        Position {
+            x: 1786,
+            y: -1538,
+            z: 337,
+        },
+        Position {
+            x: 1847,
+            y: -1591,
+            z: 415,
+        },
+        Position {
+            x: 1889,
+            y: -1729,
+            z: 1762,
+        },
+        Position {
+            x: 1994,
+            y: -1805,
+            z: 1792,
+        },
     ];
 
     #[test]
     fn test_all_beacon_positions() {
-        let expected_beacons: HashSet<Position> = EXPECTED_ABSOLUTE_BEACON_POSITIONS.to_vec()
-            .iter().cloned().collect();
+        let expected_beacons: HashSet<Position> = EXPECTED_ABSOLUTE_BEACON_POSITIONS
+            .to_vec()
+            .iter()
+            .cloned()
+            .collect();
 
         let mut scanners = parse_input(&TEST_INPUT);
 
         fix_all_scanner_positions(&mut scanners);
-        let result_beacon_set = all_beacon_positions(&scanners);
+
+        let result_beacon_set = scanners.iter().fold(HashSet::new(), |b, s| {
+            b.union(&s.abs_beacons.as_ref().unwrap()).cloned().collect()
+        });
 
         assert_eq!(result_beacon_set.len(), 79);
         assert_eq!(result_beacon_set, expected_beacons);
