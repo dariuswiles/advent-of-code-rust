@@ -6,6 +6,12 @@ This repo includes the input files that the challenge website created for me, bu
 
 Other people have similar GitHub repos with solutions to these challenges, and some have solutions in several programming languages to allow easy comparisons. Some repos are collaborative efforts to find the best code for each solution. Depending on what you are looking for, such repos may be of more use to you than mine.
 
+## Challenge Summaries
+
+Summaries of the challenges that I've completed organized by year:
+
+- [2020 Challenges](Challenges_2020.md)
+- [2021 Challenges](Challenges_2021.md)
 
 ## License
 
