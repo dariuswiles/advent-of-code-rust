@@ -3,7 +3,7 @@
 //!
 //! Challenge part 2
 //!
-//! Model Lanternfish spawning to determine the number of fish that exist after a given number of
+//! Model lanternfish spawning to determine the number of fish that exist after a given number of
 //! days. Part 2 of the challenge increases the number of days to run the simulation, requiring
 //! substantial changes to the Part 1 code.
 
@@ -11,12 +11,11 @@ use std::fs;
 
 const INPUT_FILENAME: &str = "2021_day06_input.txt";
 const CHALLENGE_DAYS: u32 = 256;
-const STARTING_DAYS_TO_SPAWN: DaysToSpawn = 8;  // For fish just born
-const RESET_DAYS_TO_SPAWN: DaysToSpawn = 6;  // For fish that have just spawned
+const STARTING_DAYS_TO_SPAWN: DaysToSpawn = 8; // For fish just born
+const RESET_DAYS_TO_SPAWN: DaysToSpawn = 6; // For fish that have just spawned
 
 type DaysToSpawn = u8;
 type Fish = [u64; STARTING_DAYS_TO_SPAWN as usize + 1];
-
 
 /// Parses an input string consisting of comma-separated numbers representing the time until fish
 /// spawn again. The return value is an array where the array index is the *number* of fish that
@@ -25,8 +24,8 @@ type Fish = [u64; STARTING_DAYS_TO_SPAWN as usize + 1];
 fn parse_input(input: &str) -> Fish {
     let mut fish = [0; STARTING_DAYS_TO_SPAWN as usize + 1];
 
-    let individual_fish = input
-        .lines().collect::<Vec<&str>>()[0].split(",")
+    let individual_fish = input.lines().collect::<Vec<&str>>()[0]
+        .split(",")
         .map(|i| DaysToSpawn::from_str_radix(i, 10).unwrap());
 
     for i in individual_fish {
@@ -34,7 +33,6 @@ fn parse_input(input: &str) -> Fish {
     }
     fish
 }
-
 
 /// Decrement the days to spawn value for every fish. If a fish is already at 0 days, restart their
 /// cycle at 6 days and add a new fish with a cycle of 8 days.
@@ -49,7 +47,6 @@ fn decrement_fish(fish: &mut Fish) {
     fish[STARTING_DAYS_TO_SPAWN as usize] = new_spawn;
 }
 
-
 /// Run the simulation for the given number of days and return the number of fish that exist at the
 /// end of the process.
 fn run_simulation(fish: &mut Fish, days: usize) -> u64 {
@@ -60,16 +57,15 @@ fn run_simulation(fish: &mut Fish, days: usize) -> u64 {
     fish.iter().fold(0, |acc, f| acc + f)
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
     let mut fish = parse_input(&input_file);
     let result = run_simulation(&mut fish, CHALLENGE_DAYS as usize);
-    println!("The total number of fish after {} days is {}", CHALLENGE_DAYS, result);
+    println!(
+        "The total number of fish after {} days is {}",
+        CHALLENGE_DAYS, result
+    );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
@@ -111,6 +107,9 @@ mod tests {
     fn challenge_answer() {
         let mut fish = parse_input(&TEST_INPUT);
 
-        assert_eq!(run_simulation(&mut fish, CHALLENGE_DAYS as usize), 26984457539);
+        assert_eq!(
+            run_simulation(&mut fish, CHALLENGE_DAYS as usize),
+            26984457539
+        );
     }
 }

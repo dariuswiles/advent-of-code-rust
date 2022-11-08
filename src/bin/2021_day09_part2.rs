@@ -3,8 +3,8 @@
 //!
 //! Challenge part 2
 //!
-//! Determines the size of each area of cells within the input data that are separated by the cell
-//! value '9', and calculates the product of the three largest to obtain the answer to the
+//! Determine the size of each area of cells within the input data that are separated by the cell
+//! value '9', and calculate the product of the three largest to obtain the answer to the
 //! challenge.
 
 use std::fs;
@@ -45,7 +45,11 @@ impl HeightMap {
                 line_length = Some(line.len());
             }
 
-            cells.push(line.chars().map(|c| c.to_digit(10).unwrap() as CellData).collect());
+            cells.push(
+                line.chars()
+                    .map(|c| c.to_digit(10).unwrap() as CellData)
+                    .collect(),
+            );
         }
         Self { cells }
     }
@@ -114,11 +118,11 @@ impl HeightMap {
         ignore_direction: Option<Direction>,
         visited: &mut Vec<Vec<bool>>,
     ) -> u32 {
-//         println!("basin_size_recurse called with row = {}, col = {}; and ignore_direction = {:?}.",
-//             row, col, ignore_direction)
-//         ;
+        // println!("basin_size_recurse called with row = {}, col = {}; and ignore_direction = {:?}.",
+        //     row, col, ignore_direction
+        // );
         if visited[row][col] | (self.cells[row][col] == 9) {
-//             println!("\tReturning 0 because this cell has been visited or its value is 9");
+            // println!("\tReturning 0 because this cell has been visited or its value is 9");
             return 0;
         }
 
@@ -173,39 +177,37 @@ impl HeightMap {
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let hm = HeightMap::new(&input_file);
     let basin_sizes = hm.all_basin_sizes();
     let biggest_basins = &basin_sizes[..3];
 
-    println!("The answer to the challenge is {}", biggest_basins.iter().fold(1, |acc, bb| acc * bb));
+    println!(
+        "The answer to the challenge is {}",
+        biggest_basins.iter().fold(1, |acc, bb| acc * bb)
+    );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"
+    const TEST_INPUT: &str = "\
 2199943210
 3987894921
 9856789892
 8767896789
-9899965678"#;
+9899965678";
 
-    const TEST_INPUT_BAD_LENGTH: &str =
-r#"2199943210
+    const TEST_INPUT_BAD_LENGTH: &str = "\
+2199943210
 39
 9856789892
 8767896789
-9899965678"#;
+9899965678";
 
     #[test]
     fn parse_test_input() {
@@ -223,12 +225,7 @@ r#"2199943210
         assert_eq!(low_points.len(), 4);
 
         low_points.sort_unstable();
-        assert_eq!(low_points, vec![
-            (0, 1),
-            (0, 9),
-            (2, 2),
-            (4, 6),
-        ]);
+        assert_eq!(low_points, vec![(0, 1), (0, 9), (2, 2), (4, 6),]);
     }
 
     #[test]
@@ -247,7 +244,7 @@ r#"2199943210
         let basin_sizes = hm.all_basin_sizes();
         let biggest_basins = &basin_sizes[..3];
 
-        assert_eq!(biggest_basins.iter().fold(1, |acc, bb| acc * bb),  1134);
+        assert_eq!(biggest_basins.iter().fold(1, |acc, bb| acc * bb), 1134);
     }
 
     #[test]

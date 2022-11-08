@@ -8,7 +8,7 @@
 //! to deduce because each requires a unique number of display segments to be active, namely
 //! 2, 4, 3 and 7 respectively.
 
-use std::collections::{ HashSet };
+use std::collections::HashSet;
 use std::fs;
 
 const INPUT_FILENAME: &str = "2021_day08_input.txt";
@@ -28,7 +28,6 @@ impl ActiveWireSet {
         Self { wires }
     }
 }
-
 
 /// Parses an input string consisting of a series of 10 blocks of segment letters, delimited by
 /// spaces, then a pipe separator, then a further 4 blocks of segment letters. Returns a Vec
@@ -51,8 +50,7 @@ fn parse_input(input: &str) -> Vec<(Vec<ActiveWireSet>, Vec<ActiveWireSet>)> {
             panic!("Malformed input in: {}", line);
         }
 
-        let left: Vec<ActiveWireSet> =
-            left_right[0]
+        let left: Vec<ActiveWireSet> = left_right[0]
             .split(' ')
             .map(|s| ActiveWireSet::new(s))
             .collect();
@@ -61,8 +59,7 @@ fn parse_input(input: &str) -> Vec<(Vec<ActiveWireSet>, Vec<ActiveWireSet>)> {
             panic!("Malformed input with left segments in: {}", line);
         }
 
-        let right: Vec<ActiveWireSet> =
-            left_right[1]
+        let right: Vec<ActiveWireSet> = left_right[1]
             .split(' ')
             .map(|s| ActiveWireSet::new(s))
             .collect();
@@ -76,29 +73,25 @@ fn parse_input(input: &str) -> Vec<(Vec<ActiveWireSet>, Vec<ActiveWireSet>)> {
     output
 }
 
-
 /// Return the number of occurrences of wire sets that contain exactly 2, 3, 4 or 7 active wires.
 fn count_easy_lengths(sets: &Vec<ActiveWireSet>) -> usize {
     let mut total = 0;
 
     for s in sets {
-        total +=
-            match s.wires.len() {
-                2 => { 1 }
-                3 => { 1 }
-                4 => { 1 }
-                7 => { 1 }
-                _ => { 0 }
-            };
+        total += match s.wires.len() {
+            2 => 1,
+            3 => 1,
+            4 => 1,
+            7 => 1,
+            _ => 0,
+        };
     }
     total
 }
 
-
 /// Count the number of occurrences of wire sets that contain exactly 2, 3, 4 or 7 active wires in
 /// the right hand side of all input lines.
-fn count_all_easy_lengths(wire_sets: &Vec<(Vec<ActiveWireSet>, Vec<ActiveWireSet>)>
-) -> usize {
+fn count_all_easy_lengths(wire_sets: &Vec<(Vec<ActiveWireSet>, Vec<ActiveWireSet>)>) -> usize {
     let mut total = 0;
 
     for rhs in wire_sets {
@@ -108,27 +101,24 @@ fn count_all_easy_lengths(wire_sets: &Vec<(Vec<ActiveWireSet>, Vec<ActiveWireSet
     total
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-        let wire_sets = parse_input(&input_file);
+    let wire_sets = parse_input(&input_file);
 
-    println!("The digits 1, 4, 7 and 8 occur {} times in the right hand side of the input",
+    println!(
+        "The digits 1, 4, 7 and 8 occur {} times in the right hand side of the input",
         count_all_easy_lengths(&wire_sets)
     );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
+    const TEST_INPUT: &str = "\
+be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
 edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
 fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg
 fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb
@@ -137,7 +127,7 @@ fgeab ca afcebg bdacfeg cfaedg gcfdb baec bfadeg bafgc acf | gebdcfa ecba ca fad
 dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe
 bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbgef
 egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb
-gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce"#;
+gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce";
 
     #[test]
     fn parse_test_input() {

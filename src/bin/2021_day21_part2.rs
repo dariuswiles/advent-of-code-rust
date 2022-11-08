@@ -3,8 +3,8 @@
 //!
 //! Challenge part 2
 //!
-//! Analyzes all possible games of "Dirac Dice" that could be played based on the starting
-//! positions given in the input file and calculates the number of wins for each player for every
+//! Analyze all possible games of "Dirac Dice" that could be played based on the starting
+//! positions given in the input file and calculate the number of wins for each player for every
 //! possible permutation of dice throws.
 //
 // The challenge is worded to encourage a strategy of branching at each roll of the die, but it
@@ -27,7 +27,6 @@ const BOARD_SIZE: u8 = 10;
 // The normal distribution of outcomes of rolling a 3-sided die 3 times. The index is the sum of
 // the three rolls and the value is the number of ways that sum can be achieved.
 const DIE_NORMAL_DIST: [u8; 10] = [0, 0, 0, 1, 3, 6, 7, 6, 3, 1];
-
 
 /// Contains state for both players, recording their position and total score.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -65,9 +64,10 @@ impl GameState {
             most_recent_player: 2,
             p1_wins: 0,
             p2_wins: 0,
-            perms: HashMap::from_iter(
-                [(PlayersState::new(p1_start_position, p2_start_position), 1)]
-            ),
+            perms: HashMap::from_iter([(
+                PlayersState::new(p1_start_position, p2_start_position),
+                1,
+            )]),
         }
     }
 
@@ -75,9 +75,13 @@ impl GameState {
     /// from the game state in `self`.
     fn make_move(&self) -> Self {
         let player = (self.most_recent_player % 2) + 1;
-        let turn = if player == 1 { self.turn + 1 } else { self.turn };
+        let turn = if player == 1 {
+            self.turn + 1
+        } else {
+            self.turn
+        };
 
-//         println!("\nTurn {} Player {}", turn, player);
+        // println!("\nTurn {} Player {}", turn, player);
 
         let mut new_perms = HashMap::new();
         let mut new_p1_wins = self.p1_wins;
@@ -101,11 +105,11 @@ impl GameState {
 
                         if new_score < WIN_SCORE {
                             let ps = PlayersState {
-                                        p1_position: new_position,
-                                        p1_score: new_score,
-                                        p2_position: players_state.p2_position,
-                                        p2_score: players_state.p2_score,
-                                    };
+                                p1_position: new_position,
+                                p1_score: new_score,
+                                p2_position: players_state.p2_position,
+                                p2_score: players_state.p2_score,
+                            };
                             match new_perms.get_mut(&ps) {
                                 Some(state) => {
                                     *state += new_occurrences;
@@ -117,9 +121,9 @@ impl GameState {
                         } else {
                             new_p1_wins += new_occurrences;
                         }
-                    },
+                    }
                     2 => {
-                       new_position = players_state.p2_position + dice;
+                        new_position = players_state.p2_position + dice;
 
                         if new_position > BOARD_SIZE {
                             new_position %= BOARD_SIZE;
@@ -129,11 +133,11 @@ impl GameState {
 
                         if new_score < WIN_SCORE {
                             let ps = PlayersState {
-                                        p1_position: players_state.p1_position,
-                                        p1_score: players_state.p1_score,
-                                        p2_position: new_position,
-                                        p2_score: new_score,
-                                    };
+                                p1_position: players_state.p1_position,
+                                p1_score: players_state.p1_score,
+                                p2_position: new_position,
+                                p2_score: new_score,
+                            };
                             match new_perms.get_mut(&ps) {
                                 Some(state) => {
                                     *state += new_occurrences;
@@ -145,7 +149,7 @@ impl GameState {
                         } else {
                             new_p2_wins += new_occurrences;
                         }
-                    },
+                    }
                     _ => {
                         panic!("Internal error - player id was neither 1 or 2.");
                     }
@@ -163,7 +167,6 @@ impl GameState {
     }
 }
 
-
 /// Reads the start positions of both players from the string passed and returns as a tuple.
 ///
 /// # Panics
@@ -172,15 +175,23 @@ impl GameState {
 fn parse_input(input: &str) -> (Position, Position) {
     let mut lines = input.lines();
 
-    ( lines.next().unwrap()
-            .strip_prefix("Player 1 starting position: ").unwrap()
-            .parse().unwrap(),
-        lines.next().unwrap()
-            .strip_prefix("Player 2 starting position: ").unwrap()
-            .parse().unwrap()
+    (
+        lines
+            .next()
+            .unwrap()
+            .strip_prefix("Player 1 starting position: ")
+            .unwrap()
+            .parse()
+            .unwrap(),
+        lines
+            .next()
+            .unwrap()
+            .strip_prefix("Player 2 starting position: ")
+            .unwrap()
+            .parse()
+            .unwrap(),
     )
 }
-
 
 /// Play a game beginning at the starting positions provided until all possible permutation of
 /// dice rolls have been considered. Return the number of wins for each player as a tuple.
@@ -194,21 +205,20 @@ fn play_game(p1_start: u8, p2_start: u8) -> (u64, u64) {
     (game.p1_wins, game.p2_wins)
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let (p1_start, p2_start) = parse_input(&input_file);
     let wins = play_game(p1_start, p2_start);
-    println!("Player 1 wins {} times and Player 2 wins {} times", wins.0, wins.1);
-    println!("The challenge answer is the larger of these numbers, which is: {}",
+    println!(
+        "Player 1 wins {} times and Player 2 wins {} times",
+        wins.0, wins.1
+    );
+    println!(
+        "The challenge answer is the larger of these numbers, which is: {}",
         u64::max(wins.0, wins.1)
     );
-
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
@@ -231,7 +241,10 @@ Player 2 starting position: 8";
     fn test_play_game() {
         let (p1_start, p2_start) = parse_input(&TEST_INPUT);
         let wins = play_game(p1_start, p2_start);
-        println!("Player 1 wins {} times and Player 2 wins {} times", wins.0, wins.1);
+        println!(
+            "Player 1 wins {} times and Player 2 wins {} times",
+            wins.0, wins.1
+        );
 
         assert_eq!(wins.0, 444356092776315);
         assert_eq!(wins.1, 341960390180808);

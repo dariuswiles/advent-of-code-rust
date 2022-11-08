@@ -34,11 +34,16 @@ impl Board {
         let mut cells = [[0; BOARD_SIZE]; BOARD_SIZE];
 
         if input.len() != BOARD_SIZE {
-            panic!("Malformed input. Every board must be {} rows long.", BOARD_SIZE);
+            panic!(
+                "Malformed input. Every board must be {} rows long.",
+                BOARD_SIZE
+            );
         }
 
         for idx in 0..input.len() {
-            let number_vector: Vec<BingoNum> = input[idx].split(' ').filter_map(|s| s.parse().ok())
+            let number_vector: Vec<BingoNum> = input[idx]
+                .split(' ')
+                .filter_map(|s| s.parse().ok())
                 .collect();
 
             for (col_idx, data) in number_vector.iter().enumerate() {
@@ -46,9 +51,11 @@ impl Board {
             }
         }
 
-        Self { cells, marks: [[false; BOARD_SIZE]; BOARD_SIZE] }
+        Self {
+            cells,
+            marks: [[false; BOARD_SIZE]; BOARD_SIZE],
+        }
     }
-
 
     /// If this `Board` contains `num`, mark it as a called number. Return `true` if this number
     /// wins the game.
@@ -81,7 +88,6 @@ impl Board {
         true
     }
 
-
     /// Returns the score for the winning board, as per the challenge rules.
     fn calculate_score(&self, winning_number: BingoNum) -> u32 {
         let mut sum = 0;
@@ -97,18 +103,19 @@ impl Board {
     }
 }
 
-
 /// Parses a single line into a vector of called bingo numbers.
 fn parse_called_numbers(input: &str) -> Vec<BingoNum> {
     let mut called_numbers = Vec::new();
 
-    for num in input.split(',').map(|i| BingoNum::from_str_radix(i, 10).unwrap()) {
+    for num in input
+        .split(',')
+        .map(|i| BingoNum::from_str_radix(i, 10).unwrap())
+    {
         called_numbers.push(num);
     }
 
     called_numbers
 }
-
 
 /// Parses a string consisting of a line of comma separated called names, then multiple boards.
 /// Each board must be preceded by a blank line and be exactly `BOARD_SIZE` rows in length.
@@ -133,12 +140,10 @@ fn parse_input(input: &str) -> (Vec<BingoNum>, Vec<Board>) {
 
         boards.push(Board::new(&lines[line_idx..line_idx + BOARD_SIZE]));
         line_idx += BOARD_SIZE;
-
     }
 
     (called_numbers, boards)
 }
-
 
 /// Marks `called_num` on all `boards` passed. Returns None if this does not lead to any wins, or
 /// the winning board otherwise.
@@ -153,23 +158,18 @@ fn mark_all_boards(boards: &mut Vec<Board>, called_num: BingoNum) -> Option<&Boa
     None
 }
 
-
 /// Iterate through all `called_numbers` until one of the `boards` wins.
 fn mark_numbers_until_win(called_numbers: Vec<BingoNum>, boards: &mut Vec<Board>) -> Option<u32> {
     for cn in called_numbers {
         if let Some(b) = mark_all_boards(boards, cn) {
             return Some(b.calculate_score(cn));
         }
-
     }
     None
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let (called_numbers, mut boards) = parse_input(&input_file);
     let answer = mark_numbers_until_win(called_numbers, &mut boards).unwrap();
@@ -177,14 +177,13 @@ fn main() {
     println!("The challenge answer is {}", answer);
 }
 
-
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
+    const TEST_INPUT: &str = "\
+7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 
 22 13 17 11  0
  8  2 23  4 24
@@ -202,19 +201,20 @@ r#"7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 10 16 15  9 19
 18  8 23 26 20
 22 11 13  6  5
- 2  0 12  3  7"#;
+ 2  0 12  3  7";
 
-    const TEST_ONE_BOARD: &str =
-r#"22 13 17 11  0
+    const TEST_ONE_BOARD: &str = "\
+22 13 17 11  0
  8  2 23  4 24
 21  9 14 16  7
  6 10  3 18  5
- 1 12 20 15 19"#;
+ 1 12 20 15 19";
 
     #[test]
     fn test_parse_called_numbers() {
-        let expected = vec![7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13, 6, 15, 25, 12,
-            22, 18, 20, 8, 19, 3, 26, 1
+        let expected = vec![
+            7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13, 6, 15, 25, 12, 22, 18, 20, 8, 19,
+            3, 26, 1,
         ];
 
         let mut input = TEST_INPUT.lines();
@@ -231,16 +231,20 @@ r#"22 13 17 11  0
                 [6, 10, 3, 18, 5],
                 [1, 12, 20, 15, 19],
             ],
-            marks: [[false; BOARD_SIZE]; BOARD_SIZE]
+            marks: [[false; BOARD_SIZE]; BOARD_SIZE],
         };
 
-        assert_eq!(Board::new(&TEST_ONE_BOARD.lines().collect::<Vec<&str>>()[..]), expected);
+        assert_eq!(
+            Board::new(&TEST_ONE_BOARD.lines().collect::<Vec<&str>>()[..]),
+            expected
+        );
     }
 
     #[test]
     fn test_parse_input() {
-        let expected_called_numbers = vec![7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13, 6,
-            15, 25, 12, 22, 18, 20, 8, 19, 3, 26, 1
+        let expected_called_numbers = vec![
+            7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13, 6, 15, 25, 12, 22, 18, 20, 8, 19,
+            3, 26, 1,
         ];
 
         let (called_numbers, boards) = parse_input(&TEST_INPUT);
@@ -266,6 +270,9 @@ r#"22 13 17 11  0
     #[test]
     fn challenge_answer() {
         let (called_numbers, mut boards) = parse_input(&TEST_INPUT);
-        assert_eq!(mark_numbers_until_win(called_numbers, &mut boards), Some(4512));
+        assert_eq!(
+            mark_numbers_until_win(called_numbers, &mut boards),
+            Some(4512)
+        );
     }
 }

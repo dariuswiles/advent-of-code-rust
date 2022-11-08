@@ -3,9 +3,10 @@
 //!
 //! Challenge part 1
 //!
-//! Update a grid of cells that all start in an off state following a list of rules that turn
-//! groups of cells on or off. After following all the rules count the number of cubes that are on.
-//! For the first part of the challenge, only a small region centered on the origin is considered.
+//! Update a 3D grid of cells that all start in an off state by following a list of rules that each
+//! either turn a specified group of cells on or off. After following all the rules count the
+//! number of cubes that are on. Part 1 of the challenge only considers a small region centered on
+//! the origin.
 
 use std::fs;
 use std::ops::RangeInclusive;
@@ -15,7 +16,7 @@ const INPUT_FILENAME: &str = "2021_day22_input.txt";
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 enum CellState {
     Off,
-    On
+    On,
 }
 
 /// Holds the x, y and z ranges associated with a rule, and whether the rule is to switch cells on
@@ -28,7 +29,6 @@ struct Rule {
     change_state_to: CellState,
 }
 
-
 impl Rule {
     /// If the x, y and z coordinates passed are all within the ranges of this `Rule`, return its
     /// `CellState`. If not, return `None`.
@@ -40,7 +40,6 @@ impl Rule {
         None
     }
 }
-
 
 /// Examines all `Rules` in the order they are passed to find the first that contains the given
 /// cell (as specified in the `x`, `y` and `z` arguments). If a matching `Rule` is found, its
@@ -59,14 +58,13 @@ fn check_all_rules(x: i32, y: i32, z: i32, rules: &Vec<Rule>) -> CellState {
     return CellState::Off;
 }
 
-
 /// Count the number of cells marked as 'on' in the volume passed.
 fn count_active_cells(
     x_range: RangeInclusive<i32>,
     y_range: RangeInclusive<i32>,
     z_range: RangeInclusive<i32>,
-    rules: &Vec<Rule>) -> u32
-{
+    rules: &Vec<Rule>,
+) -> u32 {
     let mut result = 0;
 
     for x in x_range {
@@ -82,7 +80,6 @@ fn count_active_cells(
     result
 }
 
-
 /// Reads the list of rules in the string passed and returns a `Vec` containing a list of `Rule`
 /// objects representing this data.
 ///
@@ -92,7 +89,9 @@ fn count_active_cells(
 fn parse_input(input: &str) -> Vec<Rule> {
     let mut rules = Vec::new();
     for line in input.lines() {
-        if line.len() == 0 { continue; }
+        if line.len() == 0 {
+            continue;
+        }
 
         let tokens: Vec<&str> = line.split(" ").collect();
         if tokens.len() != 2 {
@@ -100,9 +99,11 @@ fn parse_input(input: &str) -> Vec<Rule> {
         }
 
         let change_state_to = match tokens[0] {
-            "on" => { CellState::On }
-            "off" => { CellState::Off }
-            _ => { panic!("Input contains an unrecognized cell state."); }
+            "on" => CellState::On,
+            "off" => CellState::Off,
+            _ => {
+                panic!("Input contains an unrecognized cell state.");
+            }
         };
 
         let ranges: Vec<&str> = tokens[1].split(",").collect();
@@ -115,9 +116,9 @@ fn parse_input(input: &str) -> Vec<Rule> {
         let z_vec: Vec<&str> = ranges[2].strip_prefix("z=").unwrap().split("..").collect();
 
         rules.push(Rule {
-            x: x_vec[0].parse().unwrap() ..= x_vec[1].parse().unwrap(),
-            y: y_vec[0].parse().unwrap() ..= y_vec[1].parse().unwrap(),
-            z: z_vec[0].parse().unwrap() ..= z_vec[1].parse().unwrap(),
+            x: x_vec[0].parse().unwrap()..=x_vec[1].parse().unwrap(),
+            y: y_vec[0].parse().unwrap()..=y_vec[1].parse().unwrap(),
+            z: z_vec[0].parse().unwrap()..=z_vec[1].parse().unwrap(),
             change_state_to,
         });
     }
@@ -125,11 +126,8 @@ fn parse_input(input: &str) -> Vec<Rule> {
     rules
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mut rules = parse_input(&input_file);
     rules.reverse();
@@ -137,7 +135,6 @@ fn main() {
 
     println!("{} cells are in the 'on' state.", answer);
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
@@ -178,29 +175,63 @@ on x=967..23432,y=45373..81175,z=27513..53682";
     fn parse_test_input_0() {
         let rules = parse_input(&TEST_INPUT_0);
 
-        assert_eq!(rules[0],
-            Rule { x: 10..=12, y: 10..=12, z: 10..=12, change_state_to: CellState::On }
+        assert_eq!(
+            rules[0],
+            Rule {
+                x: 10..=12,
+                y: 10..=12,
+                z: 10..=12,
+                change_state_to: CellState::On
+            }
         );
-        assert_eq!(rules[1],
-            Rule { x: 11..=13, y: 11..=13, z: 11..=13, change_state_to: CellState::On }
+        assert_eq!(
+            rules[1],
+            Rule {
+                x: 11..=13,
+                y: 11..=13,
+                z: 11..=13,
+                change_state_to: CellState::On
+            }
         );
-        assert_eq!(rules[2],
-            Rule { x: 9..=11, y: 9..=11, z: 9..=11, change_state_to: CellState::Off }
+        assert_eq!(
+            rules[2],
+            Rule {
+                x: 9..=11,
+                y: 9..=11,
+                z: 9..=11,
+                change_state_to: CellState::Off
+            }
         );
-        assert_eq!(rules[3],
-            Rule { x: 10..=10, y: 10..=10, z: 10..=10, change_state_to: CellState::On }
+        assert_eq!(
+            rules[3],
+            Rule {
+                x: 10..=10,
+                y: 10..=10,
+                z: 10..=10,
+                change_state_to: CellState::On
+            }
         );
     }
 
     #[test]
     fn changes_cell_state_0() {
-        let rule = Rule { x: 1..=3, y: 7..=9, z: -5..=-2, change_state_to: CellState::On };
+        let rule = Rule {
+            x: 1..=3,
+            y: 7..=9,
+            z: -5..=-2,
+            change_state_to: CellState::On,
+        };
         assert_eq!(rule.changes_cell_state(1, 9, -4), Some(CellState::On));
     }
 
     #[test]
     fn changes_cell_state_1() {
-        let rule = Rule { x: 1..=3, y: 7..=9, z: -5..=-2, change_state_to: CellState::On };
+        let rule = Rule {
+            x: 1..=3,
+            y: 7..=9,
+            z: -5..=-2,
+            change_state_to: CellState::On,
+        };
         assert_eq!(rule.changes_cell_state(2, 8, -6), None);
     }
 
@@ -227,6 +258,9 @@ on x=967..23432,y=45373..81175,z=27513..53682";
     fn test_count_active_cells_1() {
         let mut rules = parse_input(&TEST_INPUT_1);
         rules.reverse();
-        assert_eq!(count_active_cells(-50..=50, -50..=50, -50..=50, &rules), 590784);
+        assert_eq!(
+            count_active_cells(-50..=50, -50..=50, -50..=50, &rules),
+            590784
+        );
     }
 }

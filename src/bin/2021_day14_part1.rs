@@ -3,8 +3,8 @@
 //!
 //! Challenge part 1
 //!
-//! Reads a string and a set of transformation rules from an input file, repeatedly applies the
-//! rules and outputs an answer based on the final string.
+//! Read a string and a set of transformation rules from an input file, repeatedly apply the
+//! rules defined in the challenge and output an answer based on the final string.
 
 use std::collections::HashMap;
 use std::fs;
@@ -14,7 +14,6 @@ const INPUT_FILENAME: &str = "2021_day14_input.txt";
 const ITERATIONS: usize = 10;
 
 type Rule = [char; 2];
-
 
 /// A `RuleSet` is a set of transformation rules.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -43,14 +42,10 @@ impl RuleSet {
             let rule_chars = line_split[0].chars().collect::<Vec<char>>();
             let rule: Rule = [rule_chars[0], rule_chars[1]];
 
-            rules.insert(
-                    rule,
-                    line_split[1].chars().next().unwrap()
-            );
+            rules.insert(rule, line_split[1].chars().next().unwrap());
         }
         Self { rules }
     }
-
 
     /// Applies the rules in this `RuleSet` to the string passed and returns a modified `String`
     /// with all the matching rules applied.
@@ -71,7 +66,6 @@ impl RuleSet {
         output.iter().collect()
     }
 
-
     /// Returns the result of applying this `RuleSet` to the given string `iterations` times.
     fn apply_rules_repeatedly(&self, s: &str, iterations: usize) -> String {
         let mut current_string = s.to_string();
@@ -82,7 +76,6 @@ impl RuleSet {
     }
 }
 
-
 /// Returns a `HashMap` containing the frequency of every `char` in the input string.
 fn count_letter_frequencies(s: &str) -> HashMap<char, u32> {
     let mut count = HashMap::new();
@@ -92,7 +85,6 @@ fn count_letter_frequencies(s: &str) -> HashMap<char, u32> {
     }
     count
 }
-
 
 /// Parses a string consisting of lines of comma separated coordinates, then a blank line, then
 /// lines with fold information. Returns a `Grid` containing dots at the coordinates, and a `Vec`
@@ -108,29 +100,26 @@ fn parse_input(input: &str) -> (&str, RuleSet) {
     (template, ruleset)
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let (template, ruleset) = parse_input(&input_file);
     let result = ruleset.apply_rules_repeatedly(template, ITERATIONS);
     let frequencies = count_letter_frequencies(&result);
 
-    println!("The frequency of the most common letter in the output minus the least common is {}",
+    println!(
+        "The frequency of the most common letter in the output minus the least common is {}",
         frequencies.values().max().unwrap() - frequencies.values().min().unwrap()
     );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"NNCB
+    const TEST_INPUT: &str = "\
+NNCB
 
 CH -> B
 HH -> N
@@ -147,7 +136,7 @@ BN -> B
 BB -> N
 BC -> B
 CC -> N
-CN -> C"#;
+CN -> C";
 
     #[test]
     fn test_parse_input() {
@@ -185,7 +174,10 @@ CN -> C"#;
         assert_eq!(output3, "NBBBCNCCNBBNBNBBCHBHHBCHB".to_string());
 
         let output4 = ruleset.apply_rules(&output3);
-        assert_eq!(output4, "NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB".to_string());
+        assert_eq!(
+            output4,
+            "NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB".to_string()
+        );
 
         let output5 = ruleset.apply_rules(&output4);
         assert_eq!(output5.len(), 97);
@@ -202,7 +194,8 @@ CN -> C"#;
         assert_eq!(frequencies[&'H'], 161);
         assert_eq!(frequencies[&'N'], 865);
 
-        assert_eq!(frequencies.values().max().unwrap() - frequencies.values().min().unwrap(),
+        assert_eq!(
+            frequencies.values().max().unwrap() - frequencies.values().min().unwrap(),
             1588
         );
     }
@@ -218,7 +211,8 @@ CN -> C"#;
         assert_eq!(frequencies[&'H'], 161);
         assert_eq!(frequencies[&'N'], 865);
 
-        assert_eq!(frequencies.values().max().unwrap() - frequencies.values().min().unwrap(),
+        assert_eq!(
+            frequencies.values().max().unwrap() - frequencies.values().min().unwrap(),
             1588
         );
     }

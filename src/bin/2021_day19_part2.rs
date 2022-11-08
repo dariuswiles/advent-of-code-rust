@@ -3,7 +3,7 @@
 //!
 //! Challenge part 2
 //!
-//! Determines the maximum Manhattan distance between the absolute position of all pairs of
+//! Determine the maximum Manhattan distance between the absolute position of all pairs of
 //! scanners.
 
 use std::collections::{HashMap, HashSet};
@@ -385,9 +385,8 @@ fn main() {
 mod tests {
     use super::*;
 
-    #[rustfmt::skip]
-    const TEST_INPUT: &str =
-r#"--- scanner 0 ---
+    const TEST_INPUT: &str = "\
+--- scanner 0 ---
 404,-588,-901
 528,-643,409
 -838,591,734
@@ -523,18 +522,17 @@ r#"--- scanner 0 ---
 891,-625,532
 -652,-548,-490
 30,-46,-14
-"#;
+";
 
-    #[rustfmt::skip]
-    const TEST_SINGLE_SCANNER: &str =
-r#"--- scanner 0 ---
+    const TEST_SINGLE_SCANNER: &str = "\
+--- scanner 0 ---
 -1,-1,1
 -2,-2,2
 -3,-3,3
 -2,-3,1
 5,6,-4
 8,0,7
-"#;
+";
 
     #[test]
     fn create_position() {

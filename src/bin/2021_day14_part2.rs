@@ -3,9 +3,9 @@
 //!
 //! Challenge part 2
 //!
-//! Reads a string and a set of transformation rules from an input file, repeatedly applies the
-//! rules and outputs an answer based on the final string. Part 2 simply increases the number of
-//! required iterations.
+//! Read a string and a set of transformation rules from an input file, repeatedly apply the
+//! rules defined in the challenge and output an answer based on the final string. Part 2 increases
+//! the number of required iterations.
 
 use std::collections::HashMap;
 use std::fs;
@@ -15,7 +15,6 @@ const INPUT_FILENAME: &str = "2021_day14_input.txt";
 const ITERATIONS: usize = 40;
 
 type Pair = [char; 2];
-
 
 /// A `RuleSet` is a set of transformation rules.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -44,15 +43,11 @@ impl RuleSet {
             let rule_chars = line_split[0].chars().collect::<Vec<char>>();
             let rule: Pair = [rule_chars[0], rule_chars[1]];
 
-            rules.insert(
-                    rule,
-                    line_split[1].chars().next().unwrap()
-            );
+            rules.insert(rule, line_split[1].chars().next().unwrap());
         }
         Self { rules }
     }
 }
-
 
 /// Stores the number of occurrences of each distinct pair of `char`.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -73,9 +68,11 @@ impl PairTally {
             *counter += 1;
         }
 
-        Self { template: template.to_string(), pairs }
+        Self {
+            template: template.to_string(),
+            pairs,
+        }
     }
-
 
     /// Applies the rules in the `RuleSet` passed to the pairs of `char`s in this object.
     fn apply_rules(&mut self, rules: &RuleSet) {
@@ -90,14 +87,12 @@ impl PairTally {
         self.pairs = new_pairs;
     }
 
-
     /// Applies the given `RuleSet` to the data in this object `iterations` times.
     fn apply_rules_repeatedly(&mut self, rules: &RuleSet, iterations: usize) {
         for _ in 0..iterations {
             self.apply_rules(&rules);
         }
     }
-
 
     /// Returns a `HashMap` containing the frequency of every `char` in this object.
     fn letter_frequencies(&self) -> HashMap<char, u64> {
@@ -111,8 +106,12 @@ impl PairTally {
         // Every char in the string is double counted as it appears in exactly two pairs, except
         // the first and last chars in the original `template` string, that only appear once. Add
         // these two chars in so every char is double counted.
-        *freq.entry(self.template.chars().next().unwrap()).or_insert(0) += 1;
-        *freq.entry(self.template.chars().last().unwrap()).or_insert(0) += 1;
+        *freq
+            .entry(self.template.chars().next().unwrap())
+            .or_insert(0) += 1;
+        *freq
+            .entry(self.template.chars().last().unwrap())
+            .or_insert(0) += 1;
 
         // Halve the frequency of each char to correct for the double counting.
         for (_, count) in freq.iter_mut() {
@@ -121,15 +120,12 @@ impl PairTally {
 
         freq
     }
-
 }
-
 
 fn add(hm: &mut HashMap<Pair, u64>, pair: &Pair, inc: u64) {
     let counter = hm.entry(*pair).or_insert(0);
     *counter += inc;
 }
-
 
 /// Parses a string consisting of lines of comma separated coordinates, then a blank line, then
 /// lines with fold information. Returns a `Grid` containing dots at the coordinates, and a `Vec`
@@ -145,30 +141,27 @@ fn parse_input(input: &str) -> (&str, RuleSet) {
     (template, ruleset)
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let (template, ruleset) = parse_input(&input_file);
     let mut pt = PairTally::new(template);
     pt.apply_rules_repeatedly(&ruleset, ITERATIONS);
     let frequencies = pt.letter_frequencies();
 
-    println!("The frequency of the most common letter in the output minus the least common is {}",
+    println!(
+        "The frequency of the most common letter in the output minus the least common is {}",
         frequencies.values().max().unwrap() - frequencies.values().min().unwrap()
     );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"NNCB
+    const TEST_INPUT: &str = "\
+NNCB
 
 CH -> B
 HH -> N
@@ -185,7 +178,7 @@ BN -> B
 BB -> N
 BC -> B
 CC -> N
-CN -> C"#;
+CN -> C";
 
     #[test]
     fn test_parse_input() {
@@ -346,7 +339,8 @@ CN -> C"#;
         assert_eq!(frequencies[&'H'], 161);
         assert_eq!(frequencies[&'N'], 865);
 
-        assert_eq!(frequencies.values().max().unwrap() - frequencies.values().min().unwrap(),
+        assert_eq!(
+            frequencies.values().max().unwrap() - frequencies.values().min().unwrap(),
             1588
         );
     }
@@ -361,7 +355,8 @@ CN -> C"#;
         assert_eq!(frequencies[&'B'], 2192039569602);
         assert_eq!(frequencies[&'H'], 3849876073);
 
-        assert_eq!(frequencies.values().max().unwrap() - frequencies.values().min().unwrap(),
+        assert_eq!(
+            frequencies.values().max().unwrap() - frequencies.values().min().unwrap(),
             2188189693529
         );
     }

@@ -21,25 +21,24 @@ fn count_greater_ints(input_file: &str) -> u16 {
         .fold(0, |acc, x| if x[1] > x[0] { acc + 1 } else { acc })
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let greater_ints_total = count_greater_ints(&input_file);
 
-    println!("{} integers are greater than their preceding integer", greater_ints_total);
+    println!(
+        "{} integers are greater than their preceding integer",
+        greater_ints_total
+    );
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"199
+    const TEST_INPUT: &str = "\
+199
 200
 208
 210
@@ -48,7 +47,7 @@ r#"199
 240
 269
 260
-263"#;
+263";
 
     #[test]
     fn verify_test_input() {

@@ -46,7 +46,6 @@ impl DiagnosticReport {
     }
 }
 
-
 /// Contains references to the data in a `DiagnosticReport` struct, and methods to filter these
 /// down following the process required by the challenge. References are used to avoid copying
 /// the lines of bits during each stage of the whittling process.
@@ -65,13 +64,11 @@ impl<'a> FilteredReport<'a> {
         FilteredReport { data: refs }
     }
 
-
     /// Returns the count of '1' characters in the given index position of every string in the
     /// data set.
     fn count_ones_in_position(&self, position: usize) -> u32 {
         self.data.iter().fold(0, |acc, x| acc + x[position] as u32)
     }
-
 
     /// Returns the most commonly occurring bit, either 0 or 1, at the given index position of
     /// every string in the data set. If there are equal occurrences, return 1.
@@ -84,7 +81,6 @@ impl<'a> FilteredReport<'a> {
             return 0;
         }
     }
-
 
     /// Returns the least commonly occurring bit, either 0 or 1, at the given index position of
     /// every string in the data set. If there are equal occurrences, return 0.
@@ -101,7 +97,6 @@ impl<'a> FilteredReport<'a> {
             return 1;
         }
     }
-
 
     /// Modifies `self` to only contain data lines having the most commonly occurring bit in
     /// `position`. For example, if `position` is 3, and 0 occurs more often than 1 in that
@@ -136,7 +131,6 @@ impl<'a> FilteredReport<'a> {
     }
 }
 
-
 /// Examine each bit position in turn, from left to right, for all data. If calculating the oxygen
 /// generator rating, as specified in `r`, determine the most common value (0 or 1) for each bit,
 /// and keep only data with this value in this bit position. If calculating the CO2 scrubber
@@ -152,39 +146,42 @@ fn calculate_rating(original_data: &DiagnosticReport, r: &Rating) -> u32 {
 
     for b in 0..current_data.data[0].len() {
         match r {
-            Rating::OxygenGenerator => { current_data.filter_most_common(b); }
-            Rating::CO2Scrubber => { current_data.filter_least_common(b); }
+            Rating::OxygenGenerator => {
+                current_data.filter_most_common(b);
+            }
+            Rating::CO2Scrubber => {
+                current_data.filter_least_common(b);
+            }
         }
     }
 
     assert!(current_data.data.len() == 1);
 
-    let s = current_data.data[0].iter().map(|i| i.to_string()).collect::<String>();
+    let s = current_data.data[0]
+        .iter()
+        .map(|i| i.to_string())
+        .collect::<String>();
     u32::from_str_radix(&s, 2).unwrap()
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let diag_report = DiagnosticReport::new(&input_file);
 
-    let answer = calculate_rating(&diag_report, &Rating::OxygenGenerator) *
-        calculate_rating(&diag_report, &Rating::CO2Scrubber);
+    let answer = calculate_rating(&diag_report, &Rating::OxygenGenerator)
+        * calculate_rating(&diag_report, &Rating::CO2Scrubber);
 
     println!("The submarine's life support rating is {}", answer);
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"00100
+    const TEST_INPUT: &str = "\
+00100
 11110
 10110
 10111
@@ -195,13 +192,13 @@ r#"00100
 10000
 11001
 00010
-01010"#;
+01010";
 
-    const TEST_INPUT_BAD_LENGTH: &str =
-r#"00100
+    const TEST_INPUT_BAD_LENGTH: &str = "\
+00100
 11110
 101
-10111"#;
+10111";
 
     #[test]
     fn parse_test_input() {
@@ -292,12 +289,13 @@ r#"00100
         assert_eq!(calculate_rating(&diag_report, &Rating::CO2Scrubber), 10);
     }
 
-        #[test]
+    #[test]
     fn challenge_answer() {
         let diag_report = DiagnosticReport::new(&TEST_INPUT);
         assert_eq!(
-            calculate_rating(&diag_report, &Rating::OxygenGenerator) *
-            calculate_rating(&diag_report, &Rating::CO2Scrubber), 230
+            calculate_rating(&diag_report, &Rating::OxygenGenerator)
+                * calculate_rating(&diag_report, &Rating::CO2Scrubber),
+            230
         );
     }
 

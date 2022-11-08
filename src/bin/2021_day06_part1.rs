@@ -3,7 +3,7 @@
 //!
 //! Challenge part 1
 //!
-//! Model Lanternfish spawning to determine the number of fish that exist after a given number of
+//! Model lanternfish spawning to determine the number of fish that exist after a given number of
 //! days.
 
 use std::fs;
@@ -13,15 +13,14 @@ const CHALLENGE_DAYS: u32 = 80;
 
 type Fish = u8;
 
-
 /// Parses an input string consisting of comma-separated numbers representing the time until fish
 /// spawn again.
 fn parse_input(input: &str) -> Vec<Fish> {
-    input
-        .lines().collect::<Vec<&str>>()[0].split(",")
-        .map(|i| Fish::from_str_radix(i, 10).unwrap()).collect()
+    input.lines().collect::<Vec<&str>>()[0]
+        .split(",")
+        .map(|i| Fish::from_str_radix(i, 10).unwrap())
+        .collect()
 }
-
 
 /// Decrement the days to spawn value for every fish. If a fish is already at 0 days, restart their
 /// cycle at 6 days and add a new fish with a cycle of 8 days.
@@ -42,20 +41,20 @@ fn decrement_fish(fish: &mut Vec<Fish>) {
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
     let mut fish = parse_input(&input_file);
 
     for _ in 0..CHALLENGE_DAYS {
         decrement_fish(&mut fish);
     }
 
-    println!("The total number of fish after {} days is {}", CHALLENGE_DAYS, fish.len());
+    println!(
+        "The total number of fish after {} days is {}",
+        CHALLENGE_DAYS,
+        fish.len()
+    );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
@@ -79,11 +78,16 @@ mod tests {
             decrement_fish(&mut fish);
         }
 
-        assert_eq!(fish,
+        assert_eq!(
+            fish,
             vec![6, 0, 6, 4, 5, 6, 0, 1, 1, 2, 6, 0, 1, 1, 1, 2, 2, 3, 3, 4, 6, 7, 8, 8, 8, 8]
         );
 
-        println!("The total number of fish after {} days is {}", CHALLENGE_DAYS, fish.len());
+        println!(
+            "The total number of fish after {} days is {}",
+            CHALLENGE_DAYS,
+            fish.len()
+        );
     }
 
     #[test]

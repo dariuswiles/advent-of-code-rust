@@ -16,11 +16,11 @@ type Position = u32;
 /// Parses an input string consisting of comma-separated numbers representing the crabs' initial
 /// positions.
 fn parse_input(input: &str) -> Vec<Position> {
-    input
-        .lines().collect::<Vec<&str>>()[0].split(",")
-        .map(|i| Position::from_str_radix(i, 10).unwrap()).collect()
+    input.lines().collect::<Vec<&str>>()[0]
+        .split(",")
+        .map(|i| Position::from_str_radix(i, 10).unwrap())
+        .collect()
 }
-
 
 /// Find the least fuel that can be used to move all the given crabs to the same position.
 fn minimum_fuel(crabs: &Vec<Position>) -> u32 {
@@ -52,12 +52,10 @@ fn minimum_fuel(crabs: &Vec<Position>) -> u32 {
     best_fuel
 }
 
-
 /// Calculate the fuel required for a crab to move `distance`.
 fn fuel_needed_to_move(distance: u32) -> u32 {
     ((distance + 1) * distance) / 2
 }
-
 
 /// Calculate the total fuel used to move the given crabs to given position p.
 fn total_fuel_cost(crabs: &Vec<Position>, p: Position) -> u32 {
@@ -74,17 +72,13 @@ fn total_fuel_cost(crabs: &Vec<Position>, p: Position) -> u32 {
     total_fuel
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let positions = parse_input(&input_file);
 
     println!("The total fuel cost is {}", minimum_fuel(&positions));
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
@@ -97,7 +91,7 @@ mod tests {
     fn parse_test_input() {
         let crabs = parse_input(&TEST_INPUT);
 
-        assert_eq!(crabs,  vec![16, 1, 2, 0, 4, 2, 7, 1, 2, 14]);
+        assert_eq!(crabs, vec![16, 1, 2, 0, 4, 2, 7, 1, 2, 14]);
     }
 
     #[test]

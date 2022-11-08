@@ -3,7 +3,7 @@
 //!
 //! Challenge part 1
 //!
-//! Displays the number of light pixels after enhancing a given image with a given enhancement
+//! Display the number of light pixels after enhancing a given image with a given enhancement
 //! algorithm.
 
 use std::collections::HashSet;
@@ -21,7 +21,6 @@ type PositionInt = i32;
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 struct Position(PositionInt, PositionInt);
 
-
 #[derive(Clone, Debug, PartialEq)]
 struct ImageEnhancementAlgorithm {
     data: Vec<char>,
@@ -34,7 +33,6 @@ impl ImageEnhancementAlgorithm {
         Self { data }
     }
 }
-
 
 /// Holds a representation of an image. Individual pixels are identified by their `Position`,
 /// consisting of a row and column. The first character in the input used to create an `Image`
@@ -60,7 +58,9 @@ impl Image {
         let mut row_num: usize = 0;
 
         for line in input.lines() {
-            if line == "" { continue; }
+            if line == "" {
+                continue;
+            }
 
             let chars: Vec<char> = line.chars().collect();
 
@@ -75,14 +75,14 @@ impl Image {
             for (col_num, pixel) in chars.iter().enumerate() {
                 match pixel {
                     &LIGHT => {
-                        light_pixels.insert(
-                            Position(row_num as PositionInt, col_num as PositionInt)
-                        );
+                        light_pixels
+                            .insert(Position(row_num as PositionInt, col_num as PositionInt));
                     }
                     &DARK => {}
                     _ => {
-                        panic!("Row {} of the image contains unknown character '{}'", row_num,
-                            pixel
+                        panic!(
+                            "Row {} of the image contains unknown character '{}'",
+                            row_num, pixel
                         )
                     }
                 };
@@ -95,7 +95,11 @@ impl Image {
             panic!("Image data must be square, but is not.");
         }
 
-        Self { light_pixels, initial_size: size.unwrap(), enhancement_count: 0 }
+        Self {
+            light_pixels,
+            initial_size: size.unwrap(),
+            enhancement_count: 0,
+        }
     }
 
     /// Returns a tuple containing two `Position`s. The first holds the lowest row number with a
@@ -123,22 +127,20 @@ impl Image {
     /// be used for pixels outside the square of pixels that have been explicitly enhanced so far.
     /// The boundary of this square is determined by the `Image`'s initial size and the number of
     /// times it has been enhanced, both of which are stored in its fields.
-    fn get_3x3(&self, p: &Position, outside_char: char)
-        -> usize
-    {
+    fn get_3x3(&self, p: &Position, outside_char: char) -> usize {
         let Position(row, col) = *p;
         let mut output = 0;
         let init_size = self.initial_size as PositionInt;
         let iteration = self.enhancement_count as PositionInt;
 
-        for r in row - 1 ..= row + 1 {
-            for c in col - 1 ..= col + 1 {
+        for r in row - 1..=row + 1 {
+            for c in col - 1..=col + 1 {
                 output <<= 1;
 
-                if r < -iteration ||
-                    r >= init_size + iteration ||
-                    c < -iteration ||
-                    c >= init_size + iteration
+                if r < -iteration
+                    || r >= init_size + iteration
+                    || c < -iteration
+                    || c >= init_size + iteration
                 {
                     if outside_char == LIGHT {
                         output += 1;
@@ -161,9 +163,8 @@ impl Image {
         &self,
         p: &Position,
         algo: &ImageEnhancementAlgorithm,
-        outside_char: char
-    ) -> char
-    {
+        outside_char: char,
+    ) -> char {
         algo.data[self.get_3x3(p, outside_char)]
     }
 
@@ -189,8 +190,8 @@ impl Image {
             }
         }
 
-        for row in -iteration - 1 ..= self.initial_size as PositionInt + iteration {
-            for col in -iteration - 1 ..= self.initial_size as PositionInt + iteration {
+        for row in -iteration - 1..=self.initial_size as PositionInt + iteration {
+            for col in -iteration - 1..=self.initial_size as PositionInt + iteration {
                 let p = Position(row, col);
 
                 if self.enhance_pixel(&p, algo, outside) == LIGHT {
@@ -199,19 +200,20 @@ impl Image {
             }
         }
 
-        Self { light_pixels, initial_size: self.initial_size,
-            enhancement_count: self.enhancement_count + 1
+        Self {
+            light_pixels,
+            initial_size: self.initial_size,
+            enhancement_count: self.enhancement_count + 1,
         }
     }
 }
-
 
 impl fmt::Display for Image {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let (Position(top, left), Position(bottom, right)) = self.get_light_pixel_limits();
 
-        for row in top ..= bottom {
-            for col in left ..= right {
+        for row in top..=bottom {
+            for col in left..=right {
                 let p = Position(row, col);
 
                 if self.light_pixels.get(&p).is_some() {
@@ -226,7 +228,6 @@ impl fmt::Display for Image {
     }
 }
 
-
 /// Returns `ImageEnhancementAlgorithm` and `Image` objects as a tuple, representing the data
 /// passed in `input`.
 fn parse_input(input: &str) -> (ImageEnhancementAlgorithm, Image) {
@@ -238,17 +239,16 @@ fn parse_input(input: &str) -> (ImageEnhancementAlgorithm, Image) {
     (enhancement, image)
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let (enhancement, image0) = parse_input(&input_file);
     let image2 = image0.enhance(&enhancement).enhance(&enhancement);
-    println!("The enhanced image has {} light pixels", image2.light_pixels.len());
+    println!(
+        "The enhanced image has {} light pixels",
+        image2.light_pixels.len()
+    );
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -272,7 +272,7 @@ mod tests {
     #[test]
     fn test_enhancement_from_string() {
         let enhancement = ImageEnhancementAlgorithm::from_string(
-            &TEST_INPUT.lines().collect::<Vec<&str>>().first().unwrap()
+            &TEST_INPUT.lines().collect::<Vec<&str>>().first().unwrap(),
         );
 
         assert_eq!(enhancement.data.len(), IMAGE_ENHANCEMENT_LEN);
@@ -333,7 +333,10 @@ mod tests {
     fn test_get_3x3_outside_light() {
         let image = Image::from_string(&TEST_INPUT.lines().collect::<Vec<&str>>()[1..].join("\n"));
 
-        assert_eq!(image.get_3x3(&Position(200, 200), LIGHT), IMAGE_ENHANCEMENT_LEN - 1);
+        assert_eq!(
+            image.get_3x3(&Position(200, 200), LIGHT),
+            IMAGE_ENHANCEMENT_LEN - 1
+        );
     }
 
     #[test]
@@ -376,7 +379,7 @@ mod tests {
         assert!(image1.light_pixels.contains(&Position(5, 4)));
     }
 
-#[test]
+    #[test]
     fn test_enhance_2() {
         let (enhancement, image0) = parse_input(&TEST_INPUT);
         let image2 = image0.enhance(&enhancement).enhance(&enhancement);

@@ -3,21 +3,20 @@
 //!
 //! Challenge part 2
 //!
-//! Determines the number of valid initial x and y velocity pairs that fire a probe into the target
+//! Determine the number of valid initial x and y velocity pairs that fire a probe into the target
 //! area defined in the input data.
 
-use std::collections::{ HashMap, HashSet };
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::ops::RangeInclusive;
 
 const INPUT_FILENAME: &str = "2021_day17_input.txt";
-const X_INITIAL_BOUND: Velocity = 2000;  // The lowest and highest initial velocities of x to try.
-const Y_INITIAL_BOUND: Velocity = 2000;  // The lowest and highest initial velocities of y to try.
+const X_INITIAL_BOUND: Velocity = 2000; // The lowest and highest initial velocities of x to try.
+const Y_INITIAL_BOUND: Velocity = 2000; // The lowest and highest initial velocities of y to try.
 
 type Velocity = i32;
 type Position = i32;
 type Round = usize;
-
 
 /// Returns a pair of inclusive ranges for x and y axes of the target area based on the given
 /// string.
@@ -29,7 +28,11 @@ fn parse_input(input: &str) -> (RangeInclusive<Position>, RangeInclusive<Positio
     let tokens: Vec<&str> = input.lines().next().unwrap().split(' ').collect();
     assert_eq!(tokens.len(), 4);
 
-    let x_input = tokens[2].strip_prefix("x=").unwrap().strip_suffix(",").unwrap();
+    let x_input = tokens[2]
+        .strip_prefix("x=")
+        .unwrap()
+        .strip_suffix(",")
+        .unwrap();
     let y_input = tokens[3].strip_prefix("y=").unwrap();
 
     let x_tokens: Vec<&str> = x_input.split("..").collect();
@@ -42,9 +45,11 @@ fn parse_input(input: &str) -> (RangeInclusive<Position>, RangeInclusive<Positio
     let y_start = Velocity::from_str_radix(y_tokens[0], 10).unwrap();
     let y_end = Velocity::from_str_radix(y_tokens[1], 10).unwrap();
 
-    (RangeInclusive::new(x_start, x_end), RangeInclusive::new(y_start, y_end))
+    (
+        RangeInclusive::new(x_start, x_end),
+        RangeInclusive::new(y_start, y_end),
+    )
 }
-
 
 /// Returns a `HashMap` containing the initial velocities of y that lead to the probe entering the
 /// target area. The returned HashMap is indexed by the round the probe is within the target, and
@@ -72,7 +77,6 @@ fn possible_y_velocities(y_range: &RangeInclusive<Velocity>) -> HashMap<Round, V
     results
 }
 
-
 /// Restricts the y_candidates passed to only those where the probe is within the target in the x
 /// direction during the same round. Returns a copy of y_candidates, restricted down to only
 /// entries meeting both x and y conditions, and with the initial value of x included. The returned
@@ -80,14 +84,13 @@ fn possible_y_velocities(y_range: &RangeInclusive<Velocity>) -> HashMap<Round, V
 /// values are a tuple of the initial x velocity and initial y velocity.
 fn restrict_y_candidates_with_valid_x(
     x_range: &RangeInclusive<Position>,
-    y_candidates: &HashMap<Round, Vec<Velocity>>
+    y_candidates: &HashMap<Round, Vec<Velocity>>,
 ) -> HashSet<(Velocity, Velocity)> {
     let y_round_candidates: &HashSet<Round> = &y_candidates.keys().cloned().collect();
     let y_round_max = *y_round_candidates.iter().max().unwrap();
 
     let mut results = HashSet::new();
     for initial_x in -X_INITIAL_BOUND..X_INITIAL_BOUND {
-
         let mut round = 0;
         let mut x_pos = 0;
         let mut x_velocity = initial_x;
@@ -107,7 +110,6 @@ fn restrict_y_candidates_with_valid_x(
     results
 }
 
-
 /// Returns the answer to the challenge based on the target range definitions in the given input
 /// file.
 ///
@@ -122,17 +124,14 @@ fn challenge_answer(input: &str) -> usize {
     xy_candidates.len()
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-    println!("The number of initial (x, y) velocities that land the within the target is {}",
+    println!(
+        "The number of initial (x, y) velocities that land the within the target is {}",
         challenge_answer(&input_file)
     );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
@@ -177,22 +176,127 @@ mod tests {
         let y_candidates = possible_y_velocities(&y_range);
         let xy_candidates = restrict_y_candidates_with_valid_x(&x_range, &y_candidates);
 
-        assert_eq!(xy_candidates.len(), 112);  // Challenge answer
-        assert_eq!(xy_candidates, vec![
-            (23,-10), (25,-9), (27,-5), (29,-6), (22,-6), (21,-7), (9,0), (27,-7), (24,-5),
-            (25,-7), (26,-6), (25,-5), (6,8), (11,-2), (20,-5), (29,-10), (6,3), (28,-7),
-            (8,0), (30,-6), (29,-8), (20,-10), (6,7), (6,4), (6,1), (14,-4), (21,-6),
-            (26,-10), (7,-1), (7,7), (8,-1), (21,-9), (6,2), (20,-7), (30,-10), (14,-3),
-            (20,-8), (13,-2), (7,3), (28,-8), (29,-9), (15,-3), (22,-5), (26,-8), (25,-8),
-            (25,-6), (15,-4), (9,-2), (15,-2), (12,-2), (28,-9), (12,-3), (24,-6), (23,-7),
-            (25,-10), (7,8), (11,-3), (26,-7), (7,1), (23,-9), (6,0), (22,-10), (27,-6),
-            (8,1), (22,-8), (13,-4), (7,6), (28,-6), (11,-4), (12,-4), (26,-9), (7,4),
-            (24,-10), (23,-8), (30,-8), (7,0), (9,-1), (10,-1), (26,-5), (22,-9), (6,5),
-            (7,5), (23,-6), (28,-10), (10,-2), (11,-1), (20,-9), (14,-2), (29,-7), (13,-3),
-            (23,-5), (24,-8), (27,-9), (30,-7), (28,-5), (21,-10), (7,9), (6,6), (21,-5),
-            (27,-10), (7,2), (30,-9), (21,-8), (22,-7), (24,-9), (20,-6), (6,9), (29,-5),
-            (8,-2), (27,-8), (30,-5), (24,-7)
-        ].iter().cloned().collect());
+        assert_eq!(xy_candidates.len(), 112); // Challenge answer
+        assert_eq!(
+            xy_candidates,
+            vec![
+                (23, -10),
+                (25, -9),
+                (27, -5),
+                (29, -6),
+                (22, -6),
+                (21, -7),
+                (9, 0),
+                (27, -7),
+                (24, -5),
+                (25, -7),
+                (26, -6),
+                (25, -5),
+                (6, 8),
+                (11, -2),
+                (20, -5),
+                (29, -10),
+                (6, 3),
+                (28, -7),
+                (8, 0),
+                (30, -6),
+                (29, -8),
+                (20, -10),
+                (6, 7),
+                (6, 4),
+                (6, 1),
+                (14, -4),
+                (21, -6),
+                (26, -10),
+                (7, -1),
+                (7, 7),
+                (8, -1),
+                (21, -9),
+                (6, 2),
+                (20, -7),
+                (30, -10),
+                (14, -3),
+                (20, -8),
+                (13, -2),
+                (7, 3),
+                (28, -8),
+                (29, -9),
+                (15, -3),
+                (22, -5),
+                (26, -8),
+                (25, -8),
+                (25, -6),
+                (15, -4),
+                (9, -2),
+                (15, -2),
+                (12, -2),
+                (28, -9),
+                (12, -3),
+                (24, -6),
+                (23, -7),
+                (25, -10),
+                (7, 8),
+                (11, -3),
+                (26, -7),
+                (7, 1),
+                (23, -9),
+                (6, 0),
+                (22, -10),
+                (27, -6),
+                (8, 1),
+                (22, -8),
+                (13, -4),
+                (7, 6),
+                (28, -6),
+                (11, -4),
+                (12, -4),
+                (26, -9),
+                (7, 4),
+                (24, -10),
+                (23, -8),
+                (30, -8),
+                (7, 0),
+                (9, -1),
+                (10, -1),
+                (26, -5),
+                (22, -9),
+                (6, 5),
+                (7, 5),
+                (23, -6),
+                (28, -10),
+                (10, -2),
+                (11, -1),
+                (20, -9),
+                (14, -2),
+                (29, -7),
+                (13, -3),
+                (23, -5),
+                (24, -8),
+                (27, -9),
+                (30, -7),
+                (28, -5),
+                (21, -10),
+                (7, 9),
+                (6, 6),
+                (21, -5),
+                (27, -10),
+                (7, 2),
+                (30, -9),
+                (21, -8),
+                (22, -7),
+                (24, -9),
+                (20, -6),
+                (6, 9),
+                (29, -5),
+                (8, -2),
+                (27, -8),
+                (30, -5),
+                (24, -7)
+            ]
+            .iter()
+            .cloned()
+            .collect()
+        );
     }
 
     #[test]

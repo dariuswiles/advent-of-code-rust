@@ -3,8 +3,8 @@
 //!
 //! Challenge part 1
 //!
-//! Reads a file of opening and closing symbols and determines if each line is corrupt or
-//! incomplete. Corrupt lines are scored and a total score is returned as the challange answer.
+//! Read a file of opening and closing symbols and determine which lines are corrupt or
+//! incomplete. Corrupt lines are scored and a total score is returned as the challenge answer.
 
 use std::fs;
 
@@ -41,13 +41,15 @@ fn validate_line(line: &str) -> Validity {
         } else {
             if CLOSERS.contains(c) {
                 if let Some(opening) = stack.pop() {
-                    if ((opening == '(') && (c != ')')) ||
-                        ((opening == '[') && (c != ']')) ||
-                        ((opening == '{') && (c != '}')) ||
-                        ((opening == '<') && (c != '>')) {
+                    if ((opening == '(') && (c != ')'))
+                        || ((opening == '[') && (c != ']'))
+                        || ((opening == '{') && (c != '}'))
+                        || ((opening == '<') && (c != '>'))
+                    {
                         return Validity::Corrupted(c);
                     }
-                } else {    // Stack is empty, so there is no matching opening symbol.
+                } else {
+                    // Stack is empty, so there is no matching opening symbol.
                     return Validity::Corrupted(c);
                 }
             } else {
@@ -63,18 +65,26 @@ fn validate_line(line: &str) -> Validity {
     }
 }
 
-
 /// Return the scoring value of the bad closing character passed.
 fn score_bad_closer(c: char) -> u32 {
     match c {
-        ')' => { return SCORE_PARENTHESIS; }
-        ']' => { return SCORE_BRACKET; }
-        '}' => { return SCORE_BRACE; }
-        '>' => { return SCORE_ANGLE_BRACKET; }
-        _ => { panic!("Unrecognized closing symbol '{}'", c); }
+        ')' => {
+            return SCORE_PARENTHESIS;
+        }
+        ']' => {
+            return SCORE_BRACKET;
+        }
+        '}' => {
+            return SCORE_BRACE;
+        }
+        '>' => {
+            return SCORE_ANGLE_BRACKET;
+        }
+        _ => {
+            panic!("Unrecognized closing symbol '{}'", c);
+        }
     }
 }
-
 
 /// Validate each line of the input file, scoring only corrupted lines based on the first corrupt
 /// character.
@@ -88,32 +98,29 @@ fn score_corrupted_lines(input: &str) -> u32 {
 
         let result = validate_line(&line);
         if let Validity::Corrupted(bad_closer) = result {
-//             println!("Line '{}' is corrupted due to closing symbol '{}'", &line, bad_closer);
+            // println!("Line '{}' is corrupted due to closing symbol '{}'", &line, bad_closer);
             total += score_bad_closer(bad_closer);
         }
     }
     total
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-    println!("The total score for all corrupted lines in the input files is {}",
+    println!(
+        "The total score for all corrupted lines in the input files is {}",
         score_corrupted_lines(&input_file)
     );
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"[({(<(())[]>[[{[]{<()<>>
+    const TEST_INPUT: &str = "\
+[({(<(())[]>[[{[]{<()<>>
 [(()[<>])]({[<{<<[]>>(
 {([(<{}[<>[]}>{[]{[(<()>
 (((({<>}<{<{<>}{[]{[]{}
@@ -122,13 +129,13 @@ r#"[({(<(())[]>[[{[]{<()<>>
 {<[[]]>}<{[{[{[]{()[[[]
 [<(<(<(<{}))><([]([]()
 <{([([[(<>()){}]>(<<{{
-<{([{{}}[<[[[<>{}]]]>[]]"#;
+<{([{{}}[<[[[<>{}]]]>[]]";
 
-    const TEST_LINE_0: &str = r#"{([(<{}[<>[]}>{[]{[(<()>"#;
-    const TEST_LINE_1: &str = r#"[[<[([]))<([[{}[[()]]]"#;
-    const TEST_LINE_2: &str = r#"[{[{({}]{}}([{[{{{}}([]"#;
-    const TEST_LINE_3: &str = r#"[<(<(<(<{}))><([]([]()"#;
-    const TEST_LINE_4: &str = r#"<{([([[(<>()){}]>(<<{{"#;
+    const TEST_LINE_0: &str = "{([(<{}[<>[]}>{[]{[(<()>";
+    const TEST_LINE_1: &str = "[[<[([]))<([[{}[[()]]]";
+    const TEST_LINE_2: &str = "[{[{({}]{}}([{[{{{}}([]";
+    const TEST_LINE_3: &str = "[<(<(<(<{}))><([]([]()";
+    const TEST_LINE_4: &str = "<{([([[(<>()){}]>(<<{{";
 
     #[test]
     fn test_corrupted_lines() {

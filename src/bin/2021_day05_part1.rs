@@ -16,7 +16,6 @@ const MAP_SIZE: usize = 1000;
 
 type Line = (Coordinate, Coordinate);
 
-
 #[derive(Clone, Copy, Debug, PartialEq)]
 struct Coordinate {
     x: usize,
@@ -42,7 +41,6 @@ impl Coordinate {
         }
     }
 }
-
 
 /// A grid of `cells` that record the number of hydrothermal vents across the ocean floor. The
 /// y-axis is the major access, so cells are referenced as cells[y][x].
@@ -94,7 +92,9 @@ impl Map {
     fn count_intersections(&self) -> u32 {
         let mut total = 0;
         for row in &self.cells {
-            total += row.iter().fold(0, |acc, c| if c > &1 { acc + 1 } else { acc });
+            total += row
+                .iter()
+                .fold(0, |acc, c| if c > &1 { acc + 1 } else { acc });
         }
         total
     }
@@ -105,11 +105,14 @@ impl Display for Map {
         let mut result = Ok(());
 
         for row in &self.cells {
-            let row_as_string = row.iter().map(|c|
-                if c == &0 {
-                    '.'.to_string()
-                } else {
-                    c.to_string()
+            let row_as_string = row
+                .iter()
+                .map(|c| {
+                    if c == &0 {
+                        '.'.to_string()
+                    } else {
+                        c.to_string()
+                    }
                 })
                 .collect::<String>();
             result = writeln!(f, "{}", row_as_string);
@@ -117,7 +120,6 @@ impl Display for Map {
         result
     }
 }
-
 
 /// Parses an input string consisting of two pairs of comma-separated numbers separated by an
 /// arrow. Returns the pairs as a `Line`.
@@ -145,7 +147,6 @@ fn parse_input(input: &str) -> Vec<Line> {
     coords
 }
 
-
 /// Picks only horizontal and vertical `Line`s from the input passed, and returns as a new `Vec`.
 fn filter_horizontal_and_vertical(lines: &Vec<Line>) -> Vec<Line> {
     let mut output = Vec::new();
@@ -158,11 +159,8 @@ fn filter_horizontal_and_vertical(lines: &Vec<Line>) -> Vec<Line> {
     output
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mut map = Map::new(MAP_SIZE);
     let coords = parse_input(&input_file);
@@ -172,19 +170,19 @@ fn main() {
         map.draw_line(l);
     }
 
-    println!("The number of positions with intersecting geothermal vents is {}",
+    println!(
+        "The number of positions with intersecting geothermal vents is {}",
         map.count_intersections()
     );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"0,9 -> 5,9
+    const TEST_INPUT: &str = "\
+0,9 -> 5,9
 8,0 -> 0,8
 9,4 -> 3,4
 2,2 -> 2,1
@@ -193,16 +191,25 @@ r#"0,9 -> 5,9
 0,9 -> 2,9
 3,4 -> 1,4
 0,0 -> 8,8
-5,5 -> 8,2"#;
+5,5 -> 8,2";
 
     #[test]
     fn parse_test_input() {
         let coords = parse_input(&TEST_INPUT);
 
         assert_eq!(coords.len(), 10);
-        assert_eq!(coords[0], (Coordinate { x: 0, y: 9 }, Coordinate { x: 5, y: 9 }));
-        assert_eq!(coords[4], (Coordinate { x: 7, y: 0 }, Coordinate { x: 7, y: 4 }));
-        assert_eq!(coords[9], (Coordinate { x: 5, y: 5 }, Coordinate { x: 8, y: 2 }));
+        assert_eq!(
+            coords[0],
+            (Coordinate { x: 0, y: 9 }, Coordinate { x: 5, y: 9 })
+        );
+        assert_eq!(
+            coords[4],
+            (Coordinate { x: 7, y: 0 }, Coordinate { x: 7, y: 4 })
+        );
+        assert_eq!(
+            coords[9],
+            (Coordinate { x: 5, y: 5 }, Coordinate { x: 8, y: 2 })
+        );
     }
 
     #[test]
@@ -211,9 +218,18 @@ r#"0,9 -> 5,9
         let filtered = filter_horizontal_and_vertical(&coords);
 
         assert_eq!(filtered.len(), 6);
-        assert_eq!(filtered[0], (Coordinate { x: 0, y: 9 }, Coordinate { x: 5, y: 9 }));
-        assert_eq!(filtered[1], (Coordinate { x: 9, y: 4 }, Coordinate { x: 3, y: 4 }));
-        assert_eq!(filtered[5], (Coordinate { x: 3, y: 4 }, Coordinate { x: 1, y: 4 }));
+        assert_eq!(
+            filtered[0],
+            (Coordinate { x: 0, y: 9 }, Coordinate { x: 5, y: 9 })
+        );
+        assert_eq!(
+            filtered[1],
+            (Coordinate { x: 9, y: 4 }, Coordinate { x: 3, y: 4 })
+        );
+        assert_eq!(
+            filtered[5],
+            (Coordinate { x: 3, y: 4 }, Coordinate { x: 1, y: 4 })
+        );
     }
 
     #[test]

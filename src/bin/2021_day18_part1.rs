@@ -3,7 +3,7 @@
 //!
 //! Challenge part 1
 //!
-//! Parses an input file of numbers in "Snailfish" format, one number per line, and adds them
+//! Parse an input file of numbers in "Snailfish" format, one number per line, and add them
 //! together to find the answer to the challenge.
 
 use std::fmt::{Display, Error, Formatter};
@@ -13,7 +13,6 @@ const INPUT_FILENAME: &str = "2021_day18_input.txt";
 
 type Int = u8;
 
-
 #[derive(Debug)]
 struct ExplodeData<'a> {
     node_to_explode: Option<&'a mut Number>,
@@ -21,14 +20,13 @@ struct ExplodeData<'a> {
     nearest_right: Option<&'a mut Number>,
 }
 
-
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-enum Number{
+enum Number {
     Regular(Int),
     Compound {
         left: Box<Number>,
         right: Box<Number>,
-    }
+    },
 }
 
 impl Number {
@@ -55,27 +53,27 @@ impl Number {
             nearest_right: None,
         };
 
-//         println!("explode: Data before changes {}", &self);
+        // println!("explode: Data before changes {}", &self);
         Self::explode_recurse(self, 0, &mut explode_data);
 
         if explode_data.node_to_explode.is_none() {
-//             println!("explode: no compound Number needs exploding.");
+            // println!("explode: no compound Number needs exploding.");
             return false;
         }
 
         if let Number::Compound { left, right } = explode_data.node_to_explode.as_ref().unwrap() {
             if let Some(Number::Regular(nl)) = explode_data.nearest_left {
                 if let Number::Regular(explode_left) = **left {
-//                     print!("explode: Changing the nearest Regular number to the left of the exploding node. ");
-//                     println!("Its current value is: {}. About to add {}", nl, explode_left);
+                    // print!("explode: Changing the nearest Regular number to the left of the exploding node. ");
+                    // println!("Its current value is: {}. About to add {}", nl, explode_left);
                     *nl += explode_left;
                 };
             }
 
             if let Some(Number::Regular(nl)) = explode_data.nearest_right {
                 if let Number::Regular(explode_right) = **right {
-//                     print!("explode: Changing the nearest Regular number to the right of the exploding node. ");
-//                     println!("Its current value is: {}. About to add {}", nl, explode_right);
+                    // print!("explode: Changing the nearest Regular number to the right of the exploding node. ");
+                    // println!("Its current value is: {}. About to add {}", nl, explode_right);
                     *nl += explode_right;
                 };
             }
@@ -83,7 +81,7 @@ impl Number {
 
         *explode_data.node_to_explode.unwrap() = Number::Regular(0);
 
-//         println!("explode: Data after changes {}", &self);
+        // println!("explode: Data after changes {}", &self);
         true
     }
 
@@ -97,13 +95,12 @@ impl Number {
         depth: usize,
         explode_data: &'b mut ExplodeData<'a>,
     ) {
-
         // Implementation note: this causes borrow problems if included in 'match' statement below.
         if let Number::Compound { .. } = node {
             if depth == 4 {
-//                 println!("explode: At nest level {}, reached criteria to perform an explode \
-//                     operation", depth
-//                 );
+                // println!("explode: At nest level {}, reached criteria to perform an explode \
+                // operation", depth
+                // );
                 explode_data.node_to_explode = Some(node);
                 return;
             }
@@ -111,8 +108,8 @@ impl Number {
 
         match node {
             Number::Compound { left, right } => {
-//                 println!("    The element is a compound Number", depth );
-//                 println!("    Recursing into Left nested Number");
+                // println!("    The element is a compound Number", depth );
+                // println!("    Recursing into Left nested Number");
                 if explode_data.node_to_explode.is_none() {
                     Self::explode_recurse(left, depth + 1, explode_data);
                 } else {
@@ -123,7 +120,7 @@ impl Number {
                     return;
                 }
 
-//                 println!("    Recursing into Right nested Number");
+                // println!("    Recursing into Right nested Number");
                 if explode_data.node_to_explode.is_none() {
                     Self::explode_recurse(right, depth + 1, explode_data);
                 } else {
@@ -131,7 +128,7 @@ impl Number {
                 }
             }
             Number::Regular(_reg) => {
-//                 println!("    The element is regular Number {}", _reg);
+                // println!("    The element is regular Number {}", _reg);
                 if explode_data.node_to_explode.is_none() {
                     explode_data.nearest_left = Some(node);
                 } else {
@@ -149,12 +146,11 @@ impl Number {
     ///
     /// Returns true if a split action is performed, false otherwise.
     fn split(&mut self) -> bool {
-
         if let Some(node_to_split) = Self::split_recurse(self) {
             if let Number::Regular(existing) = node_to_split {
                 *node_to_split = Number::Compound {
                     left: Box::new(Number::Regular(*existing / 2)),
-                    right: Box::new(Number::Regular((*existing as f32 / 2.0 + 0.5) as Int))
+                    right: Box::new(Number::Regular((*existing as f32 / 2.0 + 0.5) as Int)),
                 };
 
                 return true;
@@ -194,7 +190,7 @@ impl Number {
         let mut changes_made = true;
 
         while changes_made {
-//             println!("{}", self);
+            // println!("{}", self);
             changes_made = self.explode();
             if changes_made {
                 continue;
@@ -212,7 +208,7 @@ impl Number {
     fn add_no_reduce(self, n: Number) -> Self {
         Self::Compound {
             left: Box::new(self),
-            right: Box::new(n)
+            right: Box::new(n),
         }
     }
 
@@ -223,7 +219,7 @@ impl Number {
     fn add(self, n: Number) -> Self {
         let mut result = Self::Compound {
             left: Box::new(self),
-            right: Box::new(n)
+            right: Box::new(n),
         };
 
         result.reduce();
@@ -242,9 +238,7 @@ impl Number {
             Number::Compound { left, right } => {
                 3 * Self::magnitude_recurse(left) + 2 * Self::magnitude_recurse(right)
             }
-            Number::Regular(reg) => {
-                *reg as u32
-            }
+            Number::Regular(reg) => *reg as u32,
         }
     }
 
@@ -266,7 +260,6 @@ impl Number {
     }
 }
 
-
 /// Writes a Snailfish number in text form.
 impl Display for Number {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
@@ -275,7 +268,6 @@ impl Display for Number {
         Ok(())
     }
 }
-
 
 /// Returns a snailfish `Number` (consisting of left and right sides) based on the input provided.
 /// All parsed elements are removed from the input.
@@ -317,7 +309,6 @@ fn parse_number(chars: &mut Vec<char>) -> Number {
     Number::Compound { left, right }
 }
 
-
 /// Processes `input`, consisting of one snailfish Number per line, adding the result of each
 /// number with the next and returning the result.
 fn add_input(input: &str) -> Number {
@@ -334,24 +325,21 @@ fn add_input(input: &str) -> Number {
             sub_total = Some(Number::new(line));
         }
 
-//         println!("sub_total = {:?}", sub_total);
+        // println!("sub_total = {:?}", sub_total);
     }
 
     sub_total.unwrap()
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let result = add_input(&input_file);
-    println!("Iteratively adding all Snailfish numbers in the input gives a magnitude of {}",
+    println!(
+        "Iteratively adding all Snailfish numbers in the input gives a magnitude of {}",
         result.magnitude()
     );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
@@ -375,31 +363,36 @@ mod tests {
         let result = parse_number(&mut chars);
         println!("{:?}", result);
 
-        assert_eq!(result,
+        assert_eq!(
+            result,
             Number::Compound {
-                left: Box::new(Number::Regular(3)), right: Box::new(Number::Regular(4))
+                left: Box::new(Number::Regular(3)),
+                right: Box::new(Number::Regular(4))
             }
         );
     }
 
     #[test]
     fn test_new_number() {
-        assert_eq!(Number::new(&TEST_INPUT_0),
+        assert_eq!(
+            Number::new(&TEST_INPUT_0),
             Number::Compound {
                 left: Box::new(Number::Regular(1)),
                 right: Box::new(Number::Regular(2))
             }
         );
-        assert_eq!(Number::new(&TEST_INPUT_1),
+        assert_eq!(
+            Number::new(&TEST_INPUT_1),
             Number::Compound {
                 left: Box::new(Number::Compound {
                     left: Box::new(Number::Regular(1)),
                     right: Box::new(Number::Regular(2))
-                } ),
+                }),
                 right: Box::new(Number::Regular(3))
             }
         );
-        assert_eq!(Number::new(&TEST_INPUT_2),
+        assert_eq!(
+            Number::new(&TEST_INPUT_2),
             Number::Compound {
                 left: Box::new(Number::Regular(9)),
                 right: Box::new(Number::Compound {
@@ -408,126 +401,130 @@ mod tests {
                 })
             }
         );
-        assert_eq!(Number::new(&TEST_INPUT_3),
+        assert_eq!(
+            Number::new(&TEST_INPUT_3),
             Number::Compound {
                 left: Box::new(Number::Compound {
                     left: Box::new(Number::Regular(1)),
                     right: Box::new(Number::Regular(9))
                 }),
                 right: Box::new(Number::Compound {
-                        left: Box::new(Number::Regular(8)),
-                        right: Box::new(Number::Regular(5))
+                    left: Box::new(Number::Regular(8)),
+                    right: Box::new(Number::Regular(5))
                 })
             }
         );
 
-        assert_eq!(Number::new(&TEST_INPUT_4),
+        assert_eq!(
+            Number::new(&TEST_INPUT_4),
             Number::Compound {
                 left: Box::new(Number::Compound {
+                    left: Box::new(Number::Compound {
                         left: Box::new(Number::Compound {
-                                left: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(1)),
-                                        right: Box::new(Number::Regular(2))
-                                }),
-                                right: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(3)),
-                                        right: Box::new(Number::Regular(4))
-                                })
-                            }),
-                        right: Box::new(Number::Compound {
-                                left: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(5)),
-                                        right: Box::new(Number::Regular(6))
-                                }),
-                                right: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(7)),
-                                        right: Box::new(Number::Regular(8))
-                                })
+                            left: Box::new(Number::Regular(1)),
+                            right: Box::new(Number::Regular(2))
                         }),
+                        right: Box::new(Number::Compound {
+                            left: Box::new(Number::Regular(3)),
+                            right: Box::new(Number::Regular(4))
+                        })
                     }),
+                    right: Box::new(Number::Compound {
+                        left: Box::new(Number::Compound {
+                            left: Box::new(Number::Regular(5)),
+                            right: Box::new(Number::Regular(6))
+                        }),
+                        right: Box::new(Number::Compound {
+                            left: Box::new(Number::Regular(7)),
+                            right: Box::new(Number::Regular(8))
+                        })
+                    }),
+                }),
                 right: Box::new(Number::Regular(9))
             }
         );
 
-        assert_eq!(Number::new(&TEST_INPUT_5),
+        assert_eq!(
+            Number::new(&TEST_INPUT_5),
             Number::Compound {
                 left: Box::new(Number::Compound {
-                        left: Box::new(Number::Compound {
-                                left: Box::new(Number::Regular(9)),
-                                right: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(3)),
-                                        right: Box::new(Number::Regular(8))
-                                })
-                        }),
+                    left: Box::new(Number::Compound {
+                        left: Box::new(Number::Regular(9)),
                         right: Box::new(Number::Compound {
-                                left: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(0)),
-                                        right: Box::new(Number::Regular(9))
-                                }),
-                                right: Box::new(Number::Regular(6))
+                            left: Box::new(Number::Regular(3)),
+                            right: Box::new(Number::Regular(8))
                         })
+                    }),
+                    right: Box::new(Number::Compound {
+                        left: Box::new(Number::Compound {
+                            left: Box::new(Number::Regular(0)),
+                            right: Box::new(Number::Regular(9))
+                        }),
+                        right: Box::new(Number::Regular(6))
+                    })
                 }),
                 right: Box::new(Number::Compound {
+                    left: Box::new(Number::Compound {
                         left: Box::new(Number::Compound {
-                                left: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(3)),
-                                        right: Box::new(Number::Regular(7))
-                                }),
-                                right: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(4)),
-                                        right: Box::new(Number::Regular(9))
-                                }),
+                            left: Box::new(Number::Regular(3)),
+                            right: Box::new(Number::Regular(7))
                         }),
-                        right: Box::new(Number::Regular(3))
+                        right: Box::new(Number::Compound {
+                            left: Box::new(Number::Regular(4)),
+                            right: Box::new(Number::Regular(9))
+                        }),
+                    }),
+                    right: Box::new(Number::Regular(3))
                 }),
             }
         );
 
-        assert_eq!(Number::new(&TEST_INPUT_6),
+        assert_eq!(
+            Number::new(&TEST_INPUT_6),
             Number::Compound {
                 left: Box::new(Number::Compound {
+                    left: Box::new(Number::Compound {
                         left: Box::new(Number::Compound {
-                                left: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(1)),
-                                        right: Box::new(Number::Regular(3))
-                                }),
-                                right: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(5)),
-                                        right: Box::new(Number::Regular(3))
-                                })
+                            left: Box::new(Number::Regular(1)),
+                            right: Box::new(Number::Regular(3))
                         }),
                         right: Box::new(Number::Compound {
-                                left: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(1)),
-                                        right: Box::new(Number::Regular(3))
-                                }),
-                                right: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(8)),
-                                        right: Box::new(Number::Regular(7))
-                                })
+                            left: Box::new(Number::Regular(5)),
+                            right: Box::new(Number::Regular(3))
                         })
+                    }),
+                    right: Box::new(Number::Compound {
+                        left: Box::new(Number::Compound {
+                            left: Box::new(Number::Regular(1)),
+                            right: Box::new(Number::Regular(3))
+                        }),
+                        right: Box::new(Number::Compound {
+                            left: Box::new(Number::Regular(8)),
+                            right: Box::new(Number::Regular(7))
+                        })
+                    })
                 }),
                 right: Box::new(Number::Compound {
+                    left: Box::new(Number::Compound {
                         left: Box::new(Number::Compound {
-                                left: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(4)),
-                                        right: Box::new(Number::Regular(9))
-                                }),
-                                right: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(6)),
-                                        right: Box::new(Number::Regular(9))
-                                })
+                            left: Box::new(Number::Regular(4)),
+                            right: Box::new(Number::Regular(9))
                         }),
                         right: Box::new(Number::Compound {
-                                left: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(8)),
-                                        right: Box::new(Number::Regular(2))
-                                }),
-                                right: Box::new(Number::Compound {
-                                        left: Box::new(Number::Regular(7)),
-                                        right: Box::new(Number::Regular(3))
-                                })
+                            left: Box::new(Number::Regular(6)),
+                            right: Box::new(Number::Regular(9))
                         })
+                    }),
+                    right: Box::new(Number::Compound {
+                        left: Box::new(Number::Compound {
+                            left: Box::new(Number::Regular(8)),
+                            right: Box::new(Number::Regular(2))
+                        }),
+                        right: Box::new(Number::Compound {
+                            left: Box::new(Number::Regular(7)),
+                            right: Box::new(Number::Regular(3))
+                        })
+                    })
                 }),
             }
         );
@@ -614,35 +611,34 @@ mod tests {
         Number::new("[1,2");
     }
 
-
     // Tests over multiple lines of input
 
-    const TEST_MULTI_LINE_0: &str =
-r#"[1,1]
+    const TEST_MULTI_LINE_0: &str = "\
+[1,1]
 [2,2]
 [3,3]
 [4,4]
-"#;
+";
 
-    const TEST_MULTI_LINE_1: &str =
-r#"[1,1]
+    const TEST_MULTI_LINE_1: &str = "\
+[1,1]
 [2,2]
 [3,3]
 [4,4]
 [5,5]
-"#;
+";
 
-    const TEST_MULTI_LINE_2: &str =
-r#"[1,1]
+    const TEST_MULTI_LINE_2: &str = "\
+[1,1]
 [2,2]
 [3,3]
 [4,4]
 [5,5]
 [6,6]
-"#;
+";
 
-    const TEST_MULTI_LINE_3: &str =
-r#"[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]
+    const TEST_MULTI_LINE_3: &str = "\
+[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]
 [7,[[[3,7],[4,3]],[[6,3],[8,8]]]]
 [[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]
 [[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]]
@@ -652,8 +648,7 @@ r#"[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]
 [1,[[[9,3],9],[[9,0],[0,7]]]]
 [[[5,[7,4]],7],1]
 [[[[4,2],2],6],[8,7]]
-"#;
-
+";
 
     #[test]
     fn test_multi_line0() {
@@ -676,26 +671,41 @@ r#"[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]
     #[test]
     fn test_multi_line3() {
         let result = add_input(&TEST_MULTI_LINE_3);
-        assert_eq!(result, Number::new("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]"));
+        assert_eq!(
+            result,
+            Number::new("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]")
+        );
     }
 
     #[test]
     fn test_magnitude() {
         assert_eq!(Number::new("[[1,2],[[3,4],5]]").magnitude(), 143);
-        assert_eq!(Number::new("[[[[0,7],4],[[7,8],[6,0]]],[8,1]]").magnitude(), 1384);
-        assert_eq!(Number::new("[[[[1,1],[2,2]],[3,3]],[4,4]]").magnitude(), 445);
-        assert_eq!(Number::new("[[[[3,0],[5,3]],[4,4]],[5,5]]").magnitude(), 791);
-        assert_eq!(Number::new("[[[[5,0],[7,4]],[5,5]],[6,6]]").magnitude(), 1137);
-        assert_eq!(Number::new("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]")
-            .magnitude(), 3488
+        assert_eq!(
+            Number::new("[[[[0,7],4],[[7,8],[6,0]]],[8,1]]").magnitude(),
+            1384
+        );
+        assert_eq!(
+            Number::new("[[[[1,1],[2,2]],[3,3]],[4,4]]").magnitude(),
+            445
+        );
+        assert_eq!(
+            Number::new("[[[[3,0],[5,3]],[4,4]],[5,5]]").magnitude(),
+            791
+        );
+        assert_eq!(
+            Number::new("[[[[5,0],[7,4]],[5,5]],[6,6]]").magnitude(),
+            1137
+        );
+        assert_eq!(
+            Number::new("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]").magnitude(),
+            3488
         );
     }
 
-
     // Complete test, exercising all functions required to find the challenge answer.
 
-    const TEST_FULL: &str =
-r#"[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
+    const TEST_FULL: &str = "\
+[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
 [[[5,[2,8]],4],[5,[[9,9],0]]]
 [6,[[[6,2],[5,6]],[[7,6],[4,7]]]]
 [[[6,[0,7]],[0,9]],[4,[9,[9,0]]]]
@@ -704,7 +714,7 @@ r#"[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
 [[[[5,4],[7,7]],8],[[8,3],8]]
 [[9,3],[[9,9],[6,[4,9]]]]
 [[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
-[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]"#;
+[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]";
 
     #[test]
     fn test_all_functions() {

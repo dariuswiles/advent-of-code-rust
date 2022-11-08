@@ -18,13 +18,12 @@ type Depth = i32;
 enum Command {
     Down(i32),
     Forward(i32),
-    Up(i32)
+    Up(i32),
 }
-
 
 #[derive(Debug, PartialEq)]
 struct Commands {
-    commands: Vec<Command>
+    commands: Vec<Command>,
 }
 
 impl Commands {
@@ -70,44 +69,46 @@ impl Commands {
 
         for c in &self.commands {
             match c {
-                Command::Down(d) => { aim += *d as i32; }
+                Command::Down(d) => {
+                    aim += *d as i32;
+                }
                 Command::Forward(f) => {
                     horizontal += f;
                     depth += aim * f;
                 }
-                Command::Up(u) => { aim -= *u as i32; }
+                Command::Up(u) => {
+                    aim -= *u as i32;
+                }
             }
-
         }
 
         (horizontal, depth)
     }
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let position = Commands::parse_commands(&input_file).execute_commands();
 
-    println!("The product of submarine's final position is {}", position.0 * position.1);
+    println!(
+        "The product of the submarine's final position is {}",
+        position.0 * position.1
+    );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"forward 5
+    const TEST_INPUT: &str = "\
+forward 5
 down 5
 forward 8
 up 3
 down 8
-forward 2"#;
+forward 2";
 
     #[test]
     fn parse_test_input() {

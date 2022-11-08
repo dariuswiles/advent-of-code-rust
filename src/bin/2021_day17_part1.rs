@@ -3,21 +3,20 @@
 //!
 //! Challenge part 1
 //!
-//! Determines the highest trajectory a probe can take and still end up within the target area
+//! Determine the highest trajectory a probe can take and still end up within the target area
 //! defined in the input data.
 
-use std::collections::{ HashMap, HashSet };
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::ops::RangeInclusive;
 
 const INPUT_FILENAME: &str = "2021_day17_input.txt";
-const X_INITIAL_MAX: Velocity = 50;  // The highest initial velocity of x to try.
-const Y_INITIAL_MAX: Velocity = 100;  // The highest initial velocity of y to try.
+const X_INITIAL_MAX: Velocity = 50; // The highest initial velocity of x to try.
+const Y_INITIAL_MAX: Velocity = 100; // The highest initial velocity of y to try.
 
 type Velocity = i16;
 type Position = i16;
 type Round = usize;
-
 
 /// Returns a pair of inclusive ranges for x and y axes of the target area based on the given
 /// string.
@@ -29,7 +28,11 @@ fn parse_input(input: &str) -> (RangeInclusive<Position>, RangeInclusive<Positio
     let tokens: Vec<&str> = input.lines().next().unwrap().split(' ').collect();
     assert_eq!(tokens.len(), 4);
 
-    let x_input = tokens[2].strip_prefix("x=").unwrap().strip_suffix(",").unwrap();
+    let x_input = tokens[2]
+        .strip_prefix("x=")
+        .unwrap()
+        .strip_suffix(",")
+        .unwrap();
     let y_input = tokens[3].strip_prefix("y=").unwrap();
 
     let x_tokens: Vec<&str> = x_input.split("..").collect();
@@ -42,16 +45,18 @@ fn parse_input(input: &str) -> (RangeInclusive<Position>, RangeInclusive<Positio
     let y_start = Velocity::from_str_radix(y_tokens[0], 10).unwrap();
     let y_end = Velocity::from_str_radix(y_tokens[1], 10).unwrap();
 
-    (RangeInclusive::new(x_start, x_end), RangeInclusive::new(y_start, y_end))
+    (
+        RangeInclusive::new(x_start, x_end),
+        RangeInclusive::new(y_start, y_end),
+    )
 }
-
 
 /// Returns a `HashMap` containing information on initial velocities of y that lead to the probe
 /// entering the target. The returned HashMap is indexed by the round the probe is within the
 /// target, and the values are a tuple of the initial y velocity and highest y position achieved.
-fn possible_y_velocities(y_range: &RangeInclusive<Position>)
-    -> HashMap<Round, (Velocity, Position)>
-{
+fn possible_y_velocities(
+    y_range: &RangeInclusive<Position>,
+) -> HashMap<Round, (Velocity, Position)> {
     let y_min = *y_range.start();
 
     let mut results: HashMap<Round, (Velocity, Position)> = HashMap::new();
@@ -81,7 +86,6 @@ fn possible_y_velocities(y_range: &RangeInclusive<Position>)
     results
 }
 
-
 /// Restricts the y_candidates passed to only those where the probe is within the target in the x
 /// direction during the same round. Returns a copy of y_candidates, restricted down to only
 /// entries meeting both x and y conditions, and with the initial value of x included. The returned
@@ -92,14 +96,13 @@ fn possible_y_velocities(y_range: &RangeInclusive<Position>)
 /// NOTE: the challenge allows negative initial values of x, but this code does not support this.
 fn restrict_y_candidates_with_valid_x(
     x_range: &RangeInclusive<Position>,
-    y_candidates: HashMap<Round, (Velocity, Position)>
+    y_candidates: HashMap<Round, (Velocity, Position)>,
 ) -> HashMap<Round, (Velocity, Velocity, Position)> {
     let y_round_candidates: HashSet<&Round> = y_candidates.keys().collect();
     let y_round_max = **y_round_candidates.iter().max().unwrap();
 
     let mut results = HashMap::new();
     for initial_x in 0..X_INITIAL_MAX {
-
         let mut round = 0;
         let mut x_pos = 0;
         let mut x_velocity = initial_x;
@@ -110,13 +113,15 @@ fn restrict_y_candidates_with_valid_x(
             x_velocity = 0.max(x_velocity - 1);
 
             if x_range.contains(&x_pos) && y_round_candidates.contains(&round) {
-                results.insert(round, (initial_x, y_candidates[&round].0, y_candidates[&round].1));
+                results.insert(
+                    round,
+                    (initial_x, y_candidates[&round].0, y_candidates[&round].1),
+                );
             }
         }
     }
     results
 }
-
 
 /// Returns the answer to the challenge based on the target range definitions in the given input
 /// file.
@@ -132,17 +137,14 @@ fn challenge_answer(input: &str) -> Position {
     xy_candidates.values().map(|c| c.2).max().unwrap()
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-    println!("The highest y position that the probe can reach and pass through the target is {}",
+    println!(
+        "The highest y position that the probe can reach and pass through the target is {}",
         challenge_answer(&input_file)
     );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]

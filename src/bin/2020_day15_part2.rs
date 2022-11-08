@@ -3,8 +3,8 @@
 //!
 //! Challenge part 2
 //!
-//! Follows the game rules explained in the challenge until the given game turn is reached, at
-//! which point the answer to the challenge is obtained. Part 2 of the challenge only increases
+//! Follow the game rules explained in the challenge until the given game turn is reached, at
+//! which point the answer to the challenge is obtained. Part 2 of the challenge increases
 //! the number of game turns from 2,020 to 30,000,000.
 //
 // The increase in the number of turns causes the solution for part 1 to take an unacceptably long

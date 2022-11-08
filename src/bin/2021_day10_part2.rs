@@ -3,9 +3,11 @@
 //!
 //! Challenge part 2
 //!
-//! Reads a file of opening and closing symbols and determines if each line is corrupt or
-//! incomplete. Incomplete lines are scored based on the symbols that must be added to complete
-//! them and score is calculated based on these symbols. The median score is the challenge answer.
+//! Read a file of opening and closing symbols and determine which lines are corrupt or
+//! incomplete. Corrupt lines are scored and a total score is returned as the challenge answer.
+//! Incomplete lines are scored based on the symbols that must be added to complete
+//! them and a score is calculated based on these symbols. The median score is the answer to this
+//! part of the challenge.
 
 use std::fs;
 
@@ -42,13 +44,15 @@ fn validate_line(line: &str) -> Validity {
         } else {
             if CLOSERS.contains(c) {
                 if let Some(opening) = stack.pop() {
-                    if ((opening == '(') && (c != ')')) ||
-                        ((opening == '[') && (c != ']')) ||
-                        ((opening == '{') && (c != '}')) ||
-                        ((opening == '<') && (c != '>')) {
+                    if ((opening == '(') && (c != ')'))
+                        || ((opening == '[') && (c != ']'))
+                        || ((opening == '{') && (c != '}'))
+                        || ((opening == '<') && (c != '>'))
+                    {
                         return Validity::Corrupted(c);
                     }
-                } else {    // Stack is empty, so there is no matching opening symbol.
+                } else {
+                    // Stack is empty, so there is no matching opening symbol.
                     return Validity::Corrupted(c);
                 }
             } else {
@@ -64,30 +68,31 @@ fn validate_line(line: &str) -> Validity {
     }
 }
 
-
 /// Calculates a score based on the symbols required to complete the line.
 //
 // The stack passed contains unmatched symbols in the order they were opened, so this needs to be
 // reversed so the order is correct for closing. For simplicity, the opening symbols are used
 // to avoid the need to translate them to closing symbols.
-fn score_incomplete(stack: &Vec <char>) -> u64 {
+fn score_incomplete(stack: &Vec<char>) -> u64 {
     let mut score = 0;
 
     let mut reversed_stack = stack.clone();
     reversed_stack.reverse();
     for c in reversed_stack {
-        score = score * 5 + match c {
-            '(' => { SCORE_PARENTHESIS }
-            '[' => { SCORE_BRACKET }
-            '{' => { SCORE_BRACE }
-            '<' => { SCORE_ANGLE_BRACKET }
-            _ => { panic!("Unrecognized symbol '{}' found on stack", c); }
-        };
+        score = score * 5
+            + match c {
+                '(' => SCORE_PARENTHESIS,
+                '[' => SCORE_BRACKET,
+                '{' => SCORE_BRACE,
+                '<' => SCORE_ANGLE_BRACKET,
+                _ => {
+                    panic!("Unrecognized symbol '{}' found on stack", c);
+                }
+            };
     }
 
     score
 }
-
 
 /// Validates each line of the input file, scoring only incomplete lines based on the symbols
 /// required to complete the line. The scores for all incomplete lines are sorted and the
@@ -103,7 +108,7 @@ fn score_bad_lines(input: &str) -> u64 {
         let result = validate_line(&line);
 
         if let Validity::Incomplete(stack) = result {
-//             println!("Line '{}' is incomplete due to missing symbols '{:?}'", &line, &stack);
+            // println!("Line '{}' is incomplete due to missing symbols '{:?}'", &line, &stack);
             scores.push(score_incomplete(&stack));
         }
     }
@@ -112,25 +117,22 @@ fn score_bad_lines(input: &str) -> u64 {
     scores[(scores.len() - 1) / 2]
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-    println!("The total score for all corrupted lines in the input files is {}",
+    println!(
+        "The total score for all corrupted lines in the input files is {}",
         score_bad_lines(&input_file)
     );
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"[({(<(())[]>[[{[]{<()<>>
+    const TEST_INPUT: &str = "\
+[({(<(())[]>[[{[]{<()<>>
 [(()[<>])]({[<{<<[]>>(
 {([(<{}[<>[]}>{[]{[(<()>
 (((({<>}<{<{<>}{[]{[]{}
@@ -139,13 +141,13 @@ r#"[({(<(())[]>[[{[]{<()<>>
 {<[[]]>}<{[{[{[]{()[[[]
 [<(<(<(<{}))><([]([]()
 <{([([[(<>()){}]>(<<{{
-<{([{{}}[<[[[<>{}]]]>[]]"#;
+<{([{{}}[<[[[<>{}]]]>[]]";
 
-    const TEST_LINE_0: &str = r#"[({(<(())[]>[[{[]{<()<>>"#;
-    const TEST_LINE_1: &str = r#"[(()[<>])]({[<{<<[]>>("#;
-    const TEST_LINE_2: &str = r#"(((({<>}<{<{<>}{[]{[]{}"#;
-    const TEST_LINE_3: &str = r#"{<[[]]>}<{[{[{[]{()[[[]"#;
-    const TEST_LINE_4: &str = r#"<{([{{}}[<[[[<>{}]]]>[]]"#;
+    const TEST_LINE_0: &str = "[({(<(())[]>[[{[]{<()<>>";
+    const TEST_LINE_1: &str = "[(()[<>])]({[<{<<[]>>(";
+    const TEST_LINE_2: &str = "(((({<>}<{<{<>}{[]{[]{}";
+    const TEST_LINE_3: &str = "{<[[]]>}<{[{[{[]{()[[[]";
+    const TEST_LINE_4: &str = "<{([{{}}[<[[[<>{}]]]>[]]";
 
     // Note that the expected output differs from the challenge test output because the stack
     // contains opening symbols only, so closing symbols need swapping for opening symbols. Also
@@ -153,33 +155,47 @@ r#"[({(<(())[]>[[{[]{<()<>>
     // to complete a line.
     #[test]
     fn test_incomplete_lines() {
-        assert_eq!(validate_line(&TEST_LINE_0),
+        assert_eq!(
+            validate_line(&TEST_LINE_0),
             Validity::Incomplete("{{[[({([".chars().rev().collect())
         );
 
-        assert_eq!(validate_line(&TEST_LINE_1),
+        assert_eq!(
+            validate_line(&TEST_LINE_1),
             Validity::Incomplete("({<[{(".chars().rev().collect())
         );
 
-        assert_eq!(validate_line(&TEST_LINE_2),
+        assert_eq!(
+            validate_line(&TEST_LINE_2),
             Validity::Incomplete("{{<{<((((".chars().rev().collect())
         );
 
-        assert_eq!(validate_line(&TEST_LINE_3),
+        assert_eq!(
+            validate_line(&TEST_LINE_3),
             Validity::Incomplete("[[{{[{[{<".chars().rev().collect())
         );
 
-        assert_eq!(validate_line(&TEST_LINE_4),
+        assert_eq!(
+            validate_line(&TEST_LINE_4),
             Validity::Incomplete("[({<".chars().rev().collect())
         );
     }
 
     #[test]
     fn test_score_incomplete() {
-        assert_eq!(score_incomplete(&"{{[[({([".chars().rev().collect()), 288957);
+        assert_eq!(
+            score_incomplete(&"{{[[({([".chars().rev().collect()),
+            288957
+        );
         assert_eq!(score_incomplete(&"({<[{(".chars().rev().collect()), 5566);
-        assert_eq!(score_incomplete(&"{{<{<((((".chars().rev().collect()), 1480781);
-        assert_eq!(score_incomplete(&"[[{{[{[{<".chars().rev().collect()), 995444);
+        assert_eq!(
+            score_incomplete(&"{{<{<((((".chars().rev().collect()),
+            1480781
+        );
+        assert_eq!(
+            score_incomplete(&"[[{{[{[{<".chars().rev().collect()),
+            995444
+        );
         assert_eq!(score_incomplete(&"[({<".chars().rev().collect()), 294);
     }
 

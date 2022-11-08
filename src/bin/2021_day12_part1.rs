@@ -5,7 +5,7 @@
 //!
 //! Traverse a cave system and determine the number of valid paths through it.
 
-use std::collections::{ HashMap, HashSet };
+use std::collections::{HashMap, HashSet};
 use std::fs;
 
 const INPUT_FILENAME: &str = "2021_day12_input.txt";
@@ -26,7 +26,6 @@ impl<'a> Cave<'a> {
         }
     }
 }
-
 
 /// Converts the input into a `HashMap` of `Cave`s indexed by the `Cave` name.
 ///
@@ -49,19 +48,20 @@ fn parse_input(input: &str) -> HashMap<String, Cave> {
         if let Some(cave) = caves.get_mut(end_points[0]) {
             cave.connections.insert(end_points[1]);
         } else {
-            caves.insert(end_points[0].to_string(), Cave::new(end_points[0], &end_points[1]));
+            caves.insert(
+                end_points[0].to_string(),
+                Cave::new(end_points[0], &end_points[1]),
+            );
         }
     }
     caves
 }
-
 
 /// Takes a `HashMap` of `Cave`s and modifies it to add the reverse connections. For example, if
 /// the `HashMap` contains `Cave` 'A' that connects to cave b, modifies cave b to include a
 /// connection back to cave A. This makes it easier to exhaustively try all possible routes
 /// through the caves. Reverse connections are not created for the "start" and "end" caves.
 fn add_reverse_connections(caves: &mut HashMap<String, Cave>) {
-// fn add_reverse_connections<'a>(caves: &'a mut HashMap<&'a str, Cave>) {
     for (_, cave) in caves.clone().iter() {
         if cave.name != "start" {
             for conn_end in &cave.connections {
@@ -75,12 +75,10 @@ fn add_reverse_connections(caves: &mut HashMap<String, Cave>) {
     }
 }
 
-
 /// Converts a `Vec` of `Cave`s to a comma-separated string of their names.
 fn convert_cave_list_to_string(path: &Vec<&Cave>) -> String {
     path.iter().map(|c| c.name).collect::<Vec<&str>>().join(",")
 }
-
 
 /// Recursive part of `walk_paths` that should only be called from there. It walks all paths
 /// between `Cave`s, avoiding small `Cave`s that have already been visited (as indicated by their
@@ -118,7 +116,6 @@ fn walk_paths_int<'a>(
     completed_paths
 }
 
-
 /// Walks all paths between `Cave`s and returns a sorted `Vec` of strings indicating every valid
 /// path.
 fn walk_paths(caves: &HashMap<String, Cave>) -> Vec<String> {
@@ -133,35 +130,34 @@ fn walk_paths(caves: &HashMap<String, Cave>) -> Vec<String> {
     results
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let mut caves = parse_input(&input_file);
     add_reverse_connections(&mut caves);
 
-    println!("There are {} paths through the cave system", walk_paths(&caves).len());
+    println!(
+        "There are {} paths through the cave system",
+        walk_paths(&caves).len()
+    );
 }
-
 
 // Test data based on examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT_1: &str =
-r#"start-A
+    const TEST_INPUT_1: &str = "\
+start-A
 start-b
 A-c
 A-b
 b-d
 A-end
-b-end"#;
+b-end";
 
-    const TEST_INPUT_2: &str =
-r#"dc-end
+    const TEST_INPUT_2: &str = "\
+dc-end
 HN-start
 start-kj
 dc-start
@@ -170,10 +166,10 @@ LN-dc
 HN-end
 kj-sa
 kj-HN
-kj-dc"#;
+kj-dc";
 
-    const TEST_INPUT_3: &str =
-r#"fs-end
+    const TEST_INPUT_3: &str = "\
+fs-end
 he-DX
 fs-he
 start-DX
@@ -190,7 +186,7 @@ start-pj
 he-WI
 zg-he
 pj-fs
-start-RW"#;
+start-RW";
 
     #[test]
     fn create_caves() {
@@ -212,12 +208,18 @@ start-RW"#;
         let start_cave = &caves["start"];
         assert_eq!(start_cave.name, "start");
         assert_eq!(start_cave.big, false);
-        assert_eq!(start_cave.connections, vec!["A", "b"].iter().cloned().collect());
+        assert_eq!(
+            start_cave.connections,
+            vec!["A", "b"].iter().cloned().collect()
+        );
 
         let cave_a = &caves["A"];
         assert_eq!(cave_a.name, "A");
         assert_eq!(cave_a.big, true);
-        assert_eq!(cave_a.connections, vec!["b", "c", "end"].iter().cloned().collect());
+        assert_eq!(
+            cave_a.connections,
+            vec!["b", "c", "end"].iter().cloned().collect()
+        );
     }
 
     #[test]
@@ -225,9 +227,18 @@ start-RW"#;
         let mut caves = parse_input(&TEST_INPUT_1);
         add_reverse_connections(&mut caves);
 
-        assert_eq!(caves["start"].connections, vec!["A", "b"].iter().cloned().collect());
-        assert_eq!(caves["A"].connections, vec!["b", "c", "end"].iter().cloned().collect());
-        assert_eq!(caves["b"].connections, vec!["A", "d", "end"].iter().cloned().collect());
+        assert_eq!(
+            caves["start"].connections,
+            vec!["A", "b"].iter().cloned().collect()
+        );
+        assert_eq!(
+            caves["A"].connections,
+            vec!["b", "c", "end"].iter().cloned().collect()
+        );
+        assert_eq!(
+            caves["b"].connections,
+            vec!["A", "d", "end"].iter().cloned().collect()
+        );
         assert_eq!(caves["c"].connections, vec!["A"].iter().cloned().collect());
         assert_eq!(caves["d"].connections, vec!["b"].iter().cloned().collect());
     }
@@ -245,8 +256,10 @@ start-RW"#;
     fn test_walk_paths_1() {
         let mut caves = parse_input(&TEST_INPUT_1);
         add_reverse_connections(&mut caves);
-        assert_eq!(walk_paths(&caves),
-            vec!["start,A,b,A,c,A,end",
+        assert_eq!(
+            walk_paths(&caves),
+            vec![
+                "start,A,b,A,c,A,end",
                 "start,A,b,A,end",
                 "start,A,b,end",
                 "start,A,c,A,b,A,end",
@@ -264,8 +277,10 @@ start-RW"#;
     fn test_walk_paths_2() {
         let mut caves = parse_input(&TEST_INPUT_2);
         add_reverse_connections(&mut caves);
-        assert_eq!(walk_paths(&caves),
-            vec!["start,HN,dc,HN,end",
+        assert_eq!(
+            walk_paths(&caves),
+            vec![
+                "start,HN,dc,HN,end",
                 "start,HN,dc,HN,kj,HN,end",
                 "start,HN,dc,end",
                 "start,HN,dc,kj,HN,end",

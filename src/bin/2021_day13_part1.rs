@@ -3,8 +3,8 @@
 //!
 //! Challenge part 1
 //!
-//! Places dots on a grid at positions given in the input, simulates folding the grid
-//! horizontally and vertically along lines given in the input, and returns the resulting number of
+//! Place dots on a grid at positions given in the input, simulate folding the grid
+//! horizontally and vertically along lines given in the input, and return the resulting number of
 //! visible dots.
 
 use std::collections::HashSet;
@@ -12,13 +12,11 @@ use std::fs;
 
 const INPUT_FILENAME: &str = "2021_day13_input.txt";
 
-
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct Coord {
     x: u16,
     y: u16,
 }
-
 
 /// A `Grid` is a `HashSet` of dots. Top-left is (0, 0) and positive x extends horizontally to the
 /// right.
@@ -43,15 +41,13 @@ impl Grid {
             }
 
             dots.insert(Coord {
-                    x: u16::from_str_radix(x_y[0], 10).unwrap(),
-                    y: u16::from_str_radix(x_y[1], 10).unwrap(),
-                }
-            );
+                x: u16::from_str_radix(x_y[0], 10).unwrap(),
+                y: u16::from_str_radix(x_y[1], 10).unwrap(),
+            });
         }
 
         Self { dots }
     }
-
 
     /// Modifies this grid by folding it in accordance with the `Fold` instruction passed.
     fn perform_fold(&mut self, fold: &Fold) {
@@ -63,7 +59,10 @@ impl Grid {
                     if d.x < fold.location {
                         new_dots.insert(*d);
                     } else {
-                        new_dots.insert(Coord { x: fold.location * 2 - d.x, y: d.y } );
+                        new_dots.insert(Coord {
+                            x: fold.location * 2 - d.x,
+                            y: d.y,
+                        });
                     }
                 }
             }
@@ -72,17 +71,24 @@ impl Grid {
                     if d.y < fold.location {
                         new_dots.insert(*d);
                     } else {
-                        new_dots.insert(Coord { x: d.x, y: fold.location * 2 - d.y } );
+                        new_dots.insert(Coord {
+                            x: d.x,
+                            y: fold.location * 2 - d.y,
+                        });
                     }
                 }
             }
-            _ => { panic!("Internal error: `Coord` contains unexpected axis '{}'", fold.axis); }
+            _ => {
+                panic!(
+                    "Internal error: `Coord` contains unexpected axis '{}'",
+                    fold.axis
+                );
+            }
         }
 
         self.dots = new_dots;
     }
 }
-
 
 /// Contains details of a fold instruction, i.e., the fold axis and location.
 #[derive(Debug, PartialEq)]
@@ -111,10 +117,9 @@ impl Fold {
 
         location = u16::from_str_radix(fold_details[1], 10).unwrap();
 
-        Self { axis, location}
+        Self { axis, location }
     }
 }
-
 
 /// Parses a string consisting of lines of comma separated coordinates, then a blank line, then
 /// lines with fold information. Returns a `Grid` containing dots at the coordinates, and a `Vec`
@@ -125,12 +130,13 @@ fn parse_input(input: &str) -> (Grid, Vec<Fold>) {
     let mut line = input.lines();
 
     while let Some(l) = line.next() {
-        if l.len() == 0 { break; }
+        if l.len() == 0 {
+            break;
+        }
         dots.push(l);
     }
 
     let grid = Grid::new(&dots);
-
 
     while let Some(l) = line.next() {
         if l.len() > 0 {
@@ -141,26 +147,25 @@ fn parse_input(input: &str) -> (Grid, Vec<Fold>) {
     (grid, folds)
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let (mut grid, folds) = parse_input(&input_file);
     grid.perform_fold(&folds[0]);
 
-    println!("The number of visible dots in the grid is {}", grid.dots.len());
+    println!(
+        "The number of visible dots in the grid is {}",
+        grid.dots.len()
+    );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"6,10
+    const TEST_INPUT: &str = "\
+6,10
 0,14
 9,10
 0,3
@@ -180,7 +185,7 @@ r#"6,10
 9,0
 
 fold along y=7
-fold along x=5"#;
+fold along x=5";
 
     #[test]
     fn test_parse_input() {
@@ -206,8 +211,20 @@ fold along x=5"#;
         assert!(grid.dots.contains(&Coord { x: 0, y: 14 }));
         assert!(grid.dots.contains(&Coord { x: 2, y: 14 }));
         assert_eq!(folds.len(), 2);
-        assert_eq!(folds[0], Fold { axis: 'y', location: 7 });
-        assert_eq!(folds[1], Fold { axis: 'x', location: 5 });
+        assert_eq!(
+            folds[0],
+            Fold {
+                axis: 'y',
+                location: 7
+            }
+        );
+        assert_eq!(
+            folds[1],
+            Fold {
+                axis: 'x',
+                location: 5
+            }
+        );
     }
 
     #[test]

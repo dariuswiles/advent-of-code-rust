@@ -3,7 +3,7 @@
 //!
 //! Challenge part 1
 //!
-//! Follows the game rules explained in the challenge until the given game round is reached, at
+//! Follow the game rules explained in the challenge until the given game round is reached, at
 //! which point the answer to the challenge is obtained.
 
 const CHALLENGE_INPUT: &str = "7,14,0,17,11,1,2";

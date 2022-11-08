@@ -3,7 +3,7 @@
 //!
 //! Challenge part 1
 //!
-//! Finds the values in a 2D array of data that are lower than adjacent data, and sums them to
+//! Find the values in a 2D array of data that are lower than adjacent data, and sum them to
 //! generate an overall `risk` score.
 
 use std::fs;
@@ -36,7 +36,11 @@ impl HeightMap {
                 line_length = Some(line.len());
             }
 
-            cells.push(line.chars().map(|c| c.to_digit(10).unwrap() as CellData).collect());
+            cells.push(
+                line.chars()
+                    .map(|c| c.to_digit(10).unwrap() as CellData)
+                    .collect(),
+            );
         }
         Self { cells }
     }
@@ -90,43 +94,40 @@ impl HeightMap {
     }
 }
 
-
 /// Returns the total risk by summing the value of low point, plus one, as per the challenge
 /// instructions.
 fn calculate_risk(low_points: &Vec<CellData>) -> u32 {
     low_points.iter().fold(0, |acc, &i| acc + (i as u32) + 1)
 }
 
-
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let hm = HeightMap::new(&input_file);
-    println!("The total risk is {}", calculate_risk(&hm.find_low_points()));
+    println!(
+        "The total risk is {}",
+        calculate_risk(&hm.find_low_points())
+    );
 }
-
 
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"2199943210
+    const TEST_INPUT: &str = "\
+2199943210
 3987894921
 9856789892
 8767896789
-9899965678"#;
+9899965678";
 
-    const TEST_INPUT_BAD_LENGTH: &str =
-r#"2199943210
+    const TEST_INPUT_BAD_LENGTH: &str = "\
+2199943210
 39
 9856789892
 8767896789
-9899965678"#;
+9899965678";
 
     #[test]
     fn parse_test_input() {

@@ -17,7 +17,6 @@ fn calculate_gamma_epsilon(input: &str) -> (String, String) {
     let mut count_of_ones = HashMap::new();
     let mut bits_per_line = None;
 
-
     for line in input.lines() {
         if line == "" {
             continue;
@@ -61,16 +60,12 @@ fn calculate_gamma_epsilon(input: &str) -> (String, String) {
     (gamma, epsilon)
 }
 
-
 fn multiply_gamma_epsilon(gamma: &str, epsilon: &str) -> u32 {
     u32::from_str_radix(&gamma, 2).unwrap() * u32::from_str_radix(&epsilon, 2).unwrap()
 }
 
-
 fn main() {
-    let input_file =
-        fs::read_to_string(INPUT_FILENAME)
-            .expect("Error reading input file");
+    let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
     let (gamma, epsilon) = calculate_gamma_epsilon(&input_file);
 
@@ -80,14 +75,13 @@ fn main() {
     println!("The submarine's power consumption is {}", answer);
 }
 
-
 // Test using data from the examples on the challenge page.
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str =
-r#"00100
+    const TEST_INPUT: &str = "\
+00100
 11110
 10110
 10111
@@ -98,13 +92,13 @@ r#"00100
 10000
 11001
 00010
-01010"#;
+01010";
 
-    const TEST_INPUT_BAD_LENGTH: &str =
-r#"00100
+    const TEST_INPUT_BAD_LENGTH: &str = "\
+00100
 11110
 101
-10111"#;
+10111";
 
     #[test]
     fn parse_test_input() {
