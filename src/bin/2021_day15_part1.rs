@@ -60,18 +60,11 @@ impl RiskGrid {
 impl fmt::Display for RiskGrid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for row in &self.cell {
-            for cell in row.iter() {
-                let mut s;
-                if cell < &10 {
-                    s = "  ".to_string();
-                } else {
-                    s = " ".to_string();
-                }
-
-                s.push_str(&cell.to_string());
-                f.write_str(&s).unwrap();
-            }
-            f.write_str("\n").unwrap();
+            let mut s: String = row
+                .iter()
+                .map(|d| d.to_string()).collect();
+            s.push('\n');
+            f.write_str(&s).unwrap();
         }
 
         Ok(())
