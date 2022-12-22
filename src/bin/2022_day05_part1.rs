@@ -98,12 +98,13 @@ impl Stacks {
         self.stacks[to].push(stack_crate);
     }
 
-    /// Transfers `count` crates from the top of stack `from` to the top of stack `to`. Crates are
-    /// moved one at a time, so will end up stacked in the reverse of their initial order.
+    /// Transfers `num_crates` crates from the top of stack `from` to the top of stack `to`.
+    /// Crates are moved one at a time, so will end up stacked in the reverse of their initial
+    /// order.
     ///
     /// # Panics
     ///
-    /// Panics if `from` does not have `count` crates, or if `from` or `to` are out of bounds.
+    /// Panics if `from` does not have `num_crates` crates, or if `from` or `to` are out of bounds.
     fn move_crates(&mut self, m: &Move) {
         assert!(m.to_stack != 0);
         for _ in 0..m.num_crates {
