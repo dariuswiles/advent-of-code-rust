@@ -9,8 +9,7 @@
 //! sub-directories, sums the totals of all directories at least 100,000 in size, and displays this
 //! as the challenge answer.
 
-use std::fmt;
-use std::fmt::Display;
+use std::fmt::{self, Display};
 use std::fs;
 
 type FileSize = u64;
