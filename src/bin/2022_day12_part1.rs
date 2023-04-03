@@ -3,7 +3,8 @@
 //!
 //! Challenge part 1
 //!
-//! Finds the most efficient path through the given heightmap of mountainous terrain.
+//! Finds the most efficient path through the given heightmap of mountainous terrain from a given
+//! start position to a given end position.
 
 use std::collections::HashSet;
 use std::fmt::{self, Display};
@@ -319,281 +320,246 @@ abdefghi
             FlatMap::new(&hm),
             FlatMap {
                 flat_map: vec![
+                    // Row #0
                     FlatMapCell {
-                        // Row #0, 'S'
                         north: false,
                         east: true,
                         south: true,
                         west: false,
                     },
                     FlatMapCell {
-                        // 'a'
                         north: false,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'b'
                         north: false,
                         east: false,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'q'
                         north: false,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'p'
                         north: false,
                         east: true,
                         south: false,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'o'
                         north: false,
                         east: true,
                         south: false,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'n'
                         north: false,
                         east: true,
                         south: false,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'm'
                         north: false,
                         east: false,
                         south: true,
                         west: true,
                     },
+                    // Row #1
                     FlatMapCell {
-                        // Row #1, 'a'
                         north: true,
                         east: true,
                         south: true,
                         west: false,
                     },
                     FlatMapCell {
-                        // 'b'
                         north: true,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'c'
                         north: true,
                         east: false,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'r'
                         north: true,
                         east: false,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'y'
                         north: true,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'x'
                         north: true,
                         east: true,
                         south: false,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'x'
                         north: true,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'l'
+                        north: true,
+                        east: false,
+                        south: true,
+                        west: false,
+                    },
+                    // Row #2
+                    FlatMapCell {
                         north: true,
                         east: false,
                         south: true,
                         west: false,
                     },
                     FlatMapCell {
-                        // Row #2, 'a'
-                        north: true,
-                        east: false,
-                        south: true,
-                        west: false,
-                    },
-                    FlatMapCell {
-                        // 'c'
                         north: true,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'c'
                         north: true,
                         east: false,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 's'
                         north: true,
                         east: false,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'z'
                         north: true,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'E'
                         north: true,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'x'
                         north: true,
                         east: true,
                         south: true,
                         west: false,
                     },
                     FlatMapCell {
-                        // 'k'
+                        north: true,
+                        east: false,
+                        south: true,
+                        west: false,
+                    },
+                    // Row #3
+                    FlatMapCell {
                         north: true,
                         east: false,
                         south: true,
                         west: false,
                     },
                     FlatMapCell {
-                        // Row #3, 'a'
-                        north: true,
-                        east: false,
-                        south: true,
-                        west: false,
-                    },
-                    FlatMapCell {
-                        // 'c'
                         north: true,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'c'
                         north: true,
                         east: false,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 't'
                         north: true,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'u'
                         north: false,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'v'
                         north: false,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'w'
                         north: true,
                         east: true,
                         south: true,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'j'
                         north: true,
                         east: false,
                         south: true,
                         west: false,
                     },
+                    // Row #4
                     FlatMapCell {
-                        // Row #4, 'a'
                         north: true,
                         east: true,
                         south: false,
                         west: false,
                     },
                     FlatMapCell {
-                        // 'b'
                         north: true,
                         east: false,
                         south: false,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'd'
                         north: true,
                         east: true,
                         south: false,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'e'
                         north: false,
                         east: true,
                         south: false,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'f'
                         north: false,
                         east: true,
                         south: false,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'g'
                         north: false,
                         east: true,
                         south: false,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'h'
                         north: false,
                         east: true,
                         south: false,
                         west: true,
                     },
                     FlatMapCell {
-                        // 'i'
                         north: true,
                         east: false,
                         south: false,
