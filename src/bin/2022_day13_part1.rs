@@ -64,8 +64,8 @@ impl ListElement {
                         *ic = &mut &ic[1..];
                     }
 
-                    let int_tmp = Int::from_str_radix(&char_digits.iter().collect::<String>(), 10)
-                        .unwrap();
+                    let int_tmp =
+                        Int::from_str_radix(&char_digits.iter().collect::<String>(), 10).unwrap();
 
                     elements.push(ListElement::Integer(int_tmp));
                 }
@@ -109,10 +109,12 @@ fn parse_input(input: &str) -> Pairs {
                 left = None;
             }
             2 => {
-                assert!(line.is_empty(), "Blank line between pairs in input was not found");
+                assert!(
+                    line.is_empty(),
+                    "Blank line between pairs in input was not found"
+                );
             }
-            _ => {
-            }
+            _ => {}
         }
     }
 
@@ -202,7 +204,10 @@ fn check_order_of_all_pairs(pairs: &Pairs) -> usize {
 fn main() {
     let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
     let pairs = parse_input(&input_file);
-    println!("The challenge answer is {}", check_order_of_all_pairs(&pairs));
+    println!(
+        "The challenge answer is {}",
+        check_order_of_all_pairs(&pairs)
+    );
 }
 
 // Test using data from the examples on the challenge page.
@@ -240,10 +245,7 @@ mod tests {
     fn test_parse_str_0() {
         assert_eq!(
             ListElement::parse_str(&"[11,0]"),
-            ListElement::List(vec![
-                    ListElement::Integer(11),
-                    ListElement::Integer(0),
-                ])
+            ListElement::List(vec![ListElement::Integer(11), ListElement::Integer(0),])
         );
     }
 
@@ -252,14 +254,12 @@ mod tests {
         assert_eq!(
             ListElement::parse_str(&"[[1],[2,3,4]]"),
             ListElement::List(vec![
-                    ListElement::List(vec![
-                            ListElement::Integer(1),
-                    ]),
-                    ListElement::List(vec![
-                            ListElement::Integer(2),
-                            ListElement::Integer(3),
-                            ListElement::Integer(4),
-                    ]),
+                ListElement::List(vec![ListElement::Integer(1),]),
+                ListElement::List(vec![
+                    ListElement::Integer(2),
+                    ListElement::Integer(3),
+                    ListElement::Integer(4),
+                ]),
             ]),
         );
     }
@@ -280,7 +280,8 @@ mod tests {
     fn test_parse_input() {
         let result = parse_input(&TEST_INPUT);
 
-        assert_eq!(result[0].0,
+        assert_eq!(
+            result[0].0,
             ListElement::List(vec![
                 ListElement::Integer(1),
                 ListElement::Integer(1),
@@ -290,7 +291,8 @@ mod tests {
             ]),
         );
 
-        assert_eq!(result[0].1,
+        assert_eq!(
+            result[0].1,
             ListElement::List(vec![
                 ListElement::Integer(1),
                 ListElement::Integer(1),
@@ -300,11 +302,10 @@ mod tests {
             ]),
         );
 
-        assert_eq!(result[1].0,
+        assert_eq!(
+            result[1].0,
             ListElement::List(vec![
-                ListElement::List(vec![
-                    ListElement::Integer(1),
-                ]),
+                ListElement::List(vec![ListElement::Integer(1),]),
                 ListElement::List(vec![
                     ListElement::Integer(2),
                     ListElement::Integer(3),
@@ -313,55 +314,49 @@ mod tests {
             ]),
         );
 
-        assert_eq!(result[1].1,
+        assert_eq!(
+            result[1].1,
             ListElement::List(vec![
-                ListElement::List(vec![
-                    ListElement::Integer(1),
-                ]),
+                ListElement::List(vec![ListElement::Integer(1),]),
                 ListElement::Integer(4),
             ]),
         );
 
-        assert_eq!(result[2].0,
-            ListElement::List(vec![
-                ListElement::Integer(9),
-            ]),
+        assert_eq!(
+            result[2].0,
+            ListElement::List(vec![ListElement::Integer(9),]),
         );
 
-        assert_eq!(result[2].1,
-            ListElement::List(vec![
-                ListElement::List(vec![
-                    ListElement::Integer(8),
-                    ListElement::Integer(7),
-                    ListElement::Integer(6),
-                ]),
-            ]),
+        assert_eq!(
+            result[2].1,
+            ListElement::List(vec![ListElement::List(vec![
+                ListElement::Integer(8),
+                ListElement::Integer(7),
+                ListElement::Integer(6),
+            ]),]),
         );
 
-        assert_eq!(result[3].0,
+        assert_eq!(
+            result[3].0,
             ListElement::List(vec![
-                ListElement::List(vec![
-                    ListElement::Integer(4),
-                    ListElement::Integer(4),
-                ]),
+                ListElement::List(vec![ListElement::Integer(4), ListElement::Integer(4),]),
                 ListElement::Integer(4),
                 ListElement::Integer(4),
             ]),
         );
 
-        assert_eq!(result[3].1,
+        assert_eq!(
+            result[3].1,
             ListElement::List(vec![
-                ListElement::List(vec![
-                    ListElement::Integer(4),
-                    ListElement::Integer(4),
-                ]),
+                ListElement::List(vec![ListElement::Integer(4), ListElement::Integer(4),]),
                 ListElement::Integer(4),
                 ListElement::Integer(4),
                 ListElement::Integer(4),
             ]),
         );
 
-        assert_eq!(result[4].0,
+        assert_eq!(
+            result[4].0,
             ListElement::List(vec![
                 ListElement::Integer(7),
                 ListElement::Integer(7),
@@ -370,7 +365,8 @@ mod tests {
             ]),
         );
 
-        assert_eq!(result[4].1,
+        assert_eq!(
+            result[4].1,
             ListElement::List(vec![
                 ListElement::Integer(7),
                 ListElement::Integer(7),
@@ -378,34 +374,25 @@ mod tests {
             ]),
         );
 
-        assert_eq!(result[5].0,
-            ListElement::List(vec![
-            ]),
+        assert_eq!(result[5].0, ListElement::List(vec![]),);
+
+        assert_eq!(
+            result[5].1,
+            ListElement::List(vec![ListElement::Integer(3),]),
         );
 
-        assert_eq!(result[5].1,
-            ListElement::List(vec![
-                ListElement::Integer(3),
-            ]),
+        assert_eq!(
+            result[6].0,
+            ListElement::List(vec![ListElement::List(vec![ListElement::List(vec![]),]),]),
         );
 
-        assert_eq!(result[6].0,
-            ListElement::List(vec![
-                ListElement::List(vec![
-                    ListElement::List(vec![
-                    ]),
-                ]),
-            ]),
+        assert_eq!(
+            result[6].1,
+            ListElement::List(vec![ListElement::List(vec![]),]),
         );
 
-        assert_eq!(result[6].1,
-            ListElement::List(vec![
-                ListElement::List(vec![
-                ]),
-            ]),
-        );
-
-        assert_eq!(result[7].0,
+        assert_eq!(
+            result[7].0,
             ListElement::List(vec![
                 ListElement::Integer(1),
                 ListElement::List(vec![
@@ -427,7 +414,8 @@ mod tests {
             ]),
         );
 
-        assert_eq!(result[7].1,
+        assert_eq!(
+            result[7].1,
             ListElement::List(vec![
                 ListElement::Integer(1),
                 ListElement::List(vec![
