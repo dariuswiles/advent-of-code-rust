@@ -176,9 +176,9 @@ impl Chamber {
             return 0;
         }
 
-        for row_index in 0..top_row {
-            if self.cavern[row_index] == ['.', '.', '.', '.', '.', '.', '.'] {
-                return row_index - 1;
+        for row_index in (0..top_row).rev() {
+            if self.cavern[row_index] != ['.', '.', '.', '.', '.', '.', '.'] {
+                return row_index + 1;
             }
         }
 
