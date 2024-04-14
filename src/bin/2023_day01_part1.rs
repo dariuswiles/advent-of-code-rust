@@ -37,9 +37,7 @@ fn main() {
     let input_as_ints = parse_input(&input);
     let answer: u32 = input_as_ints.iter().sum();
 
-    println!(
-        "The sum of all 2-digit numbers is {answer}",
-    );
+    println!("The sum of all 2-digit numbers is {answer}",);
 }
 
 // Test data based on examples on the challenge page.
@@ -56,7 +54,7 @@ treb7uchet";
     #[test]
     fn test_parse_input() {
         let two_digit_numbers = parse_input(TEST_INPUT);
-        assert_eq!(two_digit_numbers, vec![12, 38, 15, 77]);
+        assert_eq!(vec![12, 38, 15, 77], two_digit_numbers);
     }
 
     #[test]
@@ -64,6 +62,6 @@ treb7uchet";
         let two_digit_numbers = parse_input(TEST_INPUT);
         let answer: u32 = two_digit_numbers.iter().sum();
 
-        assert_eq!(answer, 142);
+        assert_eq!(142, answer);
     }
 }
