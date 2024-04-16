@@ -7,7 +7,6 @@
 //! are taken out and shown to us. The challenge consists of determining whether a game is possible
 //! given limits on each color of cube. The challenge answer is the sum of the ids of possible
 //! games.
-//!
 
 use std::fs;
 
