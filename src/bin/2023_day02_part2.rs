@@ -4,10 +4,9 @@
 //! Challenge part 2
 //!
 //! Model a game consisting of a bag of colored cubes, from which several random handfuls of cubes
-//! are taken out and shown to us. The challenge consists of determining whether a game is possible
-//! given limits on each color of cube. The challenge answer is the sum of the ids of possible
-//! games.
-//!
+//! are taken out and shown to us. Part 2 of the challenge consists of determining the minimum
+//! number of cubes of each color must be in the bag for the revealed sets of cubes to be possible.
+//! The challenge answer is the sum of the product of the number of these cubes for each game.
 
 use std::fs;
 
