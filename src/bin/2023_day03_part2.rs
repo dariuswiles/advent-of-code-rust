@@ -202,7 +202,7 @@ fn is_gear(numbers: &HashSet<u32>) -> bool {
 fn main() {
     let input = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
     println!(
-        "The sum of all part numbers adjacent to a symbol is {}",
+        "The sum of the power of all the gears is {}",
         do_challenge(&input)
     );
 }
