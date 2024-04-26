@@ -9,8 +9,6 @@
 //! number of lines that pass through it. The challenge answer is the number of cells that have
 //! more than one line passing through.
 
-
-
 use std::fmt::{Display, Error, Formatter};
 use std::fs;
 

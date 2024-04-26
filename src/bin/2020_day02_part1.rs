@@ -55,7 +55,7 @@ fn validate_input(input: &str) -> u32 {
         if (num_matches >= range_lower) & (num_matches <= range_upper) {
             valid_string_count += 1;
             // println!("\tValidation successful");
-        // } else {
+            // } else {
             // println!("\tValidation failed");
         }
     }

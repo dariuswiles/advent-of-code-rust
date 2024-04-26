@@ -1386,7 +1386,6 @@ Tile 7777:
         assert_eq!(image_mask.mask[4], vec![false, true, true, true, false]);
     }
 
-
     #[test]
     fn pattern_flip_horizontally() {
         #[rustfmt::skip]

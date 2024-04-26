@@ -54,7 +54,7 @@ fn validate_input(input: &str) -> u32 {
             if ((char0 == required_char) | (char1 == required_char)) & (char0 != char1) {
                 valid_string_count += 1;
                 // println!("\tValidation successful");
-            // } else {
+                // } else {
                 // println!("\tValidation failed");
             }
         } else {
