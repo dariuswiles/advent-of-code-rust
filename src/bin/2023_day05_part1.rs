@@ -527,8 +527,6 @@ seed-to-soil map:
     fn test_do_full_mapping() {
         let (_, maps) = parse_input(&TEST_INPUT);
 
-        // assert_eq!(vec![79, 14, 55, 13], seeds);
-
         assert_eq!(82, do_full_mapping(&maps, 79));
         assert_eq!(43, do_full_mapping(&maps, 14));
         assert_eq!(86, do_full_mapping(&maps, 55));
