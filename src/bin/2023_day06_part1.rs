@@ -28,7 +28,7 @@ struct Race {
 
 impl Race {
     /// Returns the number of ways the current record longest distance for this race (stored in
-    /// `self.distance`, can be exceeded. This is determined by calculating how far the boat goes
+    /// `self.distance`), can be exceeded. This is determined by calculating how far the boat goes
     /// in the time stored in `self.time` when pushing the button on the boat for each possible
     /// time value between 0 milliseconds and `self.time`.
     fn count_winning_race_options(&self) -> u32 {
