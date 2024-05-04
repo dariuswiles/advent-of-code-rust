@@ -59,7 +59,9 @@ fn main() {
 fn do_challenge(input: &str) -> u32 {
     let races = parse_input(input);
 
-    races.iter().fold(1, |product, r| product * r.count_winning_race_options())
+    races
+        .iter()
+        .fold(1, |product, r| product * r.count_winning_race_options())
 }
 
 /// Returns the given input as a `Vec` of `Race`s.
@@ -75,10 +77,14 @@ fn parse_input(input: &str) -> Vec<Race> {
     assert_eq!(
         times.len(),
         distances.len(),
-        "Malformed input. There must be the same number of race times as race distances");
+        "Malformed input. There must be the same number of race times as race distances"
+    );
 
     zip(times.iter(), distances.iter())
-        .map(|(t, d)| Race { time: *t, distance: *d })
+        .map(|(t, d)| Race {
+            time: *t,
+            distance: *d,
+        })
         .collect()
 }
 
@@ -98,8 +104,7 @@ fn parse_times(times: &str) -> Vec<u32> {
             continue;
         }
 
-        times.push(u32::from_str_radix(token, 10)
-            .expect("Could not parse '{token}' as a time"));
+        times.push(u32::from_str_radix(token, 10).expect("Could not parse '{token}' as a time"));
     }
 
     times
@@ -121,8 +126,8 @@ fn parse_distances(distances: &str) -> Vec<u32> {
             continue;
         }
 
-        distances.push(u32::from_str_radix(token, 10)
-            .expect("Could not parse '{token}' as a distance"));
+        distances
+            .push(u32::from_str_radix(token, 10).expect("Could not parse '{token}' as a distance"));
     }
 
     distances
@@ -142,9 +147,18 @@ Distance:  9  40  200
     fn test_parse_input() {
         assert_eq!(
             vec![
-                Race { time: 7, distance: 9 },
-                Race { time: 15, distance: 40 },
-                Race { time: 30, distance: 200 },
+                Race {
+                    time: 7,
+                    distance: 9
+                },
+                Race {
+                    time: 15,
+                    distance: 40
+                },
+                Race {
+                    time: 30,
+                    distance: 200
+                },
             ],
             parse_input(&TEST_INPUT)
         );
