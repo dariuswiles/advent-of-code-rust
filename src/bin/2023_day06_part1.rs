@@ -118,7 +118,7 @@ fn parse_times(times: &str) -> Vec<u32> {
 fn parse_distances(distances: &str) -> Vec<u32> {
     let d = distances
         .strip_prefix("Distance: ")
-        .expect("The first line of input must begin with 'Distance: '");
+        .expect("The second line of input must begin with 'Distance: '");
 
     let mut distances = Vec::new();
     for token in d.split(' ') {
