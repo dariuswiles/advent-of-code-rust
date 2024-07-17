@@ -109,7 +109,7 @@ impl fmt::Display for Grid {
             let _ = writeln!(f);
         }
 
-        writeln!(f)
+        Ok(())
     }
 }
 
@@ -179,12 +179,7 @@ fn main() {
         grid.perform_fold(&f);
     }
 
-    println!(
-        "The number of visible dots in the grid is {}",
-        grid.dots.len()
-    );
-
-    println!("{}", grid);
+    print!("The code displayed on the grid is:\n{}", grid);
 }
 
 // Test using data from the examples on the challenge page.
