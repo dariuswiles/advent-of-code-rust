@@ -314,7 +314,7 @@ impl Grid {
     ///
     /// Panics if there is no tile at `Position`.
     fn get_border_for_pos(&self, pos: &Position, dir: CompassDir) -> Direction {
-        let grid_tile = &self.tile_grid[(pos)];
+        let grid_tile = &self.tile_grid[pos];
 
         let mut result = (dir as usize + 4 - grid_tile.rotation as usize) % 4;
 

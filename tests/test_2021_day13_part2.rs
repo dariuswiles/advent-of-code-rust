@@ -2,7 +2,7 @@ mod common;
 
 #[test]
 fn run_test() {
-    let mut result = common::run_challenge("2021_day13_part2");
+    let result = common::run_challenge("2021_day13_part2");
     let result_lines: Vec<&str> = result.trim().lines().collect();
     assert_eq!(result_lines.len(), 7);
     assert_eq!(result_lines[0].trim_end(), "The code displayed on the grid is:");

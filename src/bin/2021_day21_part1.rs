@@ -60,7 +60,7 @@ impl Game {
     }
 
     fn make_move(&mut self, player_id: u8) -> bool {
-        let mut p;
+        let p;
 
         if player_id == 1 {
             p = &mut self.player1;

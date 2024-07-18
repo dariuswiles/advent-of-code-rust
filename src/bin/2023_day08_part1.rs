@@ -113,7 +113,7 @@ fn parse_input(input: &str) -> (&str, HashMap<&str, Node>) {
 fn follow_instructions(instructions: &str, nodes: HashMap<&str, Node>) -> u64 {
     let mut steps = 0;
     let mut current_node = START_NODE;
-    let mut directions = instructions.chars().cycle();
+    let directions = instructions.chars().cycle();
 
     for dir in directions {
         if current_node == END_NODE {

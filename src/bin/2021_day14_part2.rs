@@ -185,22 +185,22 @@ CN -> C";
         let (template, ruleset) = parse_input(&TEST_INPUT);
 
         assert_eq!(template, "NNCB");
-        assert_eq!(ruleset.rules[(&['C', 'H'])], 'B');
-        assert_eq!(ruleset.rules[(&['H', 'H'])], 'N');
-        assert_eq!(ruleset.rules[(&['C', 'B'])], 'H');
-        assert_eq!(ruleset.rules[(&['N', 'H'])], 'C');
-        assert_eq!(ruleset.rules[(&['H', 'B'])], 'C');
-        assert_eq!(ruleset.rules[(&['H', 'C'])], 'B');
-        assert_eq!(ruleset.rules[(&['H', 'N'])], 'C');
-        assert_eq!(ruleset.rules[(&['N', 'N'])], 'C');
-        assert_eq!(ruleset.rules[(&['B', 'H'])], 'H');
-        assert_eq!(ruleset.rules[(&['N', 'C'])], 'B');
-        assert_eq!(ruleset.rules[(&['N', 'B'])], 'B');
-        assert_eq!(ruleset.rules[(&['B', 'N'])], 'B');
-        assert_eq!(ruleset.rules[(&['B', 'B'])], 'N');
-        assert_eq!(ruleset.rules[(&['B', 'C'])], 'B');
-        assert_eq!(ruleset.rules[(&['C', 'C'])], 'N');
-        assert_eq!(ruleset.rules[(&['C', 'N'])], 'C');
+        assert_eq!(ruleset.rules[&['C', 'H']], 'B');
+        assert_eq!(ruleset.rules[&['H', 'H']], 'N');
+        assert_eq!(ruleset.rules[&['C', 'B']], 'H');
+        assert_eq!(ruleset.rules[&['N', 'H']], 'C');
+        assert_eq!(ruleset.rules[&['H', 'B']], 'C');
+        assert_eq!(ruleset.rules[&['H', 'C']], 'B');
+        assert_eq!(ruleset.rules[&['H', 'N']], 'C');
+        assert_eq!(ruleset.rules[&['N', 'N']], 'C');
+        assert_eq!(ruleset.rules[&['B', 'H']], 'H');
+        assert_eq!(ruleset.rules[&['N', 'C']], 'B');
+        assert_eq!(ruleset.rules[&['N', 'B']], 'B');
+        assert_eq!(ruleset.rules[&['B', 'N']], 'B');
+        assert_eq!(ruleset.rules[&['B', 'B']], 'N');
+        assert_eq!(ruleset.rules[&['B', 'C']], 'B');
+        assert_eq!(ruleset.rules[&['C', 'C']], 'N');
+        assert_eq!(ruleset.rules[&['C', 'N']], 'C');
     }
 
     #[test]
