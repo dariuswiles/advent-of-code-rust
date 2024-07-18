@@ -12,6 +12,7 @@ Summaries of the challenges that I've completed organized by year:
 
 - [2020 Challenges](Challenges_2020.md)
 - [2021 Challenges](Challenges_2021.md)
+- [2023 Challenges](Challenges_2023.md)
 
 ## License
 
