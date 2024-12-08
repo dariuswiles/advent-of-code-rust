@@ -45,7 +45,11 @@ fn parse_input(input: &str) -> (Vec<u32>, Vec<u32>) {
         }
 
         let nums: Vec<&str> = line.split(' ').filter(|token| token != &"").collect();
-        assert_eq!(nums.len(), 2, "Each line of input must contain exactly two numbers");
+        assert_eq!(
+            nums.len(),
+            2,
+            "Each line of input must contain exactly two numbers"
+        );
 
         left.push(nums[0].parse::<u32>().unwrap());
         right.push(nums[1].parse::<u32>().unwrap());
@@ -64,14 +68,18 @@ fn parse_input(input: &str) -> (Vec<u32>, Vec<u32>) {
 fn sum_distances(number_pairs: (Vec<u32>, Vec<u32>)) -> u64 {
     let (mut left, mut right) = number_pairs;
 
-    assert_eq!(left.len(), right.len(),
+    assert_eq!(
+        left.len(),
+        right.len(),
         "The two columns of numbers must be the same length"
     );
 
     left.sort();
     right.sort();
 
-    zip(left, right).map(|(x, y)| Into::<u64>::into(x.abs_diff(y))).sum()
+    zip(left, right)
+        .map(|(x, y)| Into::<u64>::into(x.abs_diff(y)))
+        .sum()
 }
 
 // Test data based on examples on the challenge page.
