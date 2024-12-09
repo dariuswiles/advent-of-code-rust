@@ -14,13 +14,17 @@ impl ProjectPaths {
         let integration_test_full_path = std::env::current_exe()
             .expect("Integration test failed to determine the path it was run from");
 
-        let integration_test_dir = integration_test_full_path.parent().unwrap().parent().unwrap();
+        let integration_test_dir = integration_test_full_path
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap();
         let crate_top_level_dir = integration_test_dir.parent().unwrap().parent().unwrap();
         let input_file_dir = crate_top_level_dir.join("src/bin/");
 
         Self {
             integration_tests: integration_test_dir.to_owned(),
-            source_code: input_file_dir.to_owned()
+            source_code: input_file_dir.to_owned(),
         }
     }
 }
@@ -42,8 +46,14 @@ pub fn run_challenge(name: &str) -> String {
     if !output.status.success() {
         println!("Challenge {} returned a non-zero exit status", name);
         println!("    Exit status: {}", output.status);
-        println!("    Standard error: {}", String::from_utf8_lossy(&output.stderr));
-        println!("    Standard output: {}", String::from_utf8_lossy(&output.stdout));
+        println!(
+            "    Standard error: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        println!(
+            "    Standard output: {}",
+            String::from_utf8_lossy(&output.stdout)
+        );
         panic!("    Terminating test");
     }
 
