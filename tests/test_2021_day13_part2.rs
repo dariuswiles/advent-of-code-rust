@@ -1,6 +1,7 @@
 mod common;
 
 #[test]
+#[rustfmt::skip]
 fn run_test() {
     let result = common::run_challenge("2021_day13_part2");
     let result_lines: Vec<&str> = result.trim().lines().collect();
