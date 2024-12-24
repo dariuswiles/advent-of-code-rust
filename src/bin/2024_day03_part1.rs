@@ -25,7 +25,7 @@ fn main() {
 fn do_challenge(input: &str) -> u32 {
     let mut total = 0;
 
-    for token in input.split("mul(") {
+    for token in input.split("mul(").skip(1) {
         if let Some((parameters, _)) = token.split_once(')') {
             if let Some((first_str, second_str)) = parameters.split_once(',') {
                 if let (Ok(first), Ok(second)) =
