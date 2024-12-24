@@ -35,13 +35,13 @@ impl Bags {
         if let Some(b) = self.bags.iter().position(|b| b.name == name) {
             // println!("Lookup of bag '{}' found existing bag with BagId {}", &name, b);
 
-            return b;
+            b
         } else {
             // println!("No bag '{}' exists, so adding with BagId {}", &name, self.bags.len());
             self.bags.push(Bag {
                 name: name.to_owned(),
             });
-            return self.bags.len() - 1;
+            self.bags.len() - 1
         }
     }
 
@@ -64,8 +64,8 @@ struct Rule {
 impl Rule {
     fn new(outer_bag: BagId, inner_bags: Vec<(BagId, u32)>) -> Self {
         Self {
-            outer_bag: outer_bag,
-            inner_bags: inner_bags,
+            outer_bag,
+            inner_bags,
         }
     }
 }
@@ -142,7 +142,7 @@ fn parse_rules(input: &str) -> Ruleset {
     let mut ruleset = Ruleset::new();
 
     for line in input.lines() {
-        let new_rule = parse_rule(&line, &mut ruleset.bags);
+        let new_rule = parse_rule(line, &mut ruleset.bags);
         ruleset.add_rule(new_rule);
     }
 
@@ -169,7 +169,7 @@ fn must_contain_bag_total(rs: &Ruleset, outer_bagid: &BagId) -> u32 {
         let mut total = 1;
         for b in &r.inner_bags {
             // println!("BagId {}: Recursively finding total for BagId {}.", outer_bagid, b.0);
-            total += b.1 * (must_contain_bag_total(rs, &b.0) + 0);
+            total += b.1 * must_contain_bag_total(rs, &b.0);
             // println!("BagId {}: Returned from recursion and total is now {}.", outer_bagid, total);
         }
         // println!("BagId {}: Returning a total of {} other bags.", outer_bagid, total);
@@ -220,7 +220,7 @@ dark violet bags contain no other bags.";
 
     #[test]
     fn set_0() {
-        let ruleset = parse_rules(&TEST_RULES_0);
+        let ruleset = parse_rules(TEST_RULES_0);
         println!("{:#?}", &ruleset);
         let target_bag_id = ruleset.bags.get_bag_id("shiny gold").unwrap();
         let total = must_contain_bag_total(&ruleset, &target_bag_id) - 1;
@@ -229,7 +229,7 @@ dark violet bags contain no other bags.";
 
     #[test]
     fn set_1() {
-        let ruleset = parse_rules(&TEST_RULES_1);
+        let ruleset = parse_rules(TEST_RULES_1);
         let target_bag_id = ruleset.bags.get_bag_id("shiny gold").unwrap();
         let total = must_contain_bag_total(&ruleset, &target_bag_id) - 1;
         assert_eq!(total, 126);

@@ -21,7 +21,7 @@ fn parse_input(input: &str) -> Vec<(RangeInclusive<u32>, RangeInclusive<u32>)> {
     let mut ranges = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             let both_ranges: Vec<&str> = line.split(',').collect();
             assert_eq!(both_ranges.len(), 2);
 
@@ -49,7 +49,7 @@ fn do_ranges_overlap(a: &RangeInclusive<u32>, b: &RangeInclusive<u32>) -> bool {
 }
 
 /// Returns the number of pairs of ranges in the `Vec` passed where the ranges overlap.
-fn count_overlaps(range_pairs: &Vec<(RangeInclusive<u32>, RangeInclusive<u32>)>) -> u32 {
+fn count_overlaps(range_pairs: &[(RangeInclusive<u32>, RangeInclusive<u32>)]) -> u32 {
     range_pairs
         .iter()
         .filter(|rp| do_ranges_overlap(&rp.0, &rp.1))
@@ -91,11 +91,11 @@ mod tests {
 
     #[test]
     fn test_do_ranges_overlap() {
-        assert_eq!(do_ranges_overlap(&(1..=4), &(2..=5)), true);
-        assert_eq!(do_ranges_overlap(&(3..=4), &(5..=5)), false);
-        assert_eq!(do_ranges_overlap(&(1..=6), &(2..=5)), true);
-        assert_eq!(do_ranges_overlap(&(4..=4), &(4..=9)), true);
-        assert_eq!(do_ranges_overlap(&(7..=9), &(2..=5)), false);
+        assert!(do_ranges_overlap(&(1..=4), &(2..=5)));
+        assert!(!do_ranges_overlap(&(3..=4), &(5..=5)));
+        assert!(do_ranges_overlap(&(1..=6), &(2..=5)));
+        assert!(do_ranges_overlap(&(4..=4), &(4..=9)));
+        assert!(!do_ranges_overlap(&(7..=9), &(2..=5)));
     }
 
     #[test]

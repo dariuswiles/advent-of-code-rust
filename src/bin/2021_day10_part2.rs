@@ -41,23 +41,21 @@ fn validate_line(line: &str) -> Validity {
     for c in line.chars() {
         if OPENERS.contains(c) {
             stack.push(c);
-        } else {
-            if CLOSERS.contains(c) {
-                if let Some(opening) = stack.pop() {
-                    if ((opening == '(') && (c != ')'))
-                        || ((opening == '[') && (c != ']'))
-                        || ((opening == '{') && (c != '}'))
-                        || ((opening == '<') && (c != '>'))
-                    {
-                        return Validity::Corrupted(c);
-                    }
-                } else {
-                    // Stack is empty, so there is no matching opening symbol.
+        } else if CLOSERS.contains(c) {
+            if let Some(opening) = stack.pop() {
+                if ((opening == '(') && (c != ')'))
+                    || ((opening == '[') && (c != ']'))
+                    || ((opening == '{') && (c != '}'))
+                    || ((opening == '<') && (c != '>'))
+                {
                     return Validity::Corrupted(c);
                 }
             } else {
-                panic!("Unexpected symbol '{}' found in input", c);
+                // Stack is empty, so there is no matching opening symbol.
+                return Validity::Corrupted(c);
             }
+        } else {
+            panic!("Unexpected symbol '{}' found in input", c);
         }
     }
 
@@ -73,10 +71,10 @@ fn validate_line(line: &str) -> Validity {
 // The stack passed contains unmatched symbols in the order they were opened, so this needs to be
 // reversed so the order is correct for closing. For simplicity, the opening symbols are used
 // to avoid the need to translate them to closing symbols.
-fn score_incomplete(stack: &Vec<char>) -> u64 {
+fn score_incomplete(stack: &[char]) -> u64 {
     let mut score = 0;
 
-    let mut reversed_stack = stack.clone();
+    let mut reversed_stack = stack.to_owned();
     reversed_stack.reverse();
     for c in reversed_stack {
         score = score * 5
@@ -101,11 +99,11 @@ fn score_bad_lines(input: &str) -> u64 {
     let mut scores = Vec::new();
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
-        let result = validate_line(&line);
+        let result = validate_line(line);
 
         if let Validity::Incomplete(stack) = result {
             // println!("Line '{}' is incomplete due to missing symbols '{:?}'", &line, &stack);
@@ -156,27 +154,27 @@ mod tests {
     #[test]
     fn test_incomplete_lines() {
         assert_eq!(
-            validate_line(&TEST_LINE_0),
+            validate_line(TEST_LINE_0),
             Validity::Incomplete("{{[[({([".chars().rev().collect())
         );
 
         assert_eq!(
-            validate_line(&TEST_LINE_1),
+            validate_line(TEST_LINE_1),
             Validity::Incomplete("({<[{(".chars().rev().collect())
         );
 
         assert_eq!(
-            validate_line(&TEST_LINE_2),
+            validate_line(TEST_LINE_2),
             Validity::Incomplete("{{<{<((((".chars().rev().collect())
         );
 
         assert_eq!(
-            validate_line(&TEST_LINE_3),
+            validate_line(TEST_LINE_3),
             Validity::Incomplete("[[{{[{[{<".chars().rev().collect())
         );
 
         assert_eq!(
-            validate_line(&TEST_LINE_4),
+            validate_line(TEST_LINE_4),
             Validity::Incomplete("[({<".chars().rev().collect())
         );
     }
@@ -184,24 +182,30 @@ mod tests {
     #[test]
     fn test_score_incomplete() {
         assert_eq!(
-            score_incomplete(&"{{[[({([".chars().rev().collect()),
+            score_incomplete(&"{{[[({([".chars().rev().collect::<Vec<char>>()),
             288957
         );
-        assert_eq!(score_incomplete(&"({<[{(".chars().rev().collect()), 5566);
         assert_eq!(
-            score_incomplete(&"{{<{<((((".chars().rev().collect()),
+            score_incomplete(&"({<[{(".chars().rev().collect::<Vec<char>>()),
+            5566
+        );
+        assert_eq!(
+            score_incomplete(&"{{<{<((((".chars().rev().collect::<Vec<char>>()),
             1480781
         );
         assert_eq!(
-            score_incomplete(&"[[{{[{[{<".chars().rev().collect()),
+            score_incomplete(&"[[{{[{[{<".chars().rev().collect::<Vec<char>>()),
             995444
         );
-        assert_eq!(score_incomplete(&"[({<".chars().rev().collect()), 294);
+        assert_eq!(
+            score_incomplete(&"[({<".chars().rev().collect::<Vec<char>>()),
+            294
+        );
     }
 
     #[test]
     fn test_score_bad_lines() {
-        assert_eq!(score_bad_lines(&TEST_INPUT), 288957);
+        assert_eq!(score_bad_lines(TEST_INPUT), 288957);
     }
 
     #[test]

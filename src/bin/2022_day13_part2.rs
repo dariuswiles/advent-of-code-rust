@@ -26,9 +26,8 @@ impl ListElement {
         assert_eq!(input_chars[0], '[');
 
         let slice = &mut &input_chars[1..];
-        let result = Self::parse_element_recurse(slice);
 
-        result
+        Self::parse_element_recurse(slice)
     }
 
     /// Internal function that parses a slice of `char`s representing the input string into a
@@ -46,36 +45,35 @@ impl ListElement {
         loop {
             match ic[0] {
                 ']' => {
-                    *ic = &mut &ic[1..];
+                    *ic = &ic[1..];
                     break;
                 }
                 '[' => {
-                    *ic = &mut &ic[1..];
+                    *ic = &ic[1..];
                     let sublist = ListElement::parse_element_recurse(ic);
                     elements.push(sublist);
                 }
                 '0'..='9' => {
                     let mut char_digits = Vec::new();
 
-                    while ic[0].is_digit(10) {
+                    while ic[0].is_ascii_digit() {
                         char_digits.push(ic[0]);
-                        *ic = &mut &ic[1..];
+                        *ic = &ic[1..];
                     }
 
-                    let int_tmp =
-                        Int::from_str_radix(&char_digits.iter().collect::<String>(), 10).unwrap();
+                    let int_tmp = char_digits.iter().collect::<String>().parse().unwrap();
 
                     elements.push(ListElement::Integer(int_tmp));
                 }
                 ',' => {
-                    *ic = &mut &ic[1..];
+                    *ic = &ic[1..];
                 }
                 _ => {
                     panic!("Unrecognized character '{}' in input", ic[0]);
                 }
             }
 
-            if ic.len() == 0 {
+            if ic.is_empty() {
                 panic!("The input contains unbalanced start and end list tags");
             }
         }
@@ -93,7 +91,7 @@ fn parse_input(input: &str) -> Vec<ListElement> {
     let mut list_elements = Vec::new();
 
     for line in input.lines() {
-        if line.len() > 0 {
+        if !line.is_empty() {
             list_elements.push(ListElement::parse_str(line));
         }
     }
@@ -106,39 +104,26 @@ fn parse_input(input: &str) -> Vec<ListElement> {
 fn compare_packets(left: &ListElement, right: &ListElement) -> Ordering {
     if let ListElement::Integer(left_integer) = left {
         if let ListElement::Integer(right_integer) = right {
-            if left_integer < right_integer {
-                return Ordering::Less;
-            } else if left_integer > right_integer {
-                return Ordering::Greater;
-            } else {
-                return Ordering::Equal;
-            }
+            return left_integer.cmp(right_integer);
         }
     }
 
     // At least one of 'left' or 'right' is an `ElementList`, but both need to be treated as if
     // they are `ElementList`s so they can be compared, as described the challenge rules. This is
     // done by converting an `Integer` into a new `Vec` with it as the only element.
-    let left_elements;
-    let right_elements;
-
-    match left {
+    let left_elements = match left {
         ListElement::Integer(int) => {
-            left_elements = vec![ListElement::Integer(*int)];
+            vec![ListElement::Integer(*int)]
         }
-        ListElement::List(list) => {
-            left_elements = list.clone();
-        }
-    }
+        ListElement::List(list) => list.clone(),
+    };
 
-    match right {
+    let right_elements = match right {
         ListElement::Integer(int) => {
-            right_elements = vec![ListElement::Integer(*int)];
+            vec![ListElement::Integer(*int)]
         }
-        ListElement::List(list) => {
-            right_elements = list.clone();
-        }
-    }
+        ListElement::List(list) => list.clone(),
+    };
 
     let left_length = left_elements.len();
     let right_length = right_elements.len();
@@ -160,9 +145,9 @@ fn compare_packets(left: &ListElement, right: &ListElement) -> Ordering {
     // As per the challenge rules, the pairs are ordered correctly if the 'left' list is shorter,
     // and are not ordered correctly otherwise.
     if left_length < right_length {
-        return Ordering::Less;
+        Ordering::Less
     } else {
-        return Ordering::Greater;
+        Ordering::Greater
     }
 }
 
@@ -179,14 +164,14 @@ fn add_divider_packets(packets: &mut Vec<ListElement>) {
 }
 
 /// Sort all packets based on the ordering defined in the challenge.
-fn sort_packets(packets: &mut Vec<ListElement>) {
-    packets.sort_unstable_by(|a, b| compare_packets(&a, &b));
+fn sort_packets(packets: &mut [ListElement]) {
+    packets.sort_unstable_by(compare_packets);
 }
 
 /// Returns the index of `packet` in `packets`, or `None` if it is not found. The first index is 0,
 /// which is the Rust standard, so the caller may need to add one to be consistent with the
 /// challenge.
-fn find_packet(packet: &ListElement, packets: &Vec<ListElement>) -> Option<usize> {
+fn find_packet(packet: &ListElement, packets: &[ListElement]) -> Option<usize> {
     for (index, list_element) in packets.iter().enumerate() {
         if compare_packets(packet, list_element) == Ordering::Equal {
             return Some(index);
@@ -262,7 +247,7 @@ mod tests {
     #[test]
     fn test_parse_str_0() {
         assert_eq!(
-            ListElement::parse_str(&"[11,0]"),
+            ListElement::parse_str("[11,0]"),
             ListElement::List(vec![ListElement::Integer(11), ListElement::Integer(0),])
         );
     }
@@ -270,7 +255,7 @@ mod tests {
     #[test]
     fn test_parse_str_1() {
         assert_eq!(
-            ListElement::parse_str(&"[[1],[2,3,4]]"),
+            ListElement::parse_str("[[1],[2,3,4]]"),
             ListElement::List(vec![
                 ListElement::List(vec![ListElement::Integer(1),]),
                 ListElement::List(vec![
@@ -285,18 +270,18 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_parse_str_bad_char() {
-        ListElement::parse_str(&"[9,6,[2],a,5]");
+        ListElement::parse_str("[9,6,[2],a,5]");
     }
 
     #[test]
     #[should_panic]
     fn test_parse_str_unbalanced1() {
-        ListElement::parse_str(&"[9,6,[2]");
+        ListElement::parse_str("[9,6,[2]");
     }
 
     #[test]
     fn test_parse_input() {
-        let result = parse_input(&TEST_INPUT);
+        let result = parse_input(TEST_INPUT);
 
         assert_eq!(
             result[0],
@@ -455,7 +440,7 @@ mod tests {
 
     #[test]
     fn check_compare_packets() {
-        let packets = parse_input(&TEST_INPUT);
+        let packets = parse_input(TEST_INPUT);
         assert_eq!(compare_packets(&packets[0], &packets[1]), Ordering::Less);
         assert_eq!(compare_packets(&packets[2], &packets[3]), Ordering::Less);
         assert_eq!(compare_packets(&packets[4], &packets[5]), Ordering::Greater);
@@ -474,7 +459,7 @@ mod tests {
 
     #[test]
     fn test_add_divider_packets() {
-        let mut packets = parse_input(&TEST_INPUT);
+        let mut packets = parse_input(TEST_INPUT);
         assert_eq!(packets.len(), 16);
         add_divider_packets(&mut packets);
         assert_eq!(packets.len(), 18);
@@ -492,7 +477,7 @@ mod tests {
 
     #[test]
     fn test_sort_packets() {
-        let mut packets = parse_input(&TEST_INPUT);
+        let mut packets = parse_input(TEST_INPUT);
         sort_packets(&mut packets);
 
         assert_eq!(
@@ -600,7 +585,7 @@ mod tests {
 
     #[test]
     fn test_do_challenge() {
-        let mut packets = parse_input(&TEST_INPUT);
+        let mut packets = parse_input(TEST_INPUT);
         assert_eq!(do_challenge(&mut packets), 140);
     }
 }

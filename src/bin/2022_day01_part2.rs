@@ -19,8 +19,8 @@ fn parse_input(input: &str) -> Vec<Vec<Calories>> {
     let mut calories_vec = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
-            calories_vec.push(Calories::from_str_radix(line, 10).unwrap());
+        if !line.is_empty() {
+            calories_vec.push(line.parse().unwrap());
         } else {
             all_elves.push(calories_vec);
             calories_vec = Vec::new();
@@ -50,13 +50,13 @@ fn sum_calorie_blocks(blocks: &Vec<Vec<Calories>>) -> Vec<Calories> {
 /// # Panics
 ///
 /// Panics if the `Vec` passed contains less than 3 elements.
-fn largest_3(v: &Vec<Calories>) -> Vec<Calories> {
+fn largest_3(v: &[Calories]) -> Vec<Calories> {
     let v_len = v.len();
     assert!(v_len >= 3);
 
-    let mut v_clone = v.clone();
+    let mut v_clone = v.to_owned();
     v_clone.sort_unstable();
-    (&v_clone[v_len - 3..]).to_vec()
+    v_clone[v_len - 3..].to_vec()
 }
 
 fn main() {

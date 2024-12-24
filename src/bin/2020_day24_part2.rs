@@ -30,11 +30,11 @@ fn parse_input(input: &str) -> FlippedTileGrid {
     let mut grid = FlippedTileGrid::new();
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
-        flip_tile(&mut grid, &parse_one_line(&line));
+        flip_tile(&mut grid, &parse_one_line(line));
     }
     grid
 }
@@ -101,10 +101,13 @@ fn parse_one_line(line: &str) -> Position {
 /// Flips the tile at position `pos` within `grid`. If the tile is already present in `grid`,
 /// this flip will return it to its starting orientation, and it is therefore removed from `grid`.
 fn flip_tile(grid: &mut FlippedTileGrid, pos: &Position) {
-    if let Some(_) = grid.get(pos) {
-        grid.remove(pos);
-    } else {
-        grid.insert(*pos);
+    match grid.get(pos) {
+        Some(_) => {
+            grid.remove(pos);
+        }
+        None => {
+            grid.insert(*pos);
+        }
     }
 }
 
@@ -179,10 +182,8 @@ fn perform_day_flip(grid: &mut FlippedTileGrid) {
                 if (adjacent_flipped == 0) || (adjacent_flipped > 2) {
                     unflip.push(p);
                 }
-            } else {
-                if adjacent_flipped == 2 {
-                    flip.push(p);
-                }
+            } else if adjacent_flipped == 2 {
+                flip.push(p);
             }
         }
     }
@@ -243,101 +244,101 @@ wseweeenwnesenwwwswnew";
 
     #[test]
     fn test_parse_one_line() {
-        assert_eq!(Position { x: 1, y: -1 }, parse_one_line(&"esew"));
-        assert_eq!(Position { x: 0, y: 0 }, parse_one_line(&"nwwswee"));
+        assert_eq!(Position { x: 1, y: -1 }, parse_one_line("esew"));
+        assert_eq!(Position { x: 0, y: 0 }, parse_one_line("nwwswee"));
 
         assert_eq!(
             Position { x: -4, y: -2 },
-            parse_one_line(&"sesenwnenenewseeswwswswwnenewsewsw")
+            parse_one_line("sesenwnenenewseeswwswswwnenewsewsw")
         );
         assert_eq!(
             Position { x: -1, y: 3 },
-            parse_one_line(&"neeenesenwnwwswnenewnwwsewnenwseswesw")
+            parse_one_line("neeenesenwnwwswnenewnwwsewnenwseswesw")
         );
         assert_eq!(
             Position { x: -3, y: -3 },
-            parse_one_line(&"seswneswswsenwwnwse")
+            parse_one_line("seswneswswsenwwnwse")
         );
         assert_eq!(
             Position { x: 2, y: 2 },
-            parse_one_line(&"nwnwneseeswswnenewneswwnewseswneseene")
+            parse_one_line("nwnwneseeswswnenewneswwnewseswneseene")
         );
         assert_eq!(
             Position { x: 0, y: 2 },
-            parse_one_line(&"swweswneswnenwsewnwneneseenw")
+            parse_one_line("swweswneswnenwsewnwneneseenw")
         );
         assert_eq!(
             Position { x: -2, y: 0 },
-            parse_one_line(&"eesenwseswswnenwswnwnwsewwnwsene")
+            parse_one_line("eesenwseswswnenwswnwnwsewwnwsene")
         );
         assert_eq!(
             Position { x: -1, y: 3 },
-            parse_one_line(&"sewnenenenesenwsewnenwwwse")
+            parse_one_line("sewnenenenesenwsewnenwwwse")
         );
         assert_eq!(
             Position { x: -4, y: 0 },
-            parse_one_line(&"wenwwweseeeweswwwnwwe")
+            parse_one_line("wenwwweseeeweswwwnwwe")
         );
         assert_eq!(
             Position { x: -1, y: 1 },
-            parse_one_line(&"wsweesenenewnwwnwsenewsenwwsesesenwne")
+            parse_one_line("wsweesenenewnwwnwsenewsenwwsesesenwne")
         );
         assert_eq!(
             Position { x: -3, y: -1 },
-            parse_one_line(&"neeswseenwwswnwswswnw")
+            parse_one_line("neeswseenwwswnwswswnw")
         );
         assert_eq!(
             Position { x: -2, y: 2 },
-            parse_one_line(&"nenwswwsewswnenenewsenwsenwnesesenew")
+            parse_one_line("nenwswwsewswnenenewsenwsenwnesesenew")
         );
         assert_eq!(
             Position { x: -2, y: 2 },
-            parse_one_line(&"enewnwewneswsewnwswenweswnenwsenwsw")
+            parse_one_line("enewnwewneswsewnwswenweswnenwsenwsw")
         );
         assert_eq!(
             Position { x: 3, y: 3 },
-            parse_one_line(&"sweneswneswneneenwnewenewwneswswnese")
+            parse_one_line("sweneswneswneneenwnewenewwneswswnese")
         );
         assert_eq!(
             Position { x: -2, y: 0 },
-            parse_one_line(&"swwesenesewenwneswnwwneseswwne")
+            parse_one_line("swwesenesewenwneswnwwneseswwne")
         );
         assert_eq!(
             Position { x: 2, y: -2 },
-            parse_one_line(&"enesenwswwswneneswsenwnewswseenwsese")
+            parse_one_line("enesenwswwswneneswsenwnewswseenwsese")
         );
         assert_eq!(
             Position { x: 0, y: 0 },
-            parse_one_line(&"wnwnesenesenenwwnenwsewesewsesesew")
+            parse_one_line("wnwnesenesenenwwnenwsewesewsesesew")
         );
         assert_eq!(
             Position { x: 0, y: 2 },
-            parse_one_line(&"nenewswnwewswnenesenwnesewesw")
+            parse_one_line("nenewswnwewswnenesenwnesewesw")
         );
         assert_eq!(
             Position { x: 2, y: 2 },
-            parse_one_line(&"eneswnwswnwsenenwnwnwwseeswneewsenese")
+            parse_one_line("eneswnwswnwsenenwnwnwwseeswneewsenese")
         );
         assert_eq!(
             Position { x: 4, y: 0 },
-            parse_one_line(&"neswnwewnwnwseenwseesewsenwsweewe")
+            parse_one_line("neswnwewnwnwseenwseesewsenwsweewe")
         );
         assert_eq!(
             Position { x: -3, y: 1 },
-            parse_one_line(&"wseweeenwnesenwwwswnew")
+            parse_one_line("wseweeenwnesenwwwswnew")
         );
     }
 
     #[test]
     fn test_parse_file() {
-        let grid = parse_input(&TEST_INPUT);
+        let grid = parse_input(TEST_INPUT);
 
         assert_eq!(10, grid.len());
     }
 
     #[test]
     fn test_day_flip() {
-        let mut grid = parse_input(&TEST_INPUT);
+        let mut grid = parse_input(TEST_INPUT);
 
         perform_day_flip(&mut grid);
         assert_eq!(15, grid.len());
@@ -372,7 +373,7 @@ wseweeenwnesenwwwswnew";
 
     #[test]
     fn test_perform_multiple_day_flips() {
-        let mut grid = parse_input(&TEST_INPUT);
+        let mut grid = parse_input(TEST_INPUT);
 
         perform_multiple_day_flips(&mut grid, 10);
         assert_eq!(37, grid.len());

@@ -63,7 +63,7 @@ impl History {
 
     /// Copies the passed `emulator` state to the end of internal state history.
     fn save(&mut self, emulator: &Emulator) {
-        self.states.push(emulator.clone());
+        self.states.push(*emulator);
     }
 
     /// Returns the state of the emulator at `target_cycle`. If `target_cycle` falls within an
@@ -79,7 +79,7 @@ impl History {
         for s in &self.states {
             if s.cycle >= target_cycle {
                 if s.cycle == target_cycle {
-                    return &s;
+                    return s;
                 } else if previous_state.is_some() {
                     return previous_state.unwrap();
                 } else {
@@ -92,7 +92,7 @@ impl History {
             previous_state = Some(s);
         }
 
-        &self.states.last().unwrap()
+        self.states.last().unwrap()
     }
 }
 
@@ -115,7 +115,7 @@ fn run_program(program: &Vec<Instruction>) -> History {
 /// Calculates the challenge answer by running the program, and multiplying the register contents
 /// on the cycles given in the challenge. The answer is the sum of the multiplications.
 fn do_challenge(program: &Vec<Instruction>) -> i32 {
-    let history = run_program(&program);
+    let history = run_program(program);
     let mut cumulative_total = 0;
 
     for target_cycle in (20..=220).step_by(40) {
@@ -138,13 +138,11 @@ fn parse_input(input: &str) -> Vec<Instruction> {
     let mut program = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             if line.starts_with("noop") {
                 program.push(Instruction::Noop);
             } else if line.starts_with("addx ") {
-                let operand =
-                    AddxOperand::from_str_radix(line.strip_prefix("addx ").unwrap().trim(), 10)
-                        .unwrap();
+                let operand = line.strip_prefix("addx ").unwrap().trim().parse().unwrap();
                 program.push(Instruction::Addx(operand));
             } else {
                 panic!("Unrecognized instruction in input");
@@ -323,7 +321,7 @@ noop
 
     #[test]
     fn test_parse_input_0() {
-        let program = parse_input(&TEST_PROGRAM_0);
+        let program = parse_input(TEST_PROGRAM_0);
 
         assert_eq!(
             program,
@@ -337,7 +335,7 @@ noop
 
     #[test]
     fn test_parse_input_1() {
-        let program = parse_input(&TEST_PROGRAM_1);
+        let program = parse_input(TEST_PROGRAM_1);
 
         assert_eq!(program[0], Instruction::Addx(15));
         assert_eq!(program[28], Instruction::Addx(21));
@@ -368,7 +366,7 @@ noop
 
     #[test]
     fn test_run_program() {
-        let program = parse_input(&TEST_PROGRAM_0);
+        let program = parse_input(TEST_PROGRAM_0);
         let history = run_program(&program);
 
         assert_eq!(
@@ -403,7 +401,7 @@ noop
 
     #[test]
     fn test_get_emulator_state_at_cycle_0() {
-        let program = parse_input(&TEST_PROGRAM_0);
+        let program = parse_input(TEST_PROGRAM_0);
         let history = run_program(&program);
 
         assert_eq!(
@@ -453,7 +451,7 @@ noop
     #[test]
     #[should_panic]
     fn test_get_emulator_state_at_cycle_panic() {
-        let program = parse_input(&TEST_PROGRAM_0);
+        let program = parse_input(TEST_PROGRAM_0);
         let history = run_program(&program);
 
         history.get_emulator_state_at_cycle(0);
@@ -461,7 +459,7 @@ noop
 
     #[test]
     fn test_get_emulator_state_at_cycle_1() {
-        let program = parse_input(&TEST_PROGRAM_1);
+        let program = parse_input(TEST_PROGRAM_1);
         let history = run_program(&program);
 
         assert_eq!(history.get_emulator_state_at_cycle(20).register, 21);
@@ -474,7 +472,7 @@ noop
 
     #[test]
     fn test_do_challenge() {
-        let program = parse_input(&TEST_PROGRAM_1);
+        let program = parse_input(TEST_PROGRAM_1);
 
         assert_eq!(do_challenge(&program), 13140);
     }

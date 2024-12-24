@@ -30,7 +30,7 @@ impl Game {
         let mut loading_player_id = 0;
 
         for line in input.lines() {
-            if line == "" {
+            if line.is_empty() {
                 continue;
             }
 
@@ -96,11 +96,11 @@ impl Game {
         }
 
         // Check if a player has won the game.
-        if self.player1.len() == 0 {
+        if self.player1.is_empty() {
             return Some(2);
         }
 
-        if self.player2.len() == 0 {
+        if self.player2.is_empty() {
             return Some(1);
         }
 
@@ -114,7 +114,7 @@ impl Game {
         for _ in 0..max_rounds {
             let round_result = self.play_one_round();
 
-            if round_result != None {
+            if round_result.is_some() {
                 return round_result;
             }
         }
@@ -187,7 +187,7 @@ Player 2:
 
     #[test]
     fn test_load_game() {
-        let game = Game::load_game(&TEST_INPUT);
+        let game = Game::load_game(TEST_INPUT);
 
         let expected = Game {
             player1: vec![9, 2, 6, 3, 1],
@@ -199,7 +199,7 @@ Player 2:
 
     #[test]
     fn test_one_round() {
-        let mut game = Game::load_game(&TEST_INPUT);
+        let mut game = Game::load_game(TEST_INPUT);
         let winner = game.play_one_round();
 
         assert_eq!(None, winner);
@@ -214,7 +214,7 @@ Player 2:
 
     #[test]
     fn test_play_game() {
-        let mut game = Game::load_game(&TEST_INPUT);
+        let mut game = Game::load_game(TEST_INPUT);
         let winner = game.play_game(MAX_GAME_ROUNDS);
 
         assert_eq!(Some(2), winner);
@@ -229,7 +229,7 @@ Player 2:
 
     #[test]
     fn test_score_hand() {
-        let mut game = Game::load_game(&TEST_INPUT);
+        let mut game = Game::load_game(TEST_INPUT);
         let winner = game.play_game(MAX_GAME_ROUNDS);
 
         assert_eq!(306, game.score_player(winner.unwrap()));

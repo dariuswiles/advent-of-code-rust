@@ -15,7 +15,7 @@ fn parse_str_to_nums(input: &str) -> Vec<i32> {
     let mut result = Vec::new();
 
     for line in input.lines() {
-        if line.len() == 0 {
+        if line.is_empty() {
             continue;
         }
 
@@ -35,10 +35,10 @@ fn add_outlet_and_device(v: &mut Vec<i32>) {
 
 /// Returns a vector representing the difference between every pair of numbers in `v`. For example,
 /// if `v` is 2, 4 and 7, a new vector containing 2 and 3 is returned.
-fn generate_pair_deltas(v: &Vec<i32>) -> Vec<i32> {
+fn generate_pair_deltas(v: &[i32]) -> Vec<i32> {
     let mut result = Vec::new();
 
-    let mut num_vec = v.clone();
+    let mut num_vec = v.to_owned();
     let mut previous = num_vec.remove(0);
 
     for i in &num_vec {
@@ -65,7 +65,7 @@ fn count_occurrences(v: &Vec<i32>) -> HashMap<&i32, u16> {
 
 /// Performs the steps specified in the challenge, including the final multiplication.
 fn do_challenge(input_str: &str) -> i32 {
-    let mut input = parse_str_to_nums(&input_str);
+    let mut input = parse_str_to_nums(input_str);
     input.sort_unstable();
     add_outlet_and_device(&mut input);
     let deltas = generate_pair_deltas(&input);
@@ -134,7 +134,7 @@ mod tests {
 
     #[test]
     fn test_0() {
-        let mut input = parse_str_to_nums(&TEST_INPUT_0);
+        let mut input = parse_str_to_nums(TEST_INPUT_0);
 
         input.sort_unstable();
         add_outlet_and_device(&mut input);
@@ -151,7 +151,7 @@ mod tests {
 
     #[test]
     fn test_1() {
-        let mut input = parse_str_to_nums(&TEST_INPUT_1);
+        let mut input = parse_str_to_nums(TEST_INPUT_1);
 
         input.sort_unstable();
         add_outlet_and_device(&mut input);

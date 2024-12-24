@@ -28,16 +28,14 @@ impl DiagnosticReport {
         let mut bits_per_line = None;
 
         for line in input.lines() {
-            if line == "" {
+            if line.is_empty() {
                 continue;
             }
 
-            if bits_per_line == None {
+            if bits_per_line.is_none() {
                 bits_per_line = Some(line.len());
-            } else {
-                if bits_per_line.unwrap() != line.len() {
-                    panic!("All input lines must contain the same number of bits");
-                }
+            } else if bits_per_line.unwrap() != line.len() {
+                panic!("All input lines must contain the same number of bits");
             }
 
             data.push(line.chars().map(|c| c.to_digit(2).unwrap() as u8).collect());
@@ -58,7 +56,7 @@ impl<'a> FilteredReport<'a> {
     fn new(r: &'a DiagnosticReport) -> Self {
         let mut refs: Vec<&Vec<u8>> = Vec::new();
         for d in &r.data {
-            refs.push(&d);
+            refs.push(d);
         }
 
         FilteredReport { data: refs }
@@ -76,9 +74,9 @@ impl<'a> FilteredReport<'a> {
         let data_length = self.data.len();
 
         if self.count_ones_in_position(position) * 2 >= data_length as u32 {
-            return 1;
+            1
         } else {
-            return 0;
+            0
         }
     }
 
@@ -92,9 +90,9 @@ impl<'a> FilteredReport<'a> {
         }
 
         if self.count_ones_in_position(position) * 2 >= data_length as u32 {
-            return 0;
+            0
         } else {
-            return 1;
+            1
         }
     }
 
@@ -106,7 +104,7 @@ impl<'a> FilteredReport<'a> {
         let mut new_data: Vec<&Vec<u8>> = Vec::new();
 
         for d in &self.data {
-            if *d.iter().nth(position).unwrap() == required_bit {
+            if *d.get(position).unwrap() == required_bit {
                 new_data.push(d);
             }
         }
@@ -122,7 +120,7 @@ impl<'a> FilteredReport<'a> {
         let mut new_data: Vec<&Vec<u8>> = Vec::new();
 
         for d in &self.data {
-            if *d.iter().nth(position).unwrap() == required_bit {
+            if *d.get(position).unwrap() == required_bit {
                 new_data.push(d);
             }
         }
@@ -202,7 +200,7 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let diag_report = DiagnosticReport::new(&TEST_INPUT);
+        let diag_report = DiagnosticReport::new(TEST_INPUT);
 
         assert_eq!(diag_report.data[0], vec![0, 0, 1, 0, 0]);
         assert_eq!(diag_report.data[1], vec![1, 1, 1, 1, 0]);
@@ -220,7 +218,7 @@ mod tests {
 
     #[test]
     fn test_count_ones_in_position() {
-        let diag_report = DiagnosticReport::new(&TEST_INPUT);
+        let diag_report = DiagnosticReport::new(TEST_INPUT);
         let report = FilteredReport::new(&diag_report);
 
         assert_eq!(report.count_ones_in_position(0), 7);
@@ -232,7 +230,7 @@ mod tests {
 
     #[test]
     fn test_most_common_bit_in_position() {
-        let diag_report = DiagnosticReport::new(&TEST_INPUT);
+        let diag_report = DiagnosticReport::new(TEST_INPUT);
         let report = FilteredReport::new(&diag_report);
 
         assert_eq!(report.most_common_bit_in_position(0), 1);
@@ -244,7 +242,7 @@ mod tests {
 
     #[test]
     fn test_least_common_bit_in_position() {
-        let diag_report = DiagnosticReport::new(&TEST_INPUT);
+        let diag_report = DiagnosticReport::new(TEST_INPUT);
         let report = FilteredReport::new(&diag_report);
 
         assert_eq!(report.least_common_bit_in_position(0), 0);
@@ -256,7 +254,7 @@ mod tests {
 
     #[test]
     fn test_filter_most_common() {
-        let diag_report = DiagnosticReport::new(&TEST_INPUT);
+        let diag_report = DiagnosticReport::new(TEST_INPUT);
         let mut filtered_report = FilteredReport::new(&diag_report);
         filtered_report.filter_most_common(0);
 
@@ -279,19 +277,19 @@ mod tests {
 
     #[test]
     fn test_oxygen_generator_rating() {
-        let diag_report = DiagnosticReport::new(&TEST_INPUT);
+        let diag_report = DiagnosticReport::new(TEST_INPUT);
         assert_eq!(calculate_rating(&diag_report, &Rating::OxygenGenerator), 23);
     }
 
     #[test]
     fn test_co0_scrubber_rating() {
-        let diag_report = DiagnosticReport::new(&TEST_INPUT);
+        let diag_report = DiagnosticReport::new(TEST_INPUT);
         assert_eq!(calculate_rating(&diag_report, &Rating::CO2Scrubber), 10);
     }
 
     #[test]
     fn challenge_answer() {
-        let diag_report = DiagnosticReport::new(&TEST_INPUT);
+        let diag_report = DiagnosticReport::new(TEST_INPUT);
         assert_eq!(
             calculate_rating(&diag_report, &Rating::OxygenGenerator)
                 * calculate_rating(&diag_report, &Rating::CO2Scrubber),
@@ -302,6 +300,6 @@ mod tests {
     #[test]
     #[should_panic]
     fn different_line_lengths() {
-        DiagnosticReport::new(&TEST_INPUT_BAD_LENGTH);
+        DiagnosticReport::new(TEST_INPUT_BAD_LENGTH);
     }
 }

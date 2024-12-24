@@ -41,8 +41,8 @@ impl Grid {
             }
 
             dots.insert(Coord {
-                x: u16::from_str_radix(x_y[0], 10).unwrap(),
-                y: u16::from_str_radix(x_y[1], 10).unwrap(),
+                x: x_y[0].parse().unwrap(),
+                y: x_y[1].parse().unwrap(),
             });
         }
 
@@ -109,13 +109,10 @@ impl Fold {
         let fold_details: Vec<&str> = substring.split('=').collect();
         assert_eq!(fold_details.len(), 2);
 
-        let axis;
-        let location;
-
-        axis = fold_details[0].chars().next().unwrap();
+        let axis = fold_details[0].chars().next().unwrap();
         assert!(axis == 'x' || axis == 'y');
 
-        location = u16::from_str_radix(fold_details[1], 10).unwrap();
+        let location = fold_details[1].parse().unwrap();
 
         Self { axis, location }
     }
@@ -129,8 +126,8 @@ fn parse_input(input: &str) -> (Grid, Vec<Fold>) {
     let mut folds = Vec::new();
     let mut line = input.lines();
 
-    while let Some(l) = line.next() {
-        if l.len() == 0 {
+    for l in line.by_ref() {
+        if l.is_empty() {
             break;
         }
         dots.push(l);
@@ -138,8 +135,8 @@ fn parse_input(input: &str) -> (Grid, Vec<Fold>) {
 
     let grid = Grid::new(&dots);
 
-    while let Some(l) = line.next() {
-        if l.len() > 0 {
+    for l in line {
+        if !l.is_empty() {
             folds.push(Fold::new(l));
         }
     }
@@ -189,7 +186,7 @@ fold along x=5";
 
     #[test]
     fn test_parse_input() {
-        let (grid, folds) = parse_input(&TEST_INPUT);
+        let (grid, folds) = parse_input(TEST_INPUT);
 
         assert_eq!(grid.dots.len(), 18);
         assert!(grid.dots.contains(&Coord { x: 3, y: 0 }));
@@ -229,7 +226,7 @@ fold along x=5";
 
     #[test]
     fn test_perform_fold_1() {
-        let (mut grid, folds) = parse_input(&TEST_INPUT);
+        let (mut grid, folds) = parse_input(TEST_INPUT);
         grid.perform_fold(&folds[0]);
 
         assert_eq!(grid.dots.len(), 17);
@@ -255,7 +252,7 @@ fold along x=5";
 
     #[test]
     fn test_perform_fold_2() {
-        let (mut grid, folds) = parse_input(&TEST_INPUT);
+        let (mut grid, folds) = parse_input(TEST_INPUT);
         grid.perform_fold(&folds[0]);
         grid.perform_fold(&folds[1]);
 

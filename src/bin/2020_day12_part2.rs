@@ -63,7 +63,7 @@ impl Ship {
     }
 
     fn execute_single_command(&mut self, command: &str) {
-        if command != "" {
+        if !command.is_empty() {
             let command_chars: Vec<char> = command.chars().collect();
             let command = command_chars[0];
 
@@ -151,8 +151,8 @@ impl Ship {
 
     fn execute_multiple_commands(&mut self, commands: &str) {
         for cmd in commands.lines() {
-            if cmd != "" {
-                self.execute_single_command(&cmd);
+            if !cmd.is_empty() {
+                self.execute_single_command(cmd);
             }
         }
     }
@@ -191,7 +191,7 @@ F11";
     fn test_0() {
         let mut ship = Ship::new();
 
-        ship.execute_multiple_commands(&TEST_INPUT);
+        ship.execute_multiple_commands(TEST_INPUT);
         assert_eq!(ship.latitude, -72);
         assert_eq!(ship.longitude, 214);
         assert_eq!(ship.manhatten_distance(), 286);

@@ -29,7 +29,7 @@ impl Grid {
         let mut octopus = Vec::new();
 
         for line in input.lines() {
-            if line == "" {
+            if line.is_empty() {
                 continue;
             }
 
@@ -401,73 +401,73 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let grid = Grid::new(&TEST_INPUT);
+        let grid = Grid::new(TEST_INPUT);
         assert_eq!(grid.octopus[1][3], 5);
         assert_eq!(grid.octopus[9][8], 2);
     }
 
     #[test]
     fn after_step_1() {
-        let mut grid = Grid::new(&TEST_INPUT);
+        let mut grid = Grid::new(TEST_INPUT);
         let flashes = grid.simulate_step();
-        assert_eq!(grid, Grid::new(&AFTER_STEP_1));
+        assert_eq!(grid, Grid::new(AFTER_STEP_1));
         assert_eq!(flashes, 0);
     }
 
     #[test]
     fn after_more_steps() {
-        let mut grid = Grid::new(&TEST_INPUT);
+        let mut grid = Grid::new(TEST_INPUT);
 
         let mut flashes = grid.simulate_steps(2);
-        assert_eq!(grid, Grid::new(&AFTER_STEP_2));
+        assert_eq!(grid, Grid::new(AFTER_STEP_2));
         flashes += grid.simulate_step();
-        assert_eq!(grid, Grid::new(&AFTER_STEP_3));
+        assert_eq!(grid, Grid::new(AFTER_STEP_3));
         flashes += grid.simulate_step();
-        assert_eq!(grid, Grid::new(&AFTER_STEP_4));
+        assert_eq!(grid, Grid::new(AFTER_STEP_4));
         flashes += grid.simulate_step();
-        assert_eq!(grid, Grid::new(&AFTER_STEP_5));
+        assert_eq!(grid, Grid::new(AFTER_STEP_5));
         flashes += grid.simulate_step();
-        assert_eq!(grid, Grid::new(&AFTER_STEP_6));
+        assert_eq!(grid, Grid::new(AFTER_STEP_6));
         flashes += grid.simulate_step();
-        assert_eq!(grid, Grid::new(&AFTER_STEP_7));
+        assert_eq!(grid, Grid::new(AFTER_STEP_7));
         flashes += grid.simulate_step();
-        assert_eq!(grid, Grid::new(&AFTER_STEP_8));
+        assert_eq!(grid, Grid::new(AFTER_STEP_8));
         flashes += grid.simulate_step();
-        assert_eq!(grid, Grid::new(&AFTER_STEP_9));
+        assert_eq!(grid, Grid::new(AFTER_STEP_9));
         flashes += grid.simulate_step();
-        assert_eq!(grid, Grid::new(&AFTER_STEP_10));
+        assert_eq!(grid, Grid::new(AFTER_STEP_10));
         assert_eq!(flashes, 204);
     }
 
     #[test]
     fn after_even_more_steps() {
-        let mut grid = Grid::new(&TEST_INPUT);
+        let mut grid = Grid::new(TEST_INPUT);
 
         let mut flashes = grid.simulate_steps(20);
-        assert_eq!(grid, Grid::new(&AFTER_STEP_20));
+        assert_eq!(grid, Grid::new(AFTER_STEP_20));
         flashes += grid.simulate_steps(10);
-        assert_eq!(grid, Grid::new(&AFTER_STEP_30));
+        assert_eq!(grid, Grid::new(AFTER_STEP_30));
         flashes += grid.simulate_steps(10);
-        assert_eq!(grid, Grid::new(&AFTER_STEP_40));
+        assert_eq!(grid, Grid::new(AFTER_STEP_40));
         flashes += grid.simulate_steps(10);
-        assert_eq!(grid, Grid::new(&AFTER_STEP_50));
+        assert_eq!(grid, Grid::new(AFTER_STEP_50));
         flashes += grid.simulate_steps(10);
-        assert_eq!(grid, Grid::new(&AFTER_STEP_60));
+        assert_eq!(grid, Grid::new(AFTER_STEP_60));
         flashes += grid.simulate_steps(10);
-        assert_eq!(grid, Grid::new(&AFTER_STEP_70));
+        assert_eq!(grid, Grid::new(AFTER_STEP_70));
         flashes += grid.simulate_steps(10);
-        assert_eq!(grid, Grid::new(&AFTER_STEP_80));
+        assert_eq!(grid, Grid::new(AFTER_STEP_80));
         flashes += grid.simulate_steps(10);
-        assert_eq!(grid, Grid::new(&AFTER_STEP_90));
+        assert_eq!(grid, Grid::new(AFTER_STEP_90));
         flashes += grid.simulate_steps(10);
-        assert_eq!(grid, Grid::new(&AFTER_STEP_100));
+        assert_eq!(grid, Grid::new(AFTER_STEP_100));
         assert_eq!(flashes, 1656);
     }
 
     #[test]
     #[should_panic]
     fn incorrect_line_lengths() {
-        let _ = Grid::new(&TEST_INPUT_BAD_LINE_LENGTH);
+        let _ = Grid::new(TEST_INPUT_BAD_LINE_LENGTH);
     }
 
     #[test]

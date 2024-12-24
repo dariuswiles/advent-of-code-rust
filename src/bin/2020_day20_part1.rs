@@ -51,27 +51,21 @@ impl Tile {
             .unwrap();
 
         let mut cells = Vec::new();
-        let mut lines_read = 0;
 
-        loop {
-            if let Some(line) = lines.next() {
-                if line == "" {
-                    if lines_read == TILE_SIZE {
-                        break;
-                    } else {
-                        panic!("Input contained a tile with an unexpected number of rows");
-                    }
+        for (lines_read, line) in lines.enumerate() {
+            if line.is_empty() {
+                if lines_read == TILE_SIZE {
+                    break;
+                } else {
+                    panic!("Input contained a tile with an unexpected number of rows");
                 }
-
-                if line.len() != TILE_SIZE {
-                    panic!("Input contained a tile row with an unexpected number of columns");
-                }
-
-                cells.push(line.to_owned());
-                lines_read += 1;
-            } else {
-                break;
             }
+
+            if line.len() != TILE_SIZE {
+                panic!("Input contained a tile row with an unexpected number of columns");
+            }
+
+            cells.push(line.to_owned());
         }
 
         let mut left = String::new();
@@ -153,7 +147,7 @@ fn parse_input(input: &str) -> Vec<Tile> {
             // println!("tile_start = {}", tile_start);
         }
 
-        if lines[i] == "" {
+        if lines[i].is_empty() {
             let tile_block = lines[tile_start..i].join("\n");
             // println!("parse_input about to call from_string with data\n{:#?}", &tile_block);
 
@@ -172,7 +166,7 @@ fn parse_input(input: &str) -> Vec<Tile> {
     tiles
 }
 
-fn find_tile_matches(tiles: &Vec<Tile>) -> HashMap<Id, Vec<Id>> {
+fn find_tile_matches(tiles: &[Tile]) -> HashMap<Id, Vec<Id>> {
     let mut matches = HashMap::new();
 
     let tiles_count = tiles.len();
@@ -183,7 +177,7 @@ fn find_tile_matches(tiles: &Vec<Tile>) -> HashMap<Id, Vec<Id>> {
                 continue;
             }
 
-            if let Some(_) = tiles[t0].find_matching_border(&tiles[t1]) {
+            if tiles[t0].find_matching_border(&tiles[t1]).is_some() {
                 matches
                     .entry(tiles[t0].id)
                     .or_insert_with(Vec::new)
@@ -377,7 +371,7 @@ Tile 7777:
 
     #[test]
     fn solve_test_puzzle() {
-        let answer = do_challenge(&TEST_INPUT);
+        let answer = do_challenge(TEST_INPUT);
         assert_eq!(answer, 20899048083289u64);
     }
 

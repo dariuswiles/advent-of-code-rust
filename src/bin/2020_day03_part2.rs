@@ -79,7 +79,7 @@ fn tree_hits_for_pattern(input: &str, p: &Pattern) -> u32 {
 fn product_of_tree_hits_for_patterns(input: &str, patterns: &[Pattern]) -> u32 {
     let mut challenge_result: u32 = 1;
     for p in patterns {
-        challenge_result *= tree_hits_for_pattern(input, &p);
+        challenge_result *= tree_hits_for_pattern(input, p);
     }
 
     challenge_result

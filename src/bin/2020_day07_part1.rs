@@ -35,13 +35,13 @@ impl Bags {
         if let Some(b) = self.bags.iter().position(|b| b.name == name) {
             // println!("Lookup of bag '{}' found existing bag with BagId {}", &name, b);
 
-            return b;
+            b
         } else {
             // println!("No bag '{}' exists, so adding with BagId {}", &name, self.bags.len());
             self.bags.push(Bag {
                 name: name.to_owned(),
             });
-            return self.bags.len() - 1;
+            self.bags.len() - 1
         }
     }
 
@@ -64,8 +64,8 @@ struct Rule {
 impl Rule {
     fn new(outer_bag: BagId, inner_bags: Vec<(BagId, u32)>) -> Self {
         Self {
-            outer_bag: outer_bag,
-            inner_bags: inner_bags,
+            outer_bag,
+            inner_bags,
         }
     }
 }
@@ -142,7 +142,7 @@ fn parse_rules(input: &str) -> Ruleset {
     let mut ruleset = Ruleset::new();
 
     for line in input.lines() {
-        let new_rule = parse_rule(&line, &mut ruleset.bags);
+        let new_rule = parse_rule(line, &mut ruleset.bags);
         ruleset.add_rule(new_rule);
     }
 
@@ -179,7 +179,7 @@ fn outer_bag_options(rs: &Ruleset, target_bag_name: &str) -> HashSet<BagId> {
                 .iter()
                 .position(|(bag_id, _count)| *bag_id == b);
 
-            if matching_bag != None {
+            if matching_bag.is_some() {
                 // println!("Bag {} can contain bag {}", &r.outer_bag, &b);
                 bags_to_check.push(r.outer_bag);
             }
@@ -220,7 +220,7 @@ dotted black bags contain no other bags.";
 
     #[test]
     fn set_0() {
-        let ruleset = parse_rules(&TEST_RULES);
+        let ruleset = parse_rules(TEST_RULES);
         let obo = outer_bag_options(&ruleset, "shiny gold");
         assert_eq!(obo.len(), 4);
     }

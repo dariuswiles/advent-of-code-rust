@@ -28,9 +28,8 @@ impl ListElement {
         assert_eq!(input_chars[0], '[');
 
         let slice = &mut &input_chars[1..];
-        let result = Self::parse_element_recurse(slice);
 
-        result
+        Self::parse_element_recurse(slice)
     }
 
     /// Internal function that parses a slice of `char`s representing the input string into a
@@ -48,36 +47,35 @@ impl ListElement {
         loop {
             match ic[0] {
                 ']' => {
-                    *ic = &mut &ic[1..];
+                    *ic = &ic[1..];
                     break;
                 }
                 '[' => {
-                    *ic = &mut &ic[1..];
+                    *ic = &ic[1..];
                     let sublist = ListElement::parse_element_recurse(ic);
                     elements.push(sublist);
                 }
                 '0'..='9' => {
                     let mut char_digits = Vec::new();
 
-                    while ic[0].is_digit(10) {
+                    while ic[0].is_ascii_digit() {
                         char_digits.push(ic[0]);
-                        *ic = &mut &ic[1..];
+                        *ic = &ic[1..];
                     }
 
-                    let int_tmp =
-                        Int::from_str_radix(&char_digits.iter().collect::<String>(), 10).unwrap();
+                    let int_tmp = char_digits.iter().collect::<String>().parse().unwrap();
 
                     elements.push(ListElement::Integer(int_tmp));
                 }
                 ',' => {
-                    *ic = &mut &ic[1..];
+                    *ic = &ic[1..];
                 }
                 _ => {
                     panic!("Unrecognized character '{}' in input", ic[0]);
                 }
             }
 
-            if ic.len() == 0 {
+            if ic.is_empty() {
                 panic!("The input contains unbalanced start and end list tags");
             }
         }
@@ -138,26 +136,19 @@ fn is_order_correct(left: &ListElement, right: &ListElement) -> Option<bool> {
     // At least one of 'left' or 'right' is an `ElementList`, but both need to be treated as if
     // they are `ElementList`s so they can be compared, as described the challenge rules. This is
     // done by converting an `Integer` into a new `Vec` with it as the only element.
-    let left_elements;
-    let right_elements;
-
-    match left {
+    let left_elements = match left {
         ListElement::Integer(int) => {
-            left_elements = vec![ListElement::Integer(*int)];
+            vec![ListElement::Integer(*int)]
         }
-        ListElement::List(list) => {
-            left_elements = list.clone();
-        }
-    }
+        ListElement::List(list) => list.clone(),
+    };
 
-    match right {
+    let right_elements = match right {
         ListElement::Integer(int) => {
-            right_elements = vec![ListElement::Integer(*int)];
+            vec![ListElement::Integer(*int)]
         }
-        ListElement::List(list) => {
-            right_elements = list.clone();
-        }
-    }
+        ListElement::List(list) => list.clone(),
+    };
 
     let left_length = left_elements.len();
     let right_length = right_elements.len();
@@ -178,7 +169,7 @@ fn is_order_correct(left: &ListElement, right: &ListElement) -> Option<bool> {
 
     // As per the challenge rules, the pairs are ordered correctly if the 'left' list is shorter,
     // and are not ordered correctly otherwise.
-    return Some(left_length < right_length);
+    Some(left_length < right_length)
 }
 
 /// Iterates through all pairs of packets passed to determine which pairs are in the correct order.
@@ -244,7 +235,7 @@ mod tests {
     #[test]
     fn test_parse_str_0() {
         assert_eq!(
-            ListElement::parse_str(&"[11,0]"),
+            ListElement::parse_str("[11,0]"),
             ListElement::List(vec![ListElement::Integer(11), ListElement::Integer(0),])
         );
     }
@@ -252,7 +243,7 @@ mod tests {
     #[test]
     fn test_parse_str_1() {
         assert_eq!(
-            ListElement::parse_str(&"[[1],[2,3,4]]"),
+            ListElement::parse_str("[[1],[2,3,4]]"),
             ListElement::List(vec![
                 ListElement::List(vec![ListElement::Integer(1),]),
                 ListElement::List(vec![
@@ -267,18 +258,18 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_parse_str_bad_char() {
-        ListElement::parse_str(&"[9,6,[2],a,5]");
+        ListElement::parse_str("[9,6,[2],a,5]");
     }
 
     #[test]
     #[should_panic]
     fn test_parse_str_unbalanced1() {
-        ListElement::parse_str(&"[9,6,[2]");
+        ListElement::parse_str("[9,6,[2]");
     }
 
     #[test]
     fn test_parse_input() {
-        let result = parse_input(&TEST_INPUT);
+        let result = parse_input(TEST_INPUT);
 
         assert_eq!(
             result[0].0,
@@ -440,7 +431,7 @@ mod tests {
 
     #[test]
     fn check_ordering() {
-        let pairs = parse_input(&TEST_INPUT);
+        let pairs = parse_input(TEST_INPUT);
         assert_eq!(is_order_correct(&pairs[0].0, &pairs[0].1), Some(true));
         assert_eq!(is_order_correct(&pairs[1].0, &pairs[1].1), Some(true));
         assert_eq!(is_order_correct(&pairs[2].0, &pairs[2].1), Some(false));
@@ -453,7 +444,7 @@ mod tests {
 
     #[test]
     fn test_check_order_of_all_pairs() {
-        let pairs = parse_input(&TEST_INPUT);
+        let pairs = parse_input(TEST_INPUT);
         assert_eq!(check_order_of_all_pairs(&pairs), 13);
     }
 }

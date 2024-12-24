@@ -26,7 +26,7 @@ fn parse_input(input: &str) -> Vec<Vec<Height>> {
     let mut grid: Vec<Vec<Height>> = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             grid.push(
                 line.chars()
                     .map(|c| c.to_digit(10).unwrap() as Height)
@@ -46,7 +46,7 @@ fn parse_input(input: &str) -> Vec<Vec<Height>> {
 //
 // This is determined by looking along each row and column from both directions to determine if
 // each tree is visible from outside the grid.
-fn find_visible_trees(tree_grid: &Vec<Vec<Height>>) -> Vec<Vec<bool>> {
+fn find_visible_trees(tree_grid: &[Vec<Height>]) -> Vec<Vec<bool>> {
     let num_rows = tree_grid.len();
     let num_columns = tree_grid[0].len();
     let mut visible_trees = Vec::new();
@@ -112,7 +112,7 @@ fn find_visible_trees(tree_grid: &Vec<Vec<Height>>) -> Vec<Vec<bool>> {
 }
 
 /// Returns the number of visible trees in `visible_trees`.
-fn challenge_answer(visible_trees: &Vec<Vec<bool>>) -> usize {
+fn challenge_answer(visible_trees: &[Vec<bool>]) -> usize {
     visible_trees.iter().flatten().filter(|&t| *t).count()
 }
 

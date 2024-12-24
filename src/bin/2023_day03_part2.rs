@@ -43,7 +43,7 @@ impl Schematic {
         let mut width = None;
 
         for line in input.lines() {
-            if line == "" {
+            if line.is_empty() {
                 continue;
             }
 
@@ -61,8 +61,8 @@ impl Schematic {
             for c in &chars {
                 if c == &CELL_EMPTY {
                     row.push(Cell::Empty);
-                } else if c.is_digit(10) {
-                    row.push(Cell::Digit(c.to_digit(10).unwrap() as u32));
+                } else if c.is_ascii_digit() {
+                    row.push(Cell::Digit(c.to_digit(10).unwrap()));
                 } else if c == &GEAR_SYMBOL {
                     row.push(Cell::GearSymbol);
                 } else {
@@ -152,21 +152,19 @@ impl Schematic {
 
                     if let Some(gear_positions) = m.get(&(row, column)) {
                         adjacent_gears =
-                            HashSet::from_iter(adjacent_gears.union(gear_positions).map(|g| *g));
+                            HashSet::from_iter(adjacent_gears.union(gear_positions).copied());
                     }
-                } else {
-                    if n > 0 {
-                        if adjacent_gears.len() > 0 {
-                            add_number_to_gears(&mut gear_to_number_map, n, &mut adjacent_gears);
-                        }
+                } else if n > 0 {
+                    if !adjacent_gears.is_empty() {
+                        add_number_to_gears(&mut gear_to_number_map, n, &mut adjacent_gears);
+                    }
 
-                        n = 0;
-                        adjacent_gears = HashSet::new();
-                    }
+                    n = 0;
+                    adjacent_gears = HashSet::new();
                 }
             }
 
-            if adjacent_gears.len() > 0 {
+            if !adjacent_gears.is_empty() {
                 add_number_to_gears(&mut gear_to_number_map, n, &mut adjacent_gears);
             }
         }
@@ -182,7 +180,7 @@ fn add_number_to_gears(
     adjacent_gears: &mut HashSet<Position>,
 ) {
     for gear_position in adjacent_gears.iter() {
-        match gear_to_number_map.get_mut(&gear_position) {
+        match gear_to_number_map.get_mut(gear_position) {
             Some(entry) => {
                 entry.insert(number);
             }
@@ -220,7 +218,7 @@ fn do_challenge(input: &str) -> u32 {
     g2nums
         .values()
         .filter(|g| is_gear(g))
-        .map(|g| g.iter().fold(1, |power, n| power * n))
+        .map(|g| g.iter().product::<u32>())
         .sum()
 }
 
@@ -244,7 +242,7 @@ mod tests {
 
     #[test]
     fn schematic_from_string() {
-        let s = Schematic::from_string(&TEST_INPUT);
+        let s = Schematic::from_string(TEST_INPUT);
 
         assert_eq!(Cell::Digit(4), s.cells[0][0]);
         assert_eq!(Cell::Digit(6), s.cells[0][1]);
@@ -276,13 +274,13 @@ mod tests {
 
     #[test]
     fn test_create_gear_adjacency_map() {
-        let s = Schematic::from_string(&TEST_INPUT);
+        let s = Schematic::from_string(TEST_INPUT);
         let m = s.create_gear_adjacency_map();
 
         assert_eq!(27, m.len());
         assert_eq!(None, m.get(&(0, 0)));
 
-        let gear_1_3 = HashSet::from_iter(vec![(1, 3)].iter().cloned());
+        let gear_1_3 = HashSet::from_iter([(1, 3)].iter().cloned());
         assert_eq!(Some(&gear_1_3), m.get(&(0, 2)));
         assert_eq!(Some(&gear_1_3), m.get(&(0, 3)));
         assert_eq!(Some(&gear_1_3), m.get(&(0, 4)));
@@ -293,7 +291,7 @@ mod tests {
         assert_eq!(Some(&gear_1_3), m.get(&(2, 3)));
         assert_eq!(Some(&gear_1_3), m.get(&(2, 4)));
 
-        let gear_4_3 = HashSet::from_iter(vec![(4, 3)].iter().cloned());
+        let gear_4_3 = HashSet::from_iter([(4, 3)].iter().cloned());
         assert_eq!(Some(&gear_4_3), m.get(&(3, 2)));
         assert_eq!(Some(&gear_4_3), m.get(&(3, 3)));
         assert_eq!(Some(&gear_4_3), m.get(&(3, 4)));
@@ -304,7 +302,7 @@ mod tests {
         assert_eq!(Some(&gear_4_3), m.get(&(5, 3)));
         assert_eq!(Some(&gear_4_3), m.get(&(5, 4)));
 
-        let gear_8_5 = HashSet::from_iter(vec![(8, 5)].iter().cloned());
+        let gear_8_5 = HashSet::from_iter([(8, 5)].iter().cloned());
         assert_eq!(Some(&gear_8_5), m.get(&(7, 4)));
         assert_eq!(Some(&gear_8_5), m.get(&(7, 5)));
         assert_eq!(Some(&gear_8_5), m.get(&(7, 6)));
@@ -318,7 +316,7 @@ mod tests {
 
     #[test]
     fn test_map_gears_to_numbers() {
-        let s = Schematic::from_string(&TEST_INPUT);
+        let s = Schematic::from_string(TEST_INPUT);
         let m = s.create_gear_adjacency_map();
         let g2nums = s.map_gears_to_numbers(&m);
 
@@ -339,6 +337,6 @@ mod tests {
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(467835, do_challenge(&TEST_INPUT));
+        assert_eq!(467835, do_challenge(TEST_INPUT));
     }
 }

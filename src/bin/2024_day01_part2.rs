@@ -111,7 +111,7 @@ mod tests {
     #[test]
     fn test_parse_input() {
         assert_eq!(
-            parse_input(&TEST_INPUT),
+            parse_input(TEST_INPUT),
             (vec![3, 4, 2, 1, 3, 3], vec![4, 3, 5, 3, 9, 3])
         );
     }
@@ -149,6 +149,6 @@ mod tests {
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(do_challenge(&TEST_INPUT), 31);
+        assert_eq!(do_challenge(TEST_INPUT), 31);
     }
 }

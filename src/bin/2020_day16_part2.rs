@@ -52,7 +52,7 @@ impl ChallengeData {
         let mut defns = Vec::new();
 
         for line in input_lines {
-            if line == "" {
+            if line.is_empty() {
                 break;
             }
 
@@ -74,7 +74,7 @@ impl ChallengeData {
             let range1: Vec<u32> = tokens[1].split('-').map(|n| n.parse().unwrap()).collect();
 
             defns.push(TicketField {
-                name: name,
+                name,
                 range0: range0[0]..=range0[1],
                 range1: range1[0]..=range1[1],
             });
@@ -211,7 +211,7 @@ fn map_all_ticket_fields(data: &ChallengeData) -> Vec<&TicketField> {
     let num_of_fields = data.field_definitions.len();
 
     for col in 0..num_of_fields {
-        possibilities.push(map_one_ticket_field(&data, col));
+        possibilities.push(map_one_ticket_field(data, col));
     }
 
     let mut column_verified = Vec::new();
@@ -270,6 +270,7 @@ fn perform_work(input: &str) -> u64 {
     let mut answer = 1;
 
     let mapping_length = mapping.len();
+    #[allow(clippy::needless_range_loop)]
     for i in 0..mapping_length {
         if mapping[i].name.starts_with("departure") {
             answer *= data.my_ticket[i] as u64;
@@ -320,7 +321,7 @@ nearby tickets:
 
     #[test]
     fn test_game_init_and_aggregation() {
-        let data = ChallengeData::from_string(&TEST_INPUT_0);
+        let data = ChallengeData::from_string(TEST_INPUT_0);
 
         println!("{:#?}", data);
 
@@ -341,7 +342,7 @@ nearby tickets:
 
     #[test]
     fn test_ticket_discard() {
-        let mut data = ChallengeData::from_string(&TEST_INPUT_0);
+        let mut data = ChallengeData::from_string(TEST_INPUT_0);
         discard_invalid_tickets(&mut data);
 
         assert_eq!(data.nearby_tickets, vec![vec![7, 3, 47]]);
@@ -349,7 +350,7 @@ nearby tickets:
 
     #[test]
     fn partially_determine_field_mapping() {
-        let mut data = ChallengeData::from_string(&TEST_INPUT_1);
+        let mut data = ChallengeData::from_string(TEST_INPUT_1);
         discard_invalid_tickets(&mut data);
 
         let mut results = Vec::new();

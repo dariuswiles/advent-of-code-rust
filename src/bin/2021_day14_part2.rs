@@ -90,7 +90,7 @@ impl PairTally {
     /// Applies the given `RuleSet` to the data in this object `iterations` times.
     fn apply_rules_repeatedly(&mut self, rules: &RuleSet, iterations: usize) {
         for _ in 0..iterations {
-            self.apply_rules(&rules);
+            self.apply_rules(rules);
         }
     }
 
@@ -182,7 +182,7 @@ CN -> C";
 
     #[test]
     fn test_parse_input() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
 
         assert_eq!(template, "NNCB");
         assert_eq!(ruleset.rules[&['C', 'H']], 'B');
@@ -205,7 +205,7 @@ CN -> C";
 
     #[test]
     fn test_create_pairs() {
-        let (template, _ruleset) = parse_input(&TEST_INPUT);
+        let (template, _ruleset) = parse_input(TEST_INPUT);
         let pt = PairTally::new(template);
 
         // Expecting NNCB
@@ -216,7 +216,7 @@ CN -> C";
 
     #[test]
     fn test_apply_rules() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
         let mut pt = PairTally::new(template);
         pt.apply_rules(&ruleset);
 
@@ -231,7 +231,7 @@ CN -> C";
 
     #[test]
     fn test_apply_rules_repeatedly_1() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
         let mut pt = PairTally::new(template);
         pt.apply_rules_repeatedly(&ruleset, 1);
 
@@ -246,7 +246,7 @@ CN -> C";
 
     #[test]
     fn test_apply_rules_repeatedly_2() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
         let mut pt = PairTally::new(template);
         pt.apply_rules_repeatedly(&ruleset, 2);
 
@@ -263,7 +263,7 @@ CN -> C";
 
     #[test]
     fn test_apply_rules_repeatedly_3() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
         let mut pt = PairTally::new(template);
         pt.apply_rules_repeatedly(&ruleset, 3);
 
@@ -283,7 +283,7 @@ CN -> C";
 
     #[test]
     fn test_apply_rules_repeatedly_4() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
         let mut pt = PairTally::new(template);
         pt.apply_rules_repeatedly(&ruleset, 4);
 
@@ -305,7 +305,7 @@ CN -> C";
 
     #[test]
     fn frequency_for_4() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
         let mut pt = PairTally::new(template);
         pt.apply_rules_repeatedly(&ruleset, 4);
         let freq = pt.letter_frequencies();
@@ -319,7 +319,7 @@ CN -> C";
 
     #[test]
     fn test_apply_rules_repeatedly_5() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
         let mut pt = PairTally::new(template);
         pt.apply_rules_repeatedly(&ruleset, 5);
         let freq = pt.letter_frequencies();
@@ -329,7 +329,7 @@ CN -> C";
 
     #[test]
     fn frequency_for_10() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
         let mut pt = PairTally::new(template);
         pt.apply_rules_repeatedly(&ruleset, 10);
         let frequencies = pt.letter_frequencies();
@@ -347,7 +347,7 @@ CN -> C";
 
     #[test]
     fn frequency_for_40() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
         let mut pt = PairTally::new(template);
         pt.apply_rules_repeatedly(&ruleset, 40);
         let frequencies = pt.letter_frequencies();

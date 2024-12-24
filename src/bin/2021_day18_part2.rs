@@ -90,11 +90,7 @@ impl Number {
     /// recursion. If a node needs exploding, updates `explode_data` to point to the node. The
     /// nearest number to the left and the nearest number to the right are also tracking in this
     /// data.
-    fn explode_recurse<'a, 'b>(
-        node: &'a mut Number,
-        depth: usize,
-        explode_data: &'b mut ExplodeData<'a>,
-    ) {
+    fn explode_recurse<'a>(node: &'a mut Number, depth: usize, explode_data: &mut ExplodeData<'a>) {
         // Implementation note: this causes borrow problems if included in 'match' statement below.
         if let Number::Compound { .. } = node {
             if depth == 4 {
@@ -173,13 +169,13 @@ impl Number {
                     return search_left;
                 }
 
-                return Self::split_recurse(right);
+                Self::split_recurse(right)
             }
             Number::Regular(reg) => {
                 if *reg >= 10 {
-                    return Some(node);
+                    Some(node)
                 } else {
-                    return None;
+                    None
                 }
             }
         }
@@ -228,7 +224,7 @@ impl Number {
 
     /// Returns the magnitude of Self.
     fn magnitude(&self) -> u32 {
-        Self::magnitude_recurse(&self)
+        Self::magnitude_recurse(self)
     }
 
     /// Recursively walks the tree of Numbers starting at `node` and returns a single magnitude
@@ -263,7 +259,7 @@ impl Number {
 /// Writes a Snailfish number in text form.
 impl Display for Number {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        Self::fmt_recurse(&self, f);
+        Self::fmt_recurse(self, f);
 
         Ok(())
     }
@@ -283,7 +279,7 @@ fn parse_number(chars: &mut Vec<char>) -> Number {
     assert_eq!(c, '[');
 
     c = chars[0];
-    if c.is_digit(10) {
+    if c.is_ascii_digit() {
         c = chars.remove(0);
         left = Box::new(Number::Regular(c.to_digit(10).unwrap() as u8));
     } else {
@@ -295,7 +291,7 @@ fn parse_number(chars: &mut Vec<char>) -> Number {
     assert_eq!(c, ',');
 
     c = chars[0];
-    if c.is_digit(10) {
+    if c.is_ascii_digit() {
         c = chars.remove(0);
         right = Box::new(Number::Regular(c.to_digit(10).unwrap() as u8));
     } else {
@@ -318,7 +314,7 @@ fn max_magnitude(input: &str) -> u32 {
     let mut lines = Vec::new();
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
         lines.push(line);
@@ -381,14 +377,14 @@ mod tests {
     #[test]
     fn test_new_number() {
         assert_eq!(
-            Number::new(&TEST_INPUT_0),
+            Number::new(TEST_INPUT_0),
             Number::Compound {
                 left: Box::new(Number::Regular(1)),
                 right: Box::new(Number::Regular(2))
             }
         );
         assert_eq!(
-            Number::new(&TEST_INPUT_1),
+            Number::new(TEST_INPUT_1),
             Number::Compound {
                 left: Box::new(Number::Compound {
                     left: Box::new(Number::Regular(1)),
@@ -398,7 +394,7 @@ mod tests {
             }
         );
         assert_eq!(
-            Number::new(&TEST_INPUT_2),
+            Number::new(TEST_INPUT_2),
             Number::Compound {
                 left: Box::new(Number::Regular(9)),
                 right: Box::new(Number::Compound {
@@ -408,7 +404,7 @@ mod tests {
             }
         );
         assert_eq!(
-            Number::new(&TEST_INPUT_3),
+            Number::new(TEST_INPUT_3),
             Number::Compound {
                 left: Box::new(Number::Compound {
                     left: Box::new(Number::Regular(1)),
@@ -422,7 +418,7 @@ mod tests {
         );
 
         assert_eq!(
-            Number::new(&TEST_INPUT_4),
+            Number::new(TEST_INPUT_4),
             Number::Compound {
                 left: Box::new(Number::Compound {
                     left: Box::new(Number::Compound {
@@ -451,7 +447,7 @@ mod tests {
         );
 
         assert_eq!(
-            Number::new(&TEST_INPUT_5),
+            Number::new(TEST_INPUT_5),
             Number::Compound {
                 left: Box::new(Number::Compound {
                     left: Box::new(Number::Compound {
@@ -486,7 +482,7 @@ mod tests {
         );
 
         assert_eq!(
-            Number::new(&TEST_INPUT_6),
+            Number::new(TEST_INPUT_6),
             Number::Compound {
                 left: Box::new(Number::Compound {
                     left: Box::new(Number::Compound {
@@ -661,6 +657,6 @@ mod tests {
 
     #[test]
     fn test_max_magnitude() {
-        assert_eq!(max_magnitude(&TEST_MAX_MAGNITUDE), 3993);
+        assert_eq!(max_magnitude(TEST_MAX_MAGNITUDE), 3993);
     }
 }

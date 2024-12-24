@@ -77,7 +77,7 @@ fn find_seat(line_num: usize, line: &str) -> Seat {
     Seat {
         row: row_limit_front,
         column: col_limit_left,
-        seat_id: seat_id,
+        seat_id,
     }
 }
 
@@ -85,11 +85,11 @@ fn find_vacant_seat_id(input: &str) -> u16 {
     let mut seat_ids = Vec::new();
 
     for (line_num, line) in input.lines().enumerate() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         };
 
-        seat_ids.push(find_seat(line_num, &line).seat_id);
+        seat_ids.push(find_seat(line_num, line).seat_id);
     }
 
     seat_ids.sort_unstable();

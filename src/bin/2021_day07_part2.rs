@@ -18,13 +18,13 @@ type Position = u32;
 fn parse_input(input: &str) -> Vec<Position> {
     input.lines().collect::<Vec<&str>>()[0]
         .split(",")
-        .map(|i| Position::from_str_radix(i, 10).unwrap())
+        .map(|i| i.parse().unwrap())
         .collect()
 }
 
 /// Find the least fuel that can be used to move all the given crabs to the same position.
 fn minimum_fuel(crabs: &Vec<Position>) -> u32 {
-    let sum = crabs.iter().fold(0, |acc, i| acc + i);
+    let sum = crabs.iter().sum::<u32>();
     let mean = f32::round(sum as f32 / crabs.len() as f32 / 2.0) as u32;
 
     let mut best_position = mean;
@@ -89,21 +89,21 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let crabs = parse_input(&TEST_INPUT);
+        let crabs = parse_input(TEST_INPUT);
 
         assert_eq!(crabs, vec![16, 1, 2, 0, 4, 2, 7, 1, 2, 14]);
     }
 
     #[test]
     fn test_total_fuel_cost() {
-        let crabs = parse_input(&TEST_INPUT);
+        let crabs = parse_input(TEST_INPUT);
 
         assert_eq!(total_fuel_cost(&crabs, 2), 206);
     }
 
     #[test]
     fn test_minimum_total_movement() {
-        let positions = parse_input(&TEST_INPUT);
+        let positions = parse_input(TEST_INPUT);
 
         assert_eq!(minimum_fuel(&positions), 168);
     }

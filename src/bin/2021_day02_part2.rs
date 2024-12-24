@@ -31,7 +31,7 @@ impl Commands {
         let mut commands = Vec::new();
 
         for line in code.lines() {
-            if line == "" {
+            if line.is_empty() {
                 continue;
             }
 
@@ -70,14 +70,14 @@ impl Commands {
         for c in &self.commands {
             match c {
                 Command::Down(d) => {
-                    aim += *d as i32;
+                    aim += *d;
                 }
                 Command::Forward(f) => {
                     horizontal += f;
                     depth += aim * f;
                 }
                 Command::Up(u) => {
-                    aim -= *u as i32;
+                    aim -= *u;
                 }
             }
         }
@@ -112,7 +112,7 @@ forward 2";
 
     #[test]
     fn parse_test_input() {
-        let result = Commands::parse_commands(&TEST_INPUT);
+        let result = Commands::parse_commands(TEST_INPUT);
         let mut result_iter = result.commands.iter();
 
         assert_eq!(result_iter.next(), Some(&Command::Forward(5)));
@@ -126,7 +126,7 @@ forward 2";
 
     #[test]
     fn check_horizontal_and_depth() {
-        let c = Commands::parse_commands(&TEST_INPUT);
+        let c = Commands::parse_commands(TEST_INPUT);
 
         assert_eq!(c.execute_commands(), (15, 60));
     }

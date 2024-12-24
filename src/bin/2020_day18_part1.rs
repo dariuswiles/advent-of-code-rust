@@ -15,14 +15,14 @@ enum Token {
     Add,
     Multiply,
     Number(u64),
-    SubExpression(Box<Vec<Token>>),
+    SubExpression(Vec<Token>),
 }
 
 fn tokenize(chars: &mut Vec<char>) -> Vec<Token> {
     let mut output = Vec::new();
 
     loop {
-        if chars.len() == 0 {
+        if chars.is_empty() {
             return output;
         }
 
@@ -30,7 +30,7 @@ fn tokenize(chars: &mut Vec<char>) -> Vec<Token> {
         match c {
             ' ' => {}
             '(' => {
-                output.push(Token::SubExpression(Box::new(tokenize(chars))));
+                output.push(Token::SubExpression(tokenize(chars)));
             }
             ')' => {
                 return output;
@@ -42,7 +42,7 @@ fn tokenize(chars: &mut Vec<char>) -> Vec<Token> {
                 output.push(Token::Multiply);
             }
             _ => {
-                if c.is_digit(10) {
+                if c.is_ascii_digit() {
                     output.push(Token::Number(c.to_digit(10).unwrap() as u64));
                 } else {
                     panic!("Input contains unexpected character '{}'", c);
@@ -57,7 +57,7 @@ fn evaluate_tokens(tokens: &mut Vec<Token>) -> u64 {
     let mut operator = None;
 
     loop {
-        if tokens.len() == 0 {
+        if tokens.is_empty() {
             return total;
         }
 
@@ -67,14 +67,14 @@ fn evaluate_tokens(tokens: &mut Vec<Token>) -> u64 {
                 tokens.insert(0, Token::Number(evaluate_tokens(&mut sub)));
             }
             Token::Add => {
-                if operator == None {
+                if operator.is_none() {
                     operator = Some(Token::Add);
                 } else {
                     panic!("Input contains adjacent operators");
                 }
             }
             Token::Multiply => {
-                if operator == None {
+                if operator.is_none() {
                     operator = Some(Token::Multiply);
                 } else {
                     panic!("Input contains adjacent operators");
@@ -136,31 +136,31 @@ mod tests {
 
     #[test]
     fn test_evaluate_0() {
-        assert_eq!(evaluate(&TEST_INPUT_0), 71);
+        assert_eq!(evaluate(TEST_INPUT_0), 71);
     }
 
     #[test]
     fn test_evaluate_1() {
-        assert_eq!(evaluate(&TEST_INPUT_1), 51);
+        assert_eq!(evaluate(TEST_INPUT_1), 51);
     }
 
     #[test]
     fn test_evaluate_2() {
-        assert_eq!(evaluate(&TEST_INPUT_2), 26);
+        assert_eq!(evaluate(TEST_INPUT_2), 26);
     }
 
     #[test]
     fn test_evaluate_3() {
-        assert_eq!(evaluate(&TEST_INPUT_3), 437);
+        assert_eq!(evaluate(TEST_INPUT_3), 437);
     }
 
     #[test]
     fn test_evaluate_4() {
-        assert_eq!(evaluate(&TEST_INPUT_4), 12240);
+        assert_eq!(evaluate(TEST_INPUT_4), 12240);
     }
 
     #[test]
     fn test_evaluate_5() {
-        assert_eq!(evaluate(&TEST_INPUT_5), 13632);
+        assert_eq!(evaluate(TEST_INPUT_5), 13632);
     }
 }

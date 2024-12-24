@@ -27,13 +27,13 @@ impl Passport<'_> {
     fn is_valid(&self) -> bool {
         // println!("{:?}", &self);
 
-        (self.byr != None)
-            & (self.iyr != None)
-            & (self.eyr != None)
-            & (self.hgt != None)
-            & (self.hcl != None)
-            & (self.ecl != None)
-            & (self.pid != None)
+        self.byr.is_some()
+            & self.iyr.is_some()
+            & self.eyr.is_some()
+            & self.hgt.is_some()
+            & self.hcl.is_some()
+            & self.ecl.is_some()
+            & self.pid.is_some()
     }
 }
 
@@ -46,7 +46,7 @@ fn count_valid_passports(input: &str) -> u32 {
     for (line_num, line) in input.lines().enumerate() {
         // println!("{:?}", &line);
 
-        if line == "" {
+        if line.is_empty() {
             // A blank line indicates the end of all data for the current passport.
             if current_passport.is_valid() {
                 valid_passport_count += 1;
@@ -132,21 +132,21 @@ iyr:2011 ecl:brn hgt:59in";
 
     #[test]
     fn test_0_valid() {
-        assert_eq!(count_valid_passports(&INPUT_0), 1);
+        assert_eq!(count_valid_passports(INPUT_0), 1);
     }
 
     #[test]
     fn test_1_invalid() {
-        assert_eq!(count_valid_passports(&INPUT_1), 0);
+        assert_eq!(count_valid_passports(INPUT_1), 0);
     }
 
     #[test]
     fn test_2_valid() {
-        assert_eq!(count_valid_passports(&INPUT_2), 1);
+        assert_eq!(count_valid_passports(INPUT_2), 1);
     }
 
     #[test]
     fn test_3_invalid() {
-        assert_eq!(count_valid_passports(&INPUT_3), 0);
+        assert_eq!(count_valid_passports(INPUT_3), 0);
     }
 }

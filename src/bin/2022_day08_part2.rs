@@ -26,7 +26,7 @@ fn parse_input(input: &str) -> Vec<Vec<Height>> {
     let mut grid: Vec<Vec<Height>> = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             grid.push(
                 line.chars()
                     .map(|c| c.to_digit(10).unwrap() as Height)
@@ -43,7 +43,7 @@ fn parse_input(input: &str) -> Vec<Vec<Height>> {
 
 /// Returns a two-dimensional vector with the same dimensions as `tree_grid`. Each cell contains
 /// the associated tree's "scenic score". See `score_tree()` for details.
-fn score_trees(tree_grid: &Vec<Vec<Height>>) -> Vec<Vec<ScenicScore>> {
+fn score_trees(tree_grid: &[Vec<Height>]) -> Vec<Vec<ScenicScore>> {
     let num_rows = tree_grid.len();
     let num_columns = tree_grid[0].len();
     let mut scenic_score = Vec::new();
@@ -54,6 +54,7 @@ fn score_trees(tree_grid: &Vec<Vec<Height>>) -> Vec<Vec<ScenicScore>> {
     }
 
     // Skip the edges of the grid as the scenic scores will always be 0.
+    #[allow(clippy::needless_range_loop)]
     for r in 1..num_rows - 1 {
         for c in 1..num_columns - 1 {
             scenic_score[r][c] = score_tree(tree_grid, r, c);
@@ -68,7 +69,7 @@ fn score_trees(tree_grid: &Vec<Vec<Height>>) -> Vec<Vec<ScenicScore>> {
 /// number of trees that can be seen from the tree in the cell. Trees are counted until a tree of
 /// equal or greater height is reached (and this tree is included in the total). Trees on the edge
 /// of the grid will have one direction that scores 0, so their overall scenic score is 0.
-fn score_tree(tree_grid: &Vec<Vec<Height>>, row: usize, column: usize) -> ScenicScore {
+fn score_tree(tree_grid: &[Vec<Height>], row: usize, column: usize) -> ScenicScore {
     let num_rows = tree_grid.len();
     let num_columns = tree_grid[0].len();
     let tree_house_height = tree_grid[row][column];
@@ -106,6 +107,7 @@ fn score_tree(tree_grid: &Vec<Vec<Height>>, row: usize, column: usize) -> Scenic
 
     // Down
     let mut length = 0;
+    #[allow(clippy::needless_range_loop)]
     for r in row + 1..num_rows {
         let height = tree_grid[r][column];
 
@@ -133,7 +135,7 @@ fn score_tree(tree_grid: &Vec<Vec<Height>>, row: usize, column: usize) -> Scenic
 }
 
 // Returns the number of visible trees in `visible_trees`.
-fn challenge_answer(scenic_score: &Vec<Vec<ScenicScore>>) -> ScenicScore {
+fn challenge_answer(scenic_score: &[Vec<ScenicScore>]) -> ScenicScore {
     *scenic_score.iter().flatten().max().unwrap()
 }
 

@@ -21,7 +21,7 @@ enum Rule {
 type RuleSet = HashMap<Id, Rule>;
 type Id = u32;
 
-fn build_ruleset(lines: &Vec<&str>) -> RuleSet {
+fn build_ruleset(lines: &[&str]) -> RuleSet {
     let mut ruleset = HashMap::new();
 
     for line in lines.iter() {
@@ -77,7 +77,7 @@ fn validate_list(ruleset: &RuleSet, msg: &str, child_rules: &Vec<Id>) -> usize {
         }
     }
 
-    return matched_so_far;
+    matched_so_far
 }
 
 /// The rule with id `rule_id` is looked up in `ruleset`, and is evaluated based on its type. If it
@@ -89,7 +89,7 @@ fn validate_message(ruleset: &RuleSet, msg: &str, rule_id: Id) -> usize {
     match rule {
         Rule::Choice(left, right) => {
             if let Rule::List(left_rules) = &**left {
-                let left_result = validate_list(ruleset, msg, &left_rules);
+                let left_result = validate_list(ruleset, msg, left_rules);
                 if left_result != 0 {
                     return left_result;
                 }
@@ -101,7 +101,7 @@ fn validate_message(ruleset: &RuleSet, msg: &str, rule_id: Id) -> usize {
             }
 
             if let Rule::List(right_rules) = &**right {
-                return validate_list(ruleset, msg, &right_rules);
+                validate_list(ruleset, msg, right_rules)
             } else {
                 panic!(
                     "Unexpected rule type found on right side of rule {}",
@@ -111,9 +111,9 @@ fn validate_message(ruleset: &RuleSet, msg: &str, rule_id: Id) -> usize {
         }
         Rule::Text(s) => {
             if msg.starts_with(s) {
-                return s.len();
+                s.len()
             } else {
-                return 0;
+                0
             }
         }
         Rule::List(child_rules) => validate_list(ruleset, msg, child_rules),
@@ -122,7 +122,7 @@ fn validate_message(ruleset: &RuleSet, msg: &str, rule_id: Id) -> usize {
 
 /// Determines if `msg` matches any rules in `ruleset` and returns the result.
 fn is_message_valid(ruleset: &RuleSet, msg: &str) -> bool {
-    if msg.len() == 0 {
+    if msg.is_empty() {
         return false;
     }
 
@@ -136,7 +136,7 @@ fn parse_rules_and_verify_messages(input: &str) -> u32 {
     let mut rules_input = Vec::new();
 
     for line in &mut input_lines {
-        if line.len() == 0 {
+        if line.is_empty() {
             break;
         }
         rules_input.push(line);
@@ -146,7 +146,7 @@ fn parse_rules_and_verify_messages(input: &str) -> u32 {
 
     let mut valid_messages = 0;
     for line in &mut input_lines {
-        if is_message_valid(&ruleset, &line) {
+        if is_message_valid(&ruleset, line) {
             // println!("Valid message '{}'", &line);
             valid_messages += 1;
         } else {
@@ -184,7 +184,7 @@ aaaabbb"#;
 
     #[test]
     fn validate_test_input() {
-        assert_eq!(parse_rules_and_verify_messages(&TEST_INPUT_0), 2);
+        assert_eq!(parse_rules_and_verify_messages(TEST_INPUT_0), 2);
     }
 
     #[test]
@@ -192,7 +192,7 @@ aaaabbb"#;
         let mut rules_input = Vec::new();
 
         for line in &mut TEST_INPUT_0.lines() {
-            if line.len() == 0 {
+            if line.is_empty() {
                 break;
             }
             rules_input.push(line);
@@ -230,10 +230,10 @@ aaaabbb"#;
         let mut ruleset = HashMap::new();
         ruleset.insert(0, Rule::Text("c".to_string()));
 
-        assert!(is_message_valid(&ruleset, &"c".to_string()));
-        assert!(!is_message_valid(&ruleset, &"x".to_string()));
-        assert!(!is_message_valid(&ruleset, &"cc".to_string()));
-        assert!(!is_message_valid(&ruleset, &"".to_string()));
+        assert!(is_message_valid(&ruleset, "c"));
+        assert!(!is_message_valid(&ruleset, "x"));
+        assert!(!is_message_valid(&ruleset, "cc"));
+        assert!(!is_message_valid(&ruleset, ""));
     }
 
     #[test]
@@ -243,11 +243,11 @@ aaaabbb"#;
         ruleset.insert(1, Rule::Text("c".to_string()));
         ruleset.insert(2, Rule::Text("d".to_string()));
 
-        assert!(is_message_valid(&ruleset, &"cdc".to_string()));
-        assert!(!is_message_valid(&ruleset, &"cdd".to_string()));
-        assert!(!is_message_valid(&ruleset, &"ccc".to_string()));
-        assert!(!is_message_valid(&ruleset, &"cdcc".to_string()));
-        assert!(!is_message_valid(&ruleset, &"ccdc".to_string()));
-        assert!(!is_message_valid(&ruleset, &"".to_string()));
+        assert!(is_message_valid(&ruleset, "cdc"));
+        assert!(!is_message_valid(&ruleset, "cdd"));
+        assert!(!is_message_valid(&ruleset, "ccc"));
+        assert!(!is_message_valid(&ruleset, "cdcc"));
+        assert!(!is_message_valid(&ruleset, "ccdc"));
+        assert!(!is_message_valid(&ruleset, ""));
     }
 }

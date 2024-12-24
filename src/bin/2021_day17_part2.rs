@@ -40,10 +40,10 @@ fn parse_input(input: &str) -> (RangeInclusive<Position>, RangeInclusive<Positio
     assert_eq!(x_tokens.len(), 2);
     assert_eq!(y_tokens.len(), 2);
 
-    let x_start = Velocity::from_str_radix(x_tokens[0], 10).unwrap();
-    let x_end = Velocity::from_str_radix(x_tokens[1], 10).unwrap();
-    let y_start = Velocity::from_str_radix(y_tokens[0], 10).unwrap();
-    let y_end = Velocity::from_str_radix(y_tokens[1], 10).unwrap();
+    let x_start = x_tokens[0].parse().unwrap();
+    let x_end = x_tokens[1].parse().unwrap();
+    let y_start = y_tokens[0].parse().unwrap();
+    let y_end = y_tokens[1].parse().unwrap();
 
     (
         RangeInclusive::new(x_start, x_end),
@@ -117,7 +117,7 @@ fn restrict_y_candidates_with_valid_x(
 ///
 /// Panics if the input is malformed or if a valid answer cannot be found.
 fn challenge_answer(input: &str) -> usize {
-    let (x_range, y_range) = parse_input(&input);
+    let (x_range, y_range) = parse_input(input);
     let y_candidates = possible_y_velocities(&y_range);
     let xy_candidates = restrict_y_candidates_with_valid_x(&x_range, &y_candidates);
 
@@ -142,7 +142,7 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let (x_range, y_range) = parse_input(&TEST_INPUT);
+        let (x_range, y_range) = parse_input(TEST_INPUT);
 
         assert_eq!(x_range, RangeInclusive::new(20, 30));
         assert_eq!(y_range, RangeInclusive::new(-10, -5));
@@ -301,6 +301,6 @@ mod tests {
 
     #[test]
     fn test_challenge_answer() {
-        assert_eq!(challenge_answer(&TEST_INPUT), 112);
+        assert_eq!(challenge_answer(TEST_INPUT), 112);
     }
 }

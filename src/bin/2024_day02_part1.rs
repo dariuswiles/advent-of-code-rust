@@ -134,7 +134,7 @@ mod tests {
     #[test]
     fn test_parse_input() {
         assert_eq!(
-            parse_input(&TEST_INPUT),
+            parse_input(TEST_INPUT),
             vec![
                 Report {
                     levels: vec![7, 6, 4, 2, 1]
@@ -170,6 +170,6 @@ mod tests {
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(do_challenge(&TEST_INPUT), 2);
+        assert_eq!(do_challenge(TEST_INPUT), 2);
     }
 }

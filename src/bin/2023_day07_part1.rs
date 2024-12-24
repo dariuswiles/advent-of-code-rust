@@ -105,7 +105,9 @@ impl Hand {
 
         Self {
             cards,
-            bid: u32::from_str_radix(tokens[1], 10).expect("Could not parse bid value in input {}"),
+            bid: tokens[1]
+                .parse()
+                .expect("Could not parse bid value in input {}"),
             hand_type,
         }
     }
@@ -135,7 +137,7 @@ impl Hand {
             5 => HandType::FiveOfAKind,
             4 => HandType::FourOfAKind,
             3 => {
-                if score_set.values().find(|&&count| count == 2).is_some() {
+                if score_set.values().any(|&count| count == 2) {
                     HandType::FullHouse
                 } else {
                     HandType::ThreeOfAKind
@@ -175,7 +177,7 @@ impl Ord for Hand {
 
 impl PartialOrd for Hand {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(&other))
+        Some(self.cmp(other))
     }
 }
 
@@ -204,7 +206,7 @@ fn main() {
 /// multiplied by its rank. A `Hand`'s rank is based on its relative strength, where 1 indicates
 /// the weakest `Hand`.
 fn do_challenge(input: &str) -> u64 {
-    let mut hands = parse_hands(&input);
+    let mut hands = parse_hands(input);
     sort_hands(&mut hands);
 
     hands.into_iter().enumerate().fold(0, |acc, (index, hand)| {
@@ -214,7 +216,7 @@ fn do_challenge(input: &str) -> u64 {
 
 /// Parses the passed string as a group of `Card`s and returns them in a `Vec`.
 fn parse_card_group(s: &str) -> Vec<Card> {
-    s.chars().map(|c| Card::from_char(c)).collect()
+    s.chars().map(Card::from_char).collect()
 }
 
 /// Parses non-empty lines passed in `s` into a `Vec` of `Hands`. Each line contains a five
@@ -228,7 +230,7 @@ fn parse_hands(s: &str) -> Vec<Hand> {
     let mut hands = Vec::new();
 
     for line in s.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
@@ -240,7 +242,7 @@ fn parse_hands(s: &str) -> Vec<Hand> {
 
 /// Sorts the `Vec` of `Hand` passed such that the weakest hand is the first element in the `Vec`
 /// and the strongest is the last.
-fn sort_hands(hands: &mut Vec<Hand>) {
+fn sort_hands(hands: &mut [Hand]) {
     hands.sort_unstable();
 }
 
@@ -367,7 +369,7 @@ QQQJA 483
                     hand_type: HandType::ThreeOfAKind,
                 },
             ],
-            parse_hands(&TEST_INPUT)
+            parse_hands(TEST_INPUT)
         );
     }
 
@@ -383,7 +385,7 @@ QQQJA 483
 
     #[test]
     fn test_cmp_hands() {
-        let hands = parse_hands(&TEST_INPUT);
+        let hands = parse_hands(TEST_INPUT);
 
         assert!(hands[0] < hands[1]);
         assert!(hands[0] < hands[2]);
@@ -413,7 +415,7 @@ QQQJA 483
 
     #[test]
     fn test_sorting_hands() {
-        let mut hands = parse_hands(&TEST_INPUT);
+        let mut hands = parse_hands(TEST_INPUT);
         sort_hands(&mut hands);
 
         assert_eq!(765, hands[0].bid);
@@ -425,6 +427,6 @@ QQQJA 483
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(6440, do_challenge(&TEST_INPUT));
+        assert_eq!(6440, do_challenge(TEST_INPUT));
     }
 }

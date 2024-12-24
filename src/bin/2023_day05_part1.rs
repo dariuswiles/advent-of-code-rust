@@ -69,9 +69,9 @@ impl DataRange {
         );
 
         Self {
-            destination_range_start: u64::from_str_radix(nums[0], 10).unwrap(),
-            source_range_start: u64::from_str_radix(nums[1], 10).unwrap(),
-            range_length: u64::from_str_radix(nums[2], 10).unwrap(),
+            destination_range_start: nums[0].parse().unwrap(),
+            source_range_start: nums[1].parse().unwrap(),
+            range_length: nums[2].parse().unwrap(),
         }
     }
 }
@@ -106,7 +106,7 @@ impl Map {
 
         match input_lines.next() {
             Some(line) => {
-                (source_type, destination_type) = parse_map_type(&line);
+                (source_type, destination_type) = parse_map_type(line);
             }
             None => {
                 return None;
@@ -116,7 +116,7 @@ impl Map {
         let mut ranges = Vec::new();
 
         for line in input_lines {
-            if line == "" {
+            if line.is_empty() {
                 break;
             }
 
@@ -177,7 +177,7 @@ fn do_challenge(input: &str) -> u64 {
 /// Panics if the input is malformed.
 fn parse_input(input: &str) -> (Vec<u64>, HashMap<DataType, Map>) {
     let mut lines = input.lines();
-    let seeds = parse_seeds(&lines.next().unwrap());
+    let seeds = parse_seeds(lines.next().unwrap());
     assert_eq!(
         Some(""),
         lines.next(),
@@ -185,15 +185,8 @@ fn parse_input(input: &str) -> (Vec<u64>, HashMap<DataType, Map>) {
     );
 
     let mut maps = HashMap::new();
-    loop {
-        match Map::from_lines(&mut lines) {
-            Some(map) => {
-                maps.insert(map.source_type, map);
-            }
-            None => {
-                break;
-            }
-        }
+    while let Some(map) = Map::from_lines(&mut lines) {
+        maps.insert(map.source_type, map);
     }
 
     (seeds, maps)
@@ -211,7 +204,7 @@ fn parse_seeds(s: &str) -> Vec<u64> {
     s.strip_prefix("seeds: ")
         .expect("Expected 'seeds' prefix not found in seed list: '{}'")
         .split(' ')
-        .map(|n| u64::from_str_radix(n, 10).unwrap())
+        .map(|n| n.parse().unwrap())
         .collect()
 }
 
@@ -358,7 +351,7 @@ seed-to-soil map:
 
     #[test]
     fn test_parse_input() {
-        let (seeds, maps) = parse_input(&TEST_INPUT);
+        let (seeds, maps) = parse_input(TEST_INPUT);
 
         assert_eq!(vec![79, 14, 55, 13], seeds);
 
@@ -525,7 +518,7 @@ seed-to-soil map:
 
     #[test]
     fn test_do_full_mapping() {
-        let (_, maps) = parse_input(&TEST_INPUT);
+        let (_, maps) = parse_input(TEST_INPUT);
 
         assert_eq!(82, do_full_mapping(&maps, 79));
         assert_eq!(43, do_full_mapping(&maps, 14));
@@ -535,6 +528,6 @@ seed-to-soil map:
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(35, do_challenge(&TEST_INPUT));
+        assert_eq!(35, do_challenge(TEST_INPUT));
     }
 }

@@ -77,7 +77,7 @@ fn find_seat(line_num: usize, line: &str) -> Seat {
     Seat {
         row: row_limit_front,
         column: col_limit_left,
-        seat_id: seat_id,
+        seat_id,
     }
 }
 
@@ -85,11 +85,11 @@ fn find_highest_seat_id(input: &str) -> u16 {
     let mut highest_seat_id = 0;
 
     for (line_num, line) in input.lines().enumerate() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         };
 
-        let seat = find_seat(line_num, &line);
+        let seat = find_seat(line_num, line);
 
         if seat.seat_id > highest_seat_id {
             highest_seat_id = seat.seat_id;

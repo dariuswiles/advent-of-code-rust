@@ -55,7 +55,7 @@ fn check_all_rules(x: i32, y: i32, z: i32, rules: &Vec<Rule>) -> CellState {
         }
     }
 
-    return CellState::Off;
+    CellState::Off
 }
 
 /// Count the number of cells marked as 'on' in the volume passed.
@@ -89,7 +89,7 @@ fn count_active_cells(
 fn parse_input(input: &str) -> Vec<Rule> {
     let mut rules = Vec::new();
     for line in input.lines() {
-        if line.len() == 0 {
+        if line.is_empty() {
             continue;
         }
 
@@ -173,7 +173,7 @@ on x=967..23432,y=45373..81175,z=27513..53682";
 
     #[test]
     fn parse_test_input_0() {
-        let rules = parse_input(&TEST_INPUT_0);
+        let rules = parse_input(TEST_INPUT_0);
 
         assert_eq!(
             rules[0],
@@ -237,7 +237,7 @@ on x=967..23432,y=45373..81175,z=27513..53682";
 
     #[test]
     fn test_check_all_rules() {
-        let mut rules = parse_input(&TEST_INPUT_0);
+        let mut rules = parse_input(TEST_INPUT_0);
         rules.reverse();
 
         assert_eq!(check_all_rules(10, 10, 10, &rules), CellState::On); // Last rule in input
@@ -249,14 +249,14 @@ on x=967..23432,y=45373..81175,z=27513..53682";
 
     #[test]
     fn test_count_active_cells_0() {
-        let mut rules = parse_input(&TEST_INPUT_0);
+        let mut rules = parse_input(TEST_INPUT_0);
         rules.reverse();
         assert_eq!(count_active_cells(-50..=50, -50..=50, -50..=50, &rules), 39);
     }
 
     #[test]
     fn test_count_active_cells_1() {
-        let mut rules = parse_input(&TEST_INPUT_1);
+        let mut rules = parse_input(TEST_INPUT_1);
         rules.reverse();
         assert_eq!(
             count_active_cells(-50..=50, -50..=50, -50..=50, &rules),

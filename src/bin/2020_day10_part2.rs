@@ -16,7 +16,7 @@ fn parse_str_to_nums(input: &str) -> Vec<u32> {
     let mut result = Vec::new();
 
     for line in input.lines() {
-        if line.len() == 0 {
+        if line.is_empty() {
             continue;
         }
 
@@ -58,11 +58,11 @@ fn calculate_combinations_inner(ints: &[u32]) -> u64 {
     total
 }
 
-/// Given a vector of integers, calculates the number of combinations of integers that meet the
+/// Given a slice of integers, calculates the number of combinations of integers that meet the
 /// challenge criteria, namely that there must be a chain of integers from 0 to the largest integer
 /// where the difference between each pair of integers in the chain must be no greater than 3.
 //
-// To improve performance, groups of `ints` are calculated individually and the results combined.
+// To improve performance, groups of `int`s are calculated individually and the results combined.
 // Groups are divided only at integers that are the maximum difference from the previous integer,
 // meaning that all solutions *must* incorporate them.
 fn calculate_combinations(ints: &[u32]) -> u64 {
@@ -84,9 +84,15 @@ fn calculate_combinations(ints: &[u32]) -> u64 {
     let mut work_idx = 0; // Index of the last int included in the last calculation.
     while work_idx < ints.len() - 1 {
         let mut next_group_end = 0;
-        for i in work_idx + DIVIDE_CONQUER_LENGTH..ints.len() - 1 {
-            if ints_diffs[i] == MAX_ALLOWED_DIFF {
-                next_group_end = i;
+
+        for (idx, diff) in ints_diffs
+            .iter()
+            .enumerate()
+            .take(ints.len() - 1)
+            .skip(work_idx + DIVIDE_CONQUER_LENGTH)
+        {
+            if diff == &MAX_ALLOWED_DIFF {
+                next_group_end = idx;
                 break;
             }
         }
@@ -103,7 +109,7 @@ fn calculate_combinations(ints: &[u32]) -> u64 {
 
         // println!("Calculating combinations over range {}..={}", work_idx, next_group_end);
         // println!("\ttotal before call is {}", total);
-        total *= calculate_combinations_inner(&ints[work_idx..=next_group_end]) as u64;
+        total *= calculate_combinations_inner(&ints[work_idx..=next_group_end]);
         // println!("\ttotal after call is {}", total);
         work_idx = next_group_end;
     }
@@ -176,7 +182,7 @@ mod tests {
 
     #[test]
     fn test_0() {
-        let mut input = parse_str_to_nums(&TEST_INPUT_0);
+        let mut input = parse_str_to_nums(TEST_INPUT_0);
 
         input.sort_unstable();
         add_outlet_and_device(&mut input);
@@ -189,7 +195,7 @@ mod tests {
 
     #[test]
     fn test_1() {
-        let mut input = parse_str_to_nums(&TEST_INPUT_1);
+        let mut input = parse_str_to_nums(TEST_INPUT_1);
 
         input.sort_unstable();
         add_outlet_and_device(&mut input);

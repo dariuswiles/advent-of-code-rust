@@ -41,20 +41,15 @@ impl Operation {
 
         assert_eq!(tokens[0..4], ["Operation:", "new", "=", "old"]);
 
-        let operand;
-        if tokens[5] == "old" {
-            operand = Operand::Old;
+        let operand = if tokens[5] == "old" {
+            Operand::Old
         } else {
-            operand = Operand::Number(OperandInt::from_str_radix(tokens[5], 10).unwrap());
-        }
+            Operand::Number(tokens[5].parse().unwrap())
+        };
 
         match tokens[4] {
-            "+" => {
-                return Operation::Add(operand);
-            }
-            "*" => {
-                return Operation::Multiply(operand);
-            }
+            "+" => Operation::Add(operand),
+            "*" => Operation::Multiply(operand),
             _ => {
                 panic!("Unrecognized operator {}", tokens[4]);
             }
@@ -83,29 +78,26 @@ impl MonkeyTest {
     ///
     /// Panics if the input is empty or malformed.
     fn from_str(lines: &[&str]) -> Self {
-        let definition = OperandInt::from_str_radix(
-            lines[0].trim().strip_prefix("Test: divisible by ").unwrap(),
-            10,
-        )
-        .unwrap();
+        let definition = lines[0]
+            .trim()
+            .strip_prefix("Test: divisible by ")
+            .unwrap()
+            .parse()
+            .unwrap();
 
-        let true_id = MonkeyId::from_str_radix(
-            lines[1]
-                .trim()
-                .strip_prefix("If true: throw to monkey ")
-                .unwrap(),
-            10,
-        )
-        .unwrap();
+        let true_id = lines[1]
+            .trim()
+            .strip_prefix("If true: throw to monkey ")
+            .unwrap()
+            .parse()
+            .unwrap();
 
-        let false_id = MonkeyId::from_str_radix(
-            lines[2]
-                .trim()
-                .strip_prefix("If false: throw to monkey ")
-                .unwrap(),
-            10,
-        )
-        .unwrap();
+        let false_id = lines[2]
+            .trim()
+            .strip_prefix("If false: throw to monkey ")
+            .unwrap()
+            .parse()
+            .unwrap();
 
         Self {
             divisible_by: definition,
@@ -147,7 +139,7 @@ impl Monkey {
     fn from_str(input: &str) -> Self {
         let mut lines: Vec<&str> = input.lines().collect();
 
-        while lines[0] == "" {
+        while lines[0].is_empty() {
             lines.remove(0);
         }
 
@@ -163,7 +155,7 @@ impl Monkey {
             .unwrap()
             .strip_suffix(':')
             .unwrap();
-        let id = MonkeyId::from_str_radix(id_string, 10).unwrap();
+        let id = id_string.parse().unwrap();
 
         let mut items = Vec::new();
         let items_string: Vec<&str> = lines[1]
@@ -174,7 +166,7 @@ impl Monkey {
             .collect();
 
         for item in items_string {
-            items.push(WorryLevel::from_str_radix(item, 10).unwrap());
+            items.push(item.parse().unwrap());
         }
 
         Monkey {

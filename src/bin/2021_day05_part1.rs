@@ -8,6 +8,7 @@
 //! and vertical lines, where each x,y cell contains the number of lines that pass through it.
 //! The challenge answer is the number of cells that have more than one line passing through.
 
+use std::cmp::Ordering;
 use std::fmt::{Display, Error, Formatter};
 use std::fs;
 
@@ -36,8 +37,8 @@ impl Coordinate {
         }
 
         Self {
-            x: usize::from_str_radix(tokens[0], 10).unwrap(),
-            y: usize::from_str_radix(tokens[1], 10).unwrap(),
+            x: tokens[0].parse::<usize>().unwrap(),
+            y: tokens[1].parse::<usize>().unwrap(),
         }
     }
 }
@@ -54,8 +55,7 @@ impl Map {
         let mut cells = Vec::new();
 
         for _ in 0..size {
-            let mut row = Vec::new();
-            row.resize(size, 0);
+            let row = vec![0; size];
             cells.push(row);
         }
 
@@ -65,22 +65,24 @@ impl Map {
     /// Update each of the `cells` of this `Map` that the given `Line` passes through.
     /// Limited to horizontal and vertical lines only.
     fn draw_line(&mut self, line: &Line) {
-        if line.0.x == line.1.x {
-            if line.0.y < line.1.y {
-                for row in line.0.y..=line.1.y {
-                    self.cells[row][line.0.x] += 1;
-                }
-            } else {
-                for row in line.1.y..=line.0.y {
-                    self.cells[row][line.0.x] += 1;
+        match line.0.x.cmp(&line.1.x) {
+            Ordering::Equal => {
+                if line.0.y < line.1.y {
+                    for row in line.0.y..=line.1.y {
+                        self.cells[row][line.0.x] += 1;
+                    }
+                } else {
+                    for row in line.1.y..=line.0.y {
+                        self.cells[row][line.0.x] += 1;
+                    }
                 }
             }
-        } else {
-            if line.0.x < line.1.x {
+            Ordering::Less => {
                 for col in line.0.x..=line.1.x {
                     self.cells[line.0.y][col] += 1;
                 }
-            } else {
+            }
+            Ordering::Greater => {
                 for col in line.1.x..=line.0.x {
                     self.cells[line.0.y][col] += 1;
                 }
@@ -131,7 +133,7 @@ fn parse_input(input: &str) -> Vec<Line> {
     let mut coords = Vec::new();
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
@@ -195,7 +197,7 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let coords = parse_input(&TEST_INPUT);
+        let coords = parse_input(TEST_INPUT);
 
         assert_eq!(coords.len(), 10);
         assert_eq!(
@@ -214,7 +216,7 @@ mod tests {
 
     #[test]
     fn test_filtering() {
-        let coords = parse_input(&TEST_INPUT);
+        let coords = parse_input(TEST_INPUT);
         let filtered = filter_horizontal_and_vertical(&coords);
 
         assert_eq!(filtered.len(), 6);
@@ -249,7 +251,7 @@ mod tests {
     #[test]
     fn test_answer() {
         let mut map = Map::new(10);
-        let coords = parse_input(&TEST_INPUT);
+        let coords = parse_input(TEST_INPUT);
         let filtered = filter_horizontal_and_vertical(&coords);
 
         for l in &filtered {

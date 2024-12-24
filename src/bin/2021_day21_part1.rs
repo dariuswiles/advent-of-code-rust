@@ -60,13 +60,11 @@ impl Game {
     }
 
     fn make_move(&mut self, player_id: u8) -> bool {
-        let p;
-
-        if player_id == 1 {
-            p = &mut self.player1;
+        let p = if player_id == 1 {
+            &mut self.player1
         } else {
-            p = &mut self.player2;
-        }
+            &mut self.player2
+        };
 
         self.die_rolls += 3;
         let move_distance =
@@ -143,7 +141,7 @@ Player 2 starting position: 8";
 
     #[test]
     fn parse_test_input() {
-        let (p1_start, p2_start) = parse_input(&TEST_INPUT);
+        let (p1_start, p2_start) = parse_input(TEST_INPUT);
 
         assert_eq!(p1_start, 4);
         assert_eq!(p2_start, 8);
@@ -151,7 +149,7 @@ Player 2 starting position: 8";
 
     #[test]
     fn test_play_game() {
-        let (p1_start, p2_start) = parse_input(&TEST_INPUT);
+        let (p1_start, p2_start) = parse_input(TEST_INPUT);
 
         let mut game = Game::new(p1_start, p2_start);
         assert_eq!(game.play_game(), 739785);

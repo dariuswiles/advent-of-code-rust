@@ -32,9 +32,9 @@ fn parse_input(input: &str) -> Vec<u8> {
     let mut calibration_values = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
-            let first = find_first_number(&line).unwrap();
-            let last = find_last_number(&line).unwrap();
+        if !line.is_empty() {
+            let first = find_first_number(line).unwrap();
+            let last = find_last_number(line).unwrap();
 
             calibration_values.push(first * 10 + last);
         }
@@ -55,13 +55,13 @@ fn find_first_number(s: &str) -> Option<u8> {
     }
 
     // Skip 'zero' as it is never used in the challenge input
-    for i in 1..ALPHA_DIGITS.len() {
-        let matches: Vec<_> = s.match_indices(ALPHA_DIGITS[i]).collect();
-        if matches.len() > 0 {
-            if first_number_pos.is_none() || matches[0].0 < first_number_pos.unwrap() {
-                first_number_pos = Some(matches[0].0);
-                first_number = Some(i as u8);
-            }
+    for (i, alpha_digit) in ALPHA_DIGITS.iter().enumerate().skip(1) {
+        let matches: Vec<_> = s.match_indices(alpha_digit).collect();
+        if !matches.is_empty()
+            && (first_number_pos.is_none() || matches[0].0 < first_number_pos.unwrap())
+        {
+            first_number_pos = Some(matches[0].0);
+            first_number = Some(i as u8);
         }
     }
 
@@ -80,13 +80,13 @@ fn find_last_number(s: &str) -> Option<u8> {
     }
 
     // Skip 'zero' as it is never used in the challenge input
-    for i in 1..ALPHA_DIGITS.len() {
-        let rmatches: Vec<_> = s.rmatch_indices(ALPHA_DIGITS[i]).collect();
-        if rmatches.len() > 0 {
-            if last_number_pos.is_none() || rmatches[0].0 > last_number_pos.unwrap() {
-                last_number_pos = Some(rmatches[0].0);
-                last_number = Some(i as u8);
-            }
+    for (i, alpha_digit) in ALPHA_DIGITS.iter().enumerate().skip(1) {
+        let rmatches: Vec<_> = s.rmatch_indices(alpha_digit).collect();
+        if !rmatches.is_empty()
+            && (last_number_pos.is_none() || rmatches[0].0 > last_number_pos.unwrap())
+        {
+            last_number_pos = Some(rmatches[0].0);
+            last_number = Some(i as u8);
         }
     }
 
@@ -94,7 +94,7 @@ fn find_last_number(s: &str) -> Option<u8> {
 }
 
 /// Returns the sum of the integers in the `Vec` passed.
-fn sum_vec_ints(vec_ints: &Vec<u8>) -> u32 {
+fn sum_vec_ints(vec_ints: &[u8]) -> u32 {
     vec_ints.iter().map(|&n| n as u32).sum()
 }
 

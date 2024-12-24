@@ -39,8 +39,8 @@ fn validate_input(input: &str) -> u32 {
         let required_char = line_fields.get(1).unwrap().get(..1).unwrap();
         // println!("\tRequired character is '{}'", required_char);
 
-        let positions: Vec<&str> = line_fields.get(0).unwrap().split('-').collect();
-        let position0 = positions.get(0).unwrap().parse::<usize>().unwrap() - 1;
+        let positions: Vec<&str> = line_fields.first().unwrap().split('-').collect();
+        let position0 = positions.first().unwrap().parse::<usize>().unwrap() - 1;
         let position1 = positions.get(1).unwrap().parse::<usize>().unwrap() - 1;
         // println!("\tPositions (in Rust terms) are {} and {}", position0, position1);
 

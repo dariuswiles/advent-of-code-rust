@@ -71,7 +71,7 @@ impl Report {
     /// An internal function that returns `true` if the differences in the `levels` passed are all
     /// within the ranges allowed by the challenge. This is 1..=3 if the differences are
     /// increasing, and -1..=-3 if the differences are decreasing.
-    fn _is_level_safe(levels: &Vec<u8>) -> bool {
+    fn _is_level_safe(levels: &[u8]) -> bool {
         // Create a `Vec` containing the differences between adjacent levels.
         let differences: Vec<_> = levels
             .windows(2)
@@ -160,7 +160,7 @@ mod tests {
     #[test]
     fn test_parse_input() {
         assert_eq!(
-            parse_input(&TEST_INPUT),
+            parse_input(TEST_INPUT),
             vec![
                 Report {
                     levels: vec![7, 6, 4, 2, 1]
@@ -196,6 +196,6 @@ mod tests {
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(do_challenge(&TEST_INPUT), 4);
+        assert_eq!(do_challenge(TEST_INPUT), 4);
     }
 }

@@ -7,6 +7,7 @@
 //! position of all segments of the rope, and outputs the number of unique positions the tail
 //! visited. Part 2 of the challenge extends the rope's length from 1 unit to 10.
 
+use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::fs;
 
@@ -95,7 +96,7 @@ impl Rope {
             Self::update_knot(&self.knots[i].clone(), &mut self.knots[i + 1]);
         }
 
-        self.history.insert(self.knots[ROPE_LENGTH - 1].clone());
+        self.history.insert(self.knots[ROPE_LENGTH - 1]);
     }
 
     /// Compares the positions of the two knots passed, where `leader` should be closer to the
@@ -113,17 +114,17 @@ impl Rope {
             return;
         }
 
-        if rope_offset_vertical < 0 {
-            follower.y -= 1;
-        } else if rope_offset_vertical > 0 {
-            follower.y += 1;
-        }
+        follower.y += match rope_offset_vertical.cmp(&0) {
+            Ordering::Greater => 1,
+            Ordering::Less => -1,
+            _ => 0,
+        };
 
-        if rope_offset_horizontal < 0 {
-            follower.x -= 1;
-        } else if rope_offset_horizontal > 0 {
-            follower.x += 1;
-        }
+        follower.x += match rope_offset_horizontal.cmp(&0) {
+            Ordering::Greater => 1,
+            Ordering::Less => -1,
+            _ => 0,
+        };
     }
 }
 
@@ -137,11 +138,11 @@ fn parse_input(input: &str) -> Vec<Motion> {
     let mut motion = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             let tokens: Vec<&str> = line.split(' ').collect();
             assert_eq!(tokens.len(), 2);
 
-            let distance = Distance::from_str_radix(tokens[1], 10).unwrap();
+            let distance = tokens[1].parse().unwrap();
             match tokens[0] {
                 "D" => {
                     motion.push(Motion::Down(distance));
@@ -169,7 +170,7 @@ fn parse_input(input: &str) -> Vec<Motion> {
 /// the tail passed through.
 fn challenge_answer(motions: &Vec<Motion>) -> usize {
     let mut rope = Rope::new();
-    rope.execute_motions(&motions);
+    rope.execute_motions(motions);
 
     rope.history.len()
 }

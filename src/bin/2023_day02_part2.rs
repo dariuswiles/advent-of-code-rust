@@ -45,7 +45,7 @@ impl CubeSet {
         let tokens: Vec<_> = s.trim().split(" ").collect();
 
         for t in tokens.chunks(2) {
-            let amount = u8::from_str_radix(t[0], 10).unwrap();
+            let amount = t[0].parse().unwrap();
 
             match t[1].trim_end_matches(',') {
                 "red" => {
@@ -77,7 +77,7 @@ fn main() {
 
 /// Performs all steps required to determine the challenge answer, which is then returned.
 fn do_challenge(input: &str) -> u32 {
-    let games = parse_input(&input);
+    let games = parse_input(input);
 
     games
         .iter()
@@ -95,7 +95,7 @@ fn parse_input(input: &str) -> Vec<Game> {
     let mut games = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             games.push(parse_line(line));
         }
     }
@@ -118,7 +118,7 @@ fn parse_line(s: &str) -> Game {
     );
 
     let id_raw = line_fields[0].strip_prefix("Game ").unwrap();
-    let id = u8::from_str_radix(id_raw, 10).unwrap();
+    let id = id_raw.parse().unwrap();
 
     let reveals_raw: Vec<&str> = line_fields[1].split(';').collect();
 
@@ -436,6 +436,6 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(2286, do_challenge(&TEST_INPUT));
+        assert_eq!(2286, do_challenge(TEST_INPUT));
     }
 }

@@ -14,14 +14,14 @@ enum Token {
     Add,
     Multiply,
     Number(u64),
-    SubExpression(Box<Vec<Token>>),
+    SubExpression(Vec<Token>),
 }
 
 fn tokenize(chars: &mut Vec<char>) -> Vec<Token> {
     let mut output = Vec::new();
 
     loop {
-        if chars.len() == 0 {
+        if chars.is_empty() {
             return output;
         }
 
@@ -29,7 +29,7 @@ fn tokenize(chars: &mut Vec<char>) -> Vec<Token> {
         match c {
             ' ' => {}
             '(' => {
-                output.push(Token::SubExpression(Box::new(tokenize(chars))));
+                output.push(Token::SubExpression(tokenize(chars)));
             }
             ')' => {
                 return output;
@@ -41,7 +41,7 @@ fn tokenize(chars: &mut Vec<char>) -> Vec<Token> {
                 output.push(Token::Multiply);
             }
             _ => {
-                if c.is_digit(10) {
+                if c.is_ascii_digit() {
                     output.push(Token::Number(c.to_digit(10).unwrap() as u64));
                 } else {
                     panic!("Input contains unexpected character '{}'", c);
@@ -55,9 +55,9 @@ fn tokenize(chars: &mut Vec<char>) -> Vec<Token> {
 // multiple passes.
 fn evaluate_tokens(tokens: &mut Vec<Token>) -> u64 {
     // Pass 1 - replace sub-expressions with the result of evaluating them.
-    for i in 0..tokens.len() {
-        if let Token::SubExpression(sub) = &tokens[i] {
-            tokens[i] = Token::Number(evaluate_tokens(&mut (*sub).to_vec()));
+    for t in tokens.iter_mut() {
+        if let Token::SubExpression(sub) = t {
+            *t = Token::Number(evaluate_tokens(&mut (*sub).to_vec()));
         }
     }
 
@@ -120,31 +120,31 @@ mod tests {
 
     #[test]
     fn test_evaluate_0() {
-        assert_eq!(evaluate(&TEST_INPUT_0), 231);
+        assert_eq!(evaluate(TEST_INPUT_0), 231);
     }
 
     #[test]
     fn test_evaluate_1() {
-        assert_eq!(evaluate(&TEST_INPUT_1), 51);
+        assert_eq!(evaluate(TEST_INPUT_1), 51);
     }
 
     #[test]
     fn test_evaluate_2() {
-        assert_eq!(evaluate(&TEST_INPUT_2), 46);
+        assert_eq!(evaluate(TEST_INPUT_2), 46);
     }
 
     #[test]
     fn test_evaluate_3() {
-        assert_eq!(evaluate(&TEST_INPUT_3), 1445);
+        assert_eq!(evaluate(TEST_INPUT_3), 1445);
     }
 
     #[test]
     fn test_evaluate_4() {
-        assert_eq!(evaluate(&TEST_INPUT_4), 669060);
+        assert_eq!(evaluate(TEST_INPUT_4), 669060);
     }
 
     #[test]
     fn test_evaluate_5() {
-        assert_eq!(evaluate(&TEST_INPUT_5), 23340);
+        assert_eq!(evaluate(TEST_INPUT_5), 23340);
     }
 }

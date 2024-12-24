@@ -41,7 +41,7 @@ pub fn run_challenge(name: &str) -> String {
     let output = std::process::Command::new(project_paths.integration_tests.join(name))
         .current_dir(project_paths.source_code)
         .output()
-        .expect(&format!("Failed to run challenge {}", name));
+        .unwrap_or_else(|_| panic!("Failed to run challenge {}", name));
 
     if !output.status.success() {
         println!("Challenge {} returned a non-zero exit status", name);

@@ -30,7 +30,7 @@ impl Commands {
         let mut commands = Vec::new();
 
         for line in code.lines() {
-            if line == "" {
+            if line.is_empty() {
                 continue;
             }
 
@@ -109,7 +109,7 @@ forward 2";
 
     #[test]
     fn parse_test_input() {
-        let result = Commands::parse_commands(&TEST_INPUT);
+        let result = Commands::parse_commands(TEST_INPUT);
         let mut result_iter = result.commands.iter();
 
         assert_eq!(result_iter.next(), Some(&Command::Forward(5)));
@@ -123,7 +123,7 @@ forward 2";
 
     #[test]
     fn check_horizontal_and_depth() {
-        let c = Commands::parse_commands(&TEST_INPUT);
+        let c = Commands::parse_commands(TEST_INPUT);
 
         assert_eq!(c.execute_commands(), (15, 10));
     }

@@ -18,7 +18,7 @@ type Fish = u8;
 fn parse_input(input: &str) -> Vec<Fish> {
     input.lines().collect::<Vec<&str>>()[0]
         .split(",")
-        .map(|i| Fish::from_str_radix(i, 10).unwrap())
+        .map(|i| i.parse().unwrap())
         .collect()
 }
 
@@ -65,14 +65,14 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let fish = parse_input(&TEST_INPUT);
+        let fish = parse_input(TEST_INPUT);
 
         assert_eq!(fish, vec![3, 4, 3, 1, 2]);
     }
 
     #[test]
     fn test_decrement() {
-        let mut fish = parse_input(&TEST_INPUT);
+        let mut fish = parse_input(TEST_INPUT);
 
         for _ in 0..18 {
             decrement_fish(&mut fish);
@@ -92,7 +92,7 @@ mod tests {
 
     #[test]
     fn challenge_answer() {
-        let mut fish = parse_input(&TEST_INPUT);
+        let mut fish = parse_input(TEST_INPUT);
 
         for _ in 0..CHALLENGE_DAYS {
             decrement_fish(&mut fish);

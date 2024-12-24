@@ -30,7 +30,7 @@ impl RiskGrid {
         let mut line_length = None;
 
         for line in input.lines() {
-            if line == "" {
+            if line.is_empty() {
                 continue;
             }
 
@@ -125,7 +125,7 @@ fn walk_path(
     // If this is the best risk found so far, record it.
     best_risk.cell[row][column] = current_risk;
 
-    for dir in vec![
+    for dir in [
         Direction::Down,
         Direction::Left,
         Direction::Right,
@@ -146,7 +146,7 @@ fn walk_path(
                 }
             }
             Direction::Left => {
-                if column <= 0 {
+                if column == 0 {
                     continue;
                 } else {
                     new_row = row;
@@ -162,7 +162,7 @@ fn walk_path(
                 }
             }
             Direction::Up => {
-                if row <= 0 {
+                if row == 0 {
                     continue;
                 } else {
                     new_row = row - 1;
@@ -178,7 +178,7 @@ fn walk_path(
 
 /// Returns the total risk of the most efficient path through the grid of risks provided as input.
 fn challenge_answer(input: &str) -> Risk {
-    let risk_grid = RiskGrid::new(&input);
+    let risk_grid = RiskGrid::new(input);
     let grid_size = risk_grid.height();
     let mut best_risk = BestRiskGrid::new(grid_size);
 
@@ -227,7 +227,7 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let grid = RiskGrid::new(&TEST_INPUT);
+        let grid = RiskGrid::new(TEST_INPUT);
         println!("{}", grid);
         assert_eq!(grid.cell[2][3], 6);
         assert_eq!(grid.cell[5][1], 3);
@@ -235,12 +235,12 @@ mod tests {
 
     #[test]
     fn test_challenge_answer() {
-        assert_eq!(challenge_answer(&TEST_INPUT), 40);
+        assert_eq!(challenge_answer(TEST_INPUT), 40);
     }
 
     #[test]
     #[should_panic]
     fn incorrect_line_lengths() {
-        let _ = RiskGrid::new(&TEST_INPUT_BAD_LINE_LENGTH);
+        let _ = RiskGrid::new(TEST_INPUT_BAD_LINE_LENGTH);
     }
 }

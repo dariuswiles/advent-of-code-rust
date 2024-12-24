@@ -23,7 +23,7 @@ impl ActiveWireSet {
         let mut wires = HashSet::new();
 
         for c in input.chars() {
-            wires.insert(c.clone());
+            wires.insert(c);
         }
         Self { wires }
     }
@@ -41,7 +41,7 @@ fn parse_input(input: &str) -> Vec<(Vec<ActiveWireSet>, Vec<ActiveWireSet>)> {
     let mut output = Vec::new();
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
@@ -50,19 +50,13 @@ fn parse_input(input: &str) -> Vec<(Vec<ActiveWireSet>, Vec<ActiveWireSet>)> {
             panic!("Malformed input in: {}", line);
         }
 
-        let left: Vec<ActiveWireSet> = left_right[0]
-            .split(' ')
-            .map(|s| ActiveWireSet::new(s))
-            .collect();
+        let left: Vec<ActiveWireSet> = left_right[0].split(' ').map(ActiveWireSet::new).collect();
 
         if left.len() != 10 {
             panic!("Malformed input with left segments in: {}", line);
         }
 
-        let right: Vec<ActiveWireSet> = left_right[1]
-            .split(' ')
-            .map(|s| ActiveWireSet::new(s))
-            .collect();
+        let right: Vec<ActiveWireSet> = left_right[1].split(' ').map(ActiveWireSet::new).collect();
 
         if right.len() != 4 {
             panic!("Malformed input with right segments in: {}", line);
@@ -131,7 +125,7 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
     #[test]
     fn parse_test_input() {
-        let wire_sets = parse_input(&TEST_INPUT);
+        let wire_sets = parse_input(TEST_INPUT);
 
         assert_eq!(wire_sets[0].0[0], ActiveWireSet::new("be"));
         assert_eq!(wire_sets[0].0[4], ActiveWireSet::new("cgeb"));
@@ -143,7 +137,7 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
     #[test]
     fn test_count_easy_lengths() {
-        let wire_sets = parse_input(&TEST_INPUT);
+        let wire_sets = parse_input(TEST_INPUT);
 
         assert_eq!(count_easy_lengths(&wire_sets[0].1), 2);
         assert_eq!(count_easy_lengths(&wire_sets[1].1), 3);
@@ -154,7 +148,7 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
     #[test]
     fn test_count_all_easy_lengths() {
-        let wire_sets = parse_input(&TEST_INPUT);
+        let wire_sets = parse_input(TEST_INPUT);
 
         assert_eq!(count_all_easy_lengths(&wire_sets), 26);
     }

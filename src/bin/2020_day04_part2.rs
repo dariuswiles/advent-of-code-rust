@@ -30,13 +30,13 @@ impl Passport<'_> {
     fn is_valid(&self) -> bool {
         // println!("{:?}", &self);
 
-        if (self.byr == None)
-            | (self.iyr == None)
-            | (self.eyr == None)
-            | (self.hgt == None)
-            | (self.hcl == None)
-            | (self.ecl == None)
-            | (self.pid == None)
+        if self.byr.is_none()
+            | self.iyr.is_none()
+            | self.eyr.is_none()
+            | self.hgt.is_none()
+            | self.hcl.is_none()
+            | self.ecl.is_none()
+            | self.pid.is_none()
         {
             return false;
         }
@@ -54,15 +54,18 @@ impl Passport<'_> {
         let iyr = iyr.unwrap();
         let eyr = eyr.unwrap();
 
-        if (byr < 1920) | (byr > 2002) | (iyr < 2010) | (iyr > 2020) | (eyr < 2020) | (eyr > 2030) {
+        if !(1920..=2002).contains(&byr)
+            | !(2010..=2020).contains(&iyr)
+            | !(2020..=2030).contains(&eyr)
+        {
             // println!("A date passport field failed validation");
             return false;
         }
 
         let hgt = self.hgt.unwrap();
-        if hgt.ends_with("cm") {
-            if let Ok(h) = hgt[..hgt.len() - 2].parse::<u8>() {
-                if (h < 150) | (h > 193) {
+        if let Some(hgt_no_suffix) = hgt.strip_suffix("cm") {
+            if let Ok(h) = hgt_no_suffix.parse::<u8>() {
+                if !(150..=193).contains(&h) {
                     // println!("Height, given in cm, is outside valid range");
                     return false;
                 }
@@ -70,9 +73,9 @@ impl Passport<'_> {
                 // println!("Height was given in cm, but a valid number was not found.");
                 return false;
             }
-        } else if hgt.ends_with("in") {
-            if let Ok(h) = hgt[..hgt.len() - 2].parse::<u8>() {
-                if (h < 59) | (h > 76) {
+        } else if let Some(hgt_no_suffix) = hgt.strip_suffix("in") {
+            if let Ok(h) = hgt_no_suffix.parse::<u8>() {
+                if !(59..=76).contains(&h) {
                     // println!("Height, given in inches, is outside valid range");
                     return false;
                 }
@@ -105,7 +108,7 @@ impl Passport<'_> {
             return false;
         }
 
-        if EYE_COLORS.iter().position(|ec| ec == &self.ecl.unwrap()) == None {
+        if !EYE_COLORS.iter().any(|ec| ec == &self.ecl.unwrap()) {
             // println!("Eye color is invalid");
             return false;
         }
@@ -134,7 +137,7 @@ fn count_valid_passports(input: &str) -> u32 {
     for (line_num, line) in input.lines().enumerate() {
         // println!("{:?}", &line);
 
-        if line == "" {
+        if line.is_empty() {
             // A blank line indicates the end of all data for the current passport.
             if current_passport.is_valid() {
                 valid_passport_count += 1;
@@ -238,41 +241,41 @@ iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719";
 
     #[test]
     fn invalid_0() {
-        assert_eq!(count_valid_passports(&INVALID_0), 0);
+        assert_eq!(count_valid_passports(INVALID_0), 0);
     }
 
     #[test]
     fn invalid_1() {
-        assert_eq!(count_valid_passports(&INVALID_1), 0);
+        assert_eq!(count_valid_passports(INVALID_1), 0);
     }
 
     #[test]
     fn invalid_2() {
-        assert_eq!(count_valid_passports(&INVALID_2), 0);
+        assert_eq!(count_valid_passports(INVALID_2), 0);
     }
 
     #[test]
     fn invalid_3() {
-        assert_eq!(count_valid_passports(&INVALID_3), 0);
+        assert_eq!(count_valid_passports(INVALID_3), 0);
     }
 
     #[test]
     fn valid_0() {
-        assert_eq!(count_valid_passports(&VALID_0), 1);
+        assert_eq!(count_valid_passports(VALID_0), 1);
     }
 
     #[test]
     fn valid_1() {
-        assert_eq!(count_valid_passports(&VALID_1), 1);
+        assert_eq!(count_valid_passports(VALID_1), 1);
     }
 
     #[test]
     fn valid_2() {
-        assert_eq!(count_valid_passports(&VALID_2), 1);
+        assert_eq!(count_valid_passports(VALID_2), 1);
     }
 
     #[test]
     fn valid_3() {
-        assert_eq!(count_valid_passports(&VALID_3), 1);
+        assert_eq!(count_valid_passports(VALID_3), 1);
     }
 }

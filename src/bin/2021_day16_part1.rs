@@ -90,22 +90,22 @@ impl Packet {
         match packet_type {
             4 => {
                 // Literal value
-                let literal = Packet::parse_literal(&buffer, buffer_pos);
+                let literal = Packet::parse_literal(buffer, buffer_pos);
 
-                return Self {
+                Self {
                     version,
                     packet_type,
                     data: PacketData::Literal(literal),
-                };
+                }
             }
 
             _ => {
                 // Operator
-                return Self {
+                Self {
                     version,
                     packet_type,
                     data: PacketData::Operator(Packet::parse_operator(buffer, buffer_pos)),
-                };
+                }
             }
         }
     }
@@ -149,7 +149,7 @@ impl Packet {
             // println!("Entering loop with buffer_pos = {}, sub_packet_end = {}", buffer_pos, sub_packet_end);
 
             while *buffer_pos < sub_packet_end {
-                sub_packets.push(Packet::parse_packet(&buffer, buffer_pos));
+                sub_packets.push(Packet::parse_packet(buffer, buffer_pos));
             }
         } else {
             // Length type ID: next 11-bits = number of sub-packets
@@ -161,7 +161,7 @@ impl Packet {
             // println!("Entering loop with buffer_pos = {}", buffer_pos);
 
             for _ in 0..sub_packet_count {
-                sub_packets.push(Packet::parse_packet(&buffer, buffer_pos));
+                sub_packets.push(Packet::parse_packet(buffer, buffer_pos));
             }
         }
         sub_packets
@@ -181,7 +181,7 @@ fn sum_versions(p: &Packet) -> u32 {
 
     if let PacketData::Operator(sub_packets) = &p.data {
         for sub_packet in sub_packets {
-            sum += sum_versions(sub_packet) as u32;
+            sum += sum_versions(sub_packet);
         }
     } else {
         panic!(
@@ -196,7 +196,7 @@ fn sum_versions(p: &Packet) -> u32 {
 fn main() {
     let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-    let sum = sum_versions(&Packet::new(&input_file.lines().next().unwrap()));
+    let sum = sum_versions(&Packet::new(input_file.lines().next().unwrap()));
 
     println!("The sum of all versions is {}", sum);
 }
@@ -219,7 +219,7 @@ mod tests {
 
     #[test]
     fn test_bitbuffer() {
-        let bb = BitBuffer::new(&TEST_PACKET_LITERAL);
+        let bb = BitBuffer::new(TEST_PACKET_LITERAL);
         assert_eq!(bb.bit_vec[0], TEST_PACKET_AS_BITS[0]);
         assert_eq!(bb.bit_vec[1], TEST_PACKET_AS_BITS[1]);
         assert_eq!(bb.bit_vec[2], TEST_PACKET_AS_BITS[2]);
@@ -227,7 +227,7 @@ mod tests {
 
     #[test]
     fn test_bb_nth() {
-        let bb = BitBuffer::new(&TEST_PACKET_LITERAL);
+        let bb = BitBuffer::new(TEST_PACKET_LITERAL);
         assert_eq!(bb.nth(0), 1);
         assert_eq!(bb.nth(1), 1);
         assert_eq!(bb.nth(2), 0);
@@ -239,7 +239,7 @@ mod tests {
 
     #[test]
     fn test_bb_get_bits() {
-        let bb = BitBuffer::new(&TEST_PACKET_LITERAL);
+        let bb = BitBuffer::new(TEST_PACKET_LITERAL);
 
         let bits0 = bb.get_bits(0, 8);
         assert_eq!(bits0, TEST_PACKET_AS_BITS[0] as u32);
@@ -250,7 +250,7 @@ mod tests {
 
     #[test]
     fn test_parse_literal_packet() {
-        let p = Packet::new(&TEST_PACKET_LITERAL);
+        let p = Packet::new(TEST_PACKET_LITERAL);
 
         assert_eq!(p.version, 6);
         assert_eq!(p.packet_type, 4);
@@ -259,7 +259,7 @@ mod tests {
 
     #[test]
     fn test_parse_op0() {
-        let p = Packet::new(&TEST_PACKET_OP_ID0);
+        let p = Packet::new(TEST_PACKET_OP_ID0);
 
         assert_eq!(
             p,
@@ -284,7 +284,7 @@ mod tests {
 
     #[test]
     fn test_parse_op1() {
-        let p = Packet::new(&TEST_PACKET_OP_ID1);
+        let p = Packet::new(TEST_PACKET_OP_ID1);
 
         assert_eq!(
             p,
@@ -314,7 +314,7 @@ mod tests {
 
     #[test]
     fn test_parse_op_op_op() {
-        let p = Packet::new(&TEST_PACKET_OP_OP_OP);
+        let p = Packet::new(TEST_PACKET_OP_OP_OP);
 
         assert_eq!(
             p,
@@ -340,9 +340,9 @@ mod tests {
 
     #[test]
     fn test_sum_versions_0() {
-        assert_eq!(sum_versions(&Packet::new(&TEST_PACKET_OP_OP_OP)), 16);
-        assert_eq!(sum_versions(&Packet::new(&TEST_PACKET_VER_0)), 12);
-        assert_eq!(sum_versions(&Packet::new(&TEST_PACKET_VER_1)), 23);
-        assert_eq!(sum_versions(&Packet::new(&TEST_PACKET_VER_2)), 31);
+        assert_eq!(sum_versions(&Packet::new(TEST_PACKET_OP_OP_OP)), 16);
+        assert_eq!(sum_versions(&Packet::new(TEST_PACKET_VER_0)), 12);
+        assert_eq!(sum_versions(&Packet::new(TEST_PACKET_VER_1)), 23);
+        assert_eq!(sum_versions(&Packet::new(TEST_PACKET_VER_2)), 31);
     }
 }

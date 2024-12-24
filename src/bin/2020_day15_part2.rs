@@ -55,8 +55,8 @@ impl Game {
         state.insert(*nums.last().unwrap(), nums.len());
 
         Self {
-            state: state,
-            next_num: next_num,
+            state,
+            next_num,
             turn: nums.len(),
         }
     }
@@ -116,7 +116,7 @@ mod tests {
 
     #[test]
     fn test_game_0() {
-        let mut game = Game::from_str(&TEST_INPUT_0);
+        let mut game = Game::from_str(TEST_INPUT_0);
         let result = game.play_until_turn(STOP_AT_TURN);
 
         assert_eq!(result, 175594);
@@ -124,7 +124,7 @@ mod tests {
 
     #[test]
     fn test_game_1() {
-        let mut game = Game::from_str(&TEST_INPUT_1);
+        let mut game = Game::from_str(TEST_INPUT_1);
         let result = game.play_until_turn(STOP_AT_TURN);
 
         assert_eq!(result, 2578);
@@ -132,7 +132,7 @@ mod tests {
 
     #[test]
     fn test_game_2() {
-        let mut game = Game::from_str(&TEST_INPUT_2);
+        let mut game = Game::from_str(TEST_INPUT_2);
         let result = game.play_until_turn(STOP_AT_TURN);
 
         assert_eq!(result, 3544142);
@@ -140,7 +140,7 @@ mod tests {
 
     #[test]
     fn test_game_3() {
-        let mut game = Game::from_str(&TEST_INPUT_3);
+        let mut game = Game::from_str(TEST_INPUT_3);
         let result = game.play_until_turn(STOP_AT_TURN);
 
         assert_eq!(result, 261214);
@@ -148,7 +148,7 @@ mod tests {
 
     #[test]
     fn test_game_4() {
-        let mut game = Game::from_str(&TEST_INPUT_4);
+        let mut game = Game::from_str(TEST_INPUT_4);
         let result = game.play_until_turn(STOP_AT_TURN);
 
         assert_eq!(result, 6895259);
@@ -156,7 +156,7 @@ mod tests {
 
     #[test]
     fn test_game_5() {
-        let mut game = Game::from_str(&TEST_INPUT_5);
+        let mut game = Game::from_str(TEST_INPUT_5);
         let result = game.play_until_turn(STOP_AT_TURN);
 
         assert_eq!(result, 18);
@@ -164,7 +164,7 @@ mod tests {
 
     #[test]
     fn test_game_6() {
-        let mut game = Game::from_str(&TEST_INPUT_6);
+        let mut game = Game::from_str(TEST_INPUT_6);
         let result = game.play_until_turn(STOP_AT_TURN);
 
         assert_eq!(result, 362);

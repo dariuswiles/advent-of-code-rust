@@ -56,7 +56,7 @@ fn parse_line(input: &str) -> Valve {
 
     Valve {
         identifier,
-        rate: FlowRateType::from_str_radix(flow_rate, 10).unwrap(),
+        rate: flow_rate.parse().unwrap(),
         connected_valves,
     }
 }
@@ -70,11 +70,11 @@ fn parse_line(input: &str) -> Valve {
 fn parse_lines(input: &str) -> HashMap<&str, Valve> {
     let mut valves = HashMap::new();
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
-        let v = parse_line(&line);
+        let v = parse_line(line);
         valves.insert(v.identifier, v);
     }
 
@@ -95,7 +95,7 @@ impl<'a> ValveDistances<'a> {
     ) -> ValveDistances<'a> {
         let mut valve_distances: HashMap<(&str, &str), Distance> = HashMap::new();
 
-        for (_, v) in valves {
+        for v in valves.values() {
             let mut d = 0u8;
             let mut visited = HashSet::new();
             let mut leading_edge = HashSet::new();
@@ -213,8 +213,8 @@ fn make_move<'a>(
         let result = make_move(
             choice_valve_id,
             current_time + valve_distances.distance(current_location, choice_valve_id) + 1,
-            &valves,
-            &valve_distances,
+            valves,
+            valve_distances,
             &(closed_valve_ids - &HashSet::from([choice_valve_id])),
             total_flow + choice_flow_rate,
         );
@@ -229,7 +229,7 @@ fn make_move<'a>(
 /// between the `Valve`s, and calls the logic that determines the most fluid that can be made to
 /// flow by opening the `Valve`s in the optimal order. Returns the optimal result.
 fn do_challenge(input: &str) -> FlowRateType {
-    let valves = parse_lines(&input);
+    let valves = parse_lines(input);
     let valve_distance_lookup = ValveDistances::generate_valve_distance_lookup_table(&valves);
 
     let valves_with_non_zero_flow: HashSet<&str> = valves
@@ -238,7 +238,7 @@ fn do_challenge(input: &str) -> FlowRateType {
         .collect();
 
     make_move(
-        &"AA",
+        "AA",
         0, // Current time
         &valves,
         &valve_distance_lookup,
@@ -589,7 +589,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
         let valve_distance_lookup = ValveDistances::generate_valve_distance_lookup_table(&valves);
 
         let result0 = score_valves(
-            &"AA",
+            "AA",
             0,
             &valves,
             &valve_distance_lookup,
@@ -617,7 +617,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
         assert_eq!(
             make_move(
-                &"AA",
+                "AA",
                 28, // Current time
                 &valves,
                 &valve_distance_lookup,
@@ -635,7 +635,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
         assert_eq!(
             make_move(
-                &"AA",
+                "AA",
                 27, // Current time
                 &valves,
                 &valve_distance_lookup,
@@ -653,7 +653,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
         assert_eq!(
             make_move(
-                &"AA",
+                "AA",
                 27, // Current time
                 &valves,
                 &valve_distance_lookup,
@@ -671,7 +671,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
         assert_eq!(
             make_move(
-                &"II",
+                "II",
                 27, // Current time
                 &valves,
                 &valve_distance_lookup,
@@ -689,7 +689,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
         assert_eq!(
             make_move(
-                &"FF",
+                "FF",
                 26, // Current time
                 &valves,
                 &valve_distance_lookup,
@@ -707,7 +707,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
         assert_eq!(
             make_move(
-                &"HH",
+                "HH",
                 26, // Current time
                 &valves,
                 &valve_distance_lookup,
@@ -725,7 +725,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
         assert_eq!(
             make_move(
-                &"GG",
+                "GG",
                 24, // Current time
                 &valves,
                 &valve_distance_lookup,
@@ -743,7 +743,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
         assert_eq!(
             make_move(
-                &"GG",
+                "GG",
                 23, // Current time
                 &valves,
                 &valve_distance_lookup,
@@ -761,7 +761,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
         assert_eq!(
             make_move(
-                &"AA",
+                "AA",
                 0, // Current time
                 &valves,
                 &valve_distance_lookup,

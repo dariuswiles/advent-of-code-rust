@@ -22,14 +22,14 @@ impl Xmas {
         let mut data = Vec::new();
 
         for line in input_string.lines() {
-            if line.len() == 0 {
+            if line.is_empty() {
                 continue;
             }
 
             data.push(line.parse().unwrap());
         }
 
-        Self { data: data }
+        Self { data }
     }
 }
 
@@ -44,11 +44,7 @@ struct SumPairs<'a> {
 
 impl<'a> SumPairs<'a> {
     fn new(data: &'a Vec<u64>) -> Self {
-        Self {
-            data: data,
-            i: 0,
-            j: 1,
-        }
+        Self { data, i: 0, j: 1 }
     }
 }
 
@@ -71,7 +67,7 @@ impl Iterator for SumPairs<'_> {
             self.j = self.i + 1;
         }
 
-        Some(ret as u64)
+        Some(ret)
     }
 }
 
@@ -87,10 +83,10 @@ fn find_invalid_number(input: &Xmas, preamble_len: usize) -> u64 {
         let num_to_verify = input.data[w + preamble_len];
         // print!("Checking {:?}. ", num_to_verify);
 
-        let window: &Vec<u64> = &(&input.data[w..w + preamble_len]).to_vec();
+        let window: &Vec<u64> = &input.data[w..w + preamble_len].to_vec();
         // print!("Window = {:?}. ", window);
 
-        let window_pairs: Vec<u64> = SumPairs::new(&window).collect();
+        let window_pairs: Vec<u64> = SumPairs::new(window).collect();
         // println!("Pairs = {:?}", window_pairs);
 
         if !window_pairs.contains(&num_to_verify) {
@@ -139,7 +135,7 @@ mod tests {
 
     #[test]
     fn test_program() {
-        let input = Xmas::create_from_string(&TEST_INPUT);
+        let input = Xmas::create_from_string(TEST_INPUT);
 
         let result = find_invalid_number(&input, 5);
 
@@ -149,7 +145,7 @@ mod tests {
     #[test]
     fn test_iterator_empty() {
         let nums = &vec![];
-        let mut sap = SumPairs::new(&nums);
+        let mut sap = SumPairs::new(nums);
 
         assert_eq!(sap.next(), None);
         assert_eq!(sap.next(), None);

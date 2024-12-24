@@ -40,9 +40,9 @@ fn play_one_round(game: &mut GameState) {
 
     let (earlier, later) = rsearch_for_number(game, *last_number);
 
-    if (earlier == Option::None) && (later != Option::None) {
+    if earlier.is_none() && later.is_some() {
         game.push(0);
-    } else if (earlier != Option::None) && (later != Option::None) {
+    } else if earlier.is_some() && later.is_some() {
         game.push((later.unwrap() - earlier.unwrap()) as u32);
     } else {
         panic!("Unexpected error - search could not find any occurrences of last number");

@@ -44,8 +44,8 @@ impl Point {
         let tokens: Vec<&str> = s.split(',').collect();
         assert_eq!(tokens.len(), 2, "Error during parsing of x,y pair in input");
 
-        let x = Axis::from_str_radix(tokens[0], 10).unwrap();
-        let y = Axis::from_str_radix(tokens[1], 10).unwrap();
+        let x = tokens[0].parse().unwrap();
+        let y = tokens[1].parse().unwrap();
 
         Self { x, y }
     }
@@ -73,16 +73,16 @@ impl Grid {
         let mut grid = Grid::new();
 
         for line in input.lines() {
-            if line.len() == 0 {
+            if line.is_empty() {
                 continue;
             }
 
             let mut p_previous = None;
             for p_str in line.split(INPUT_SEPARATOR) {
-                let p = Point::from_str(&p_str);
+                let p = Point::from_str(p_str);
 
-                if p_previous.is_some() {
-                    grid.add_line(&p_previous.unwrap(), &p, Cell::Rock);
+                if let Some(prev) = p_previous {
+                    grid.add_line(&prev, &p, Cell::Rock);
                 }
                 p_previous = Some(p);
             }
@@ -91,7 +91,7 @@ impl Grid {
     }
 
     fn get(&self, p: &Point) -> Cell {
-        *self.cells.get(p).or(Some(&Cell::Air)).unwrap()
+        *self.cells.get(p).unwrap_or(&Cell::Air)
     }
 
     fn set(&mut self, p: Point, value: Cell) {
@@ -105,7 +105,7 @@ impl Grid {
     /// Returns an inclusive range over the x-coordinates of all `Cell`s defined in this object, or
     /// `None` if no cells have yet been defined.
     fn range_x(&self) -> Option<RangeInclusive<Axis>> {
-        if self.cells.len() == 0 {
+        if self.cells.is_empty() {
             return None;
         }
 
@@ -118,7 +118,7 @@ impl Grid {
     /// Returns an inclusive range over the y-coordinates of all `Cell`s defined in this object, or
     /// `None` if no cells have yet been defined.
     fn range_y(&self) -> Option<RangeInclusive<Axis>> {
-        if self.cells.len() == 0 {
+        if self.cells.is_empty() {
             return None;
         }
 
@@ -181,11 +181,9 @@ impl Display for Grid {
                 }
             }
             let result = writeln!(f, "{}", contents);
-            if result.is_err() {
-                return result;
-            }
+            result?;
         }
-        return Ok(());
+        Ok(())
     }
 }
 

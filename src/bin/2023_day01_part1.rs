@@ -19,7 +19,7 @@ fn parse_input(input: &str) -> Vec<u32> {
     let mut calibration_values = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             let digits: Vec<&str> = line.matches(char::is_numeric).collect();
 
             let first = digits.first().unwrap().parse::<u32>().unwrap();

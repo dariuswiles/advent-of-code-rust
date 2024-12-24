@@ -25,7 +25,7 @@ enum Rule {
 type RuleSet = HashMap<Id, Rule>;
 type Id = u32;
 
-fn build_ruleset(lines: &Vec<&str>) -> RuleSet {
+fn build_ruleset(lines: &[&str]) -> RuleSet {
     let mut ruleset = HashMap::new();
 
     for line in lines.iter() {
@@ -107,7 +107,7 @@ fn validate_list(
         }
     }
 
-    return matched_so_far;
+    matched_so_far
 }
 
 /// The rule with id `rule_id` is looked up in `ruleset`, and is evaluated based on its type. If it
@@ -124,7 +124,7 @@ fn validate_message(
     match rule {
         Rule::Choice(left, right) => {
             if let Rule::List(left_rules) = &**left {
-                let left_result = validate_list(ruleset, msg, &left_rules, recursion);
+                let left_result = validate_list(ruleset, msg, left_rules, recursion);
                 if left_result != 0 {
                     return left_result;
                 }
@@ -136,7 +136,7 @@ fn validate_message(
             }
 
             if let Rule::List(right_rules) = &**right {
-                return validate_list(ruleset, msg, &right_rules, recursion);
+                validate_list(ruleset, msg, right_rules, recursion)
             } else {
                 panic!(
                     "Unexpected rule type found on right side of rule {}",
@@ -153,7 +153,7 @@ fn validate_message(
             let mut left_choice: Vec<Id>;
 
             if let Rule::List(left_rules) = &**left {
-                left_choice = left_rules.iter().cloned().collect();
+                left_choice = left_rules.to_vec();
             } else {
                 panic!(
                     "Unexpected rule type found on left side of rule {}",
@@ -166,20 +166,21 @@ fn validate_message(
 
                 let before_recursion: &[Id] = &right_rules[..recursion_position];
 
-                let after_recursion;
-                if right_rules.len() > recursion_position + 1 {
-                    after_recursion = &right_rules[recursion_position + 1..];
+                let after_recursion = if right_rules.len() > recursion_position + 1 {
+                    &right_rules[recursion_position + 1..]
                 } else {
-                    after_recursion = &EMPTY_ARRAY;
-                }
+                    &EMPTY_ARRAY
+                };
 
-                let recursion_level = *recursion.get(&rule_id).expect(&format!(
-                    "Recursive rule id {} needs an associated recursion level to be passed",
-                    rule_id
-                ));
+                let recursion_level = *recursion.get(&rule_id).unwrap_or_else(|| {
+                    panic!(
+                        "Recursive rule id {} needs an associated recursion level to be passed",
+                        rule_id
+                    )
+                });
 
                 let mut new_list: Vec<Id> = iter::repeat(before_recursion)
-                    .take(recursion_level as usize)
+                    .take(recursion_level)
                     .collect::<Vec<&[Id]>>()
                     .concat()
                     .to_vec();
@@ -188,7 +189,7 @@ fn validate_message(
 
                 new_list.append(
                     &mut iter::repeat(after_recursion)
-                        .take(recursion_level as usize)
+                        .take(recursion_level)
                         .collect::<Vec<&[Id]>>()
                         .concat()
                         .to_vec(),
@@ -209,9 +210,9 @@ fn validate_message(
         }
         Rule::Text(s) => {
             if msg.starts_with(s) {
-                return s.len();
+                s.len()
             } else {
-                return 0;
+                0
             }
         }
         Rule::List(child_rules) => validate_list(ruleset, msg, child_rules, recursion),
@@ -220,7 +221,7 @@ fn validate_message(
 
 /// Determines if `msg` matches any rules in `ruleset` and returns the result.
 fn is_message_valid(ruleset: &RuleSet, msg: &str) -> bool {
-    if msg.len() == 0 {
+    if msg.is_empty() {
         return false;
     }
 
@@ -250,7 +251,7 @@ fn is_message_valid(ruleset: &RuleSet, msg: &str) -> bool {
 
         complete = true;
         for rid in &recursion_rule_ids {
-            let recursion_value = recursion[&rid];
+            let recursion_value = recursion[rid];
 
             if recursion_value < MAX_RECURSION_LEVEL as usize {
                 recursion.insert(*rid, recursion_value + 1);
@@ -272,7 +273,7 @@ fn parse_input(input: &str) -> (RuleSet, Vec<&str>) {
     let mut rules_input = Vec::new();
 
     for line in &mut input_lines {
-        if line.len() == 0 {
+        if line.is_empty() {
             break;
         }
         rules_input.push(line);
@@ -282,7 +283,7 @@ fn parse_input(input: &str) -> (RuleSet, Vec<&str>) {
 
     let mut messages = Vec::new();
     for line in &mut input_lines {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
@@ -295,7 +296,7 @@ fn parse_input(input: &str) -> (RuleSet, Vec<&str>) {
 fn verify_messages(ruleset: &RuleSet, messages: Vec<&str>) -> u32 {
     let mut valid_messages = 0;
     for msg in messages.iter() {
-        if is_message_valid(&ruleset, &msg) {
+        if is_message_valid(ruleset, msg) {
             // println!("Valid message '{}'", &msg);
             valid_messages += 1;
         } else {
@@ -393,7 +394,7 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
 
     #[test]
     fn validate_test_input_0() {
-        assert_eq!(do_challenge(&TEST_INPUT_0), 2);
+        assert_eq!(do_challenge(TEST_INPUT_0), 2);
     }
 
     #[test]
@@ -401,7 +402,7 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
         let mut rules_input = Vec::new();
 
         for line in &mut TEST_INPUT_0.lines() {
-            if line.len() == 0 {
+            if line.is_empty() {
                 break;
             }
             rules_input.push(line);
@@ -439,10 +440,10 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
         let mut ruleset = HashMap::new();
         ruleset.insert(0, Rule::Text("c".to_string()));
 
-        assert!(is_message_valid(&ruleset, &"c".to_string()));
-        assert!(!is_message_valid(&ruleset, &"x".to_string()));
-        assert!(!is_message_valid(&ruleset, &"cc".to_string()));
-        assert!(!is_message_valid(&ruleset, &"".to_string()));
+        assert!(is_message_valid(&ruleset, "c"));
+        assert!(!is_message_valid(&ruleset, "x"));
+        assert!(!is_message_valid(&ruleset, "cc"));
+        assert!(!is_message_valid(&ruleset, ""));
     }
 
     #[test]
@@ -452,12 +453,12 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
         ruleset.insert(1, Rule::Text("c".to_string()));
         ruleset.insert(2, Rule::Text("d".to_string()));
 
-        assert!(is_message_valid(&ruleset, &"cdc".to_string()));
-        assert!(!is_message_valid(&ruleset, &"cdd".to_string()));
-        assert!(!is_message_valid(&ruleset, &"ccc".to_string()));
-        assert!(!is_message_valid(&ruleset, &"cdcc".to_string()));
-        assert!(!is_message_valid(&ruleset, &"ccdc".to_string()));
-        assert!(!is_message_valid(&ruleset, &"".to_string()));
+        assert!(is_message_valid(&ruleset, "cdc"));
+        assert!(!is_message_valid(&ruleset, "cdd"));
+        assert!(!is_message_valid(&ruleset, "ccc"));
+        assert!(!is_message_valid(&ruleset, "cdcc"));
+        assert!(!is_message_valid(&ruleset, "ccdc"));
+        assert!(!is_message_valid(&ruleset, ""));
     }
 
     #[test]
@@ -472,15 +473,15 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
         );
         ruleset.insert(1, Rule::Text("e".to_string()));
 
-        assert!(is_message_valid(&ruleset, &"e".to_string()));
-        assert!(is_message_valid(&ruleset, &"ee".to_string()));
-        assert!(is_message_valid(&ruleset, &"eee".to_string()));
+        assert!(is_message_valid(&ruleset, "e"));
+        assert!(is_message_valid(&ruleset, "ee"));
+        assert!(is_message_valid(&ruleset, "eee"));
     }
 
     #[test]
     fn full_test_no_recursive_rules() {
-        let mut input = &TEST_INPUT_1;
-        let (ruleset, messages) = parse_input(&mut input);
+        let input = &TEST_INPUT_1;
+        let (ruleset, messages) = parse_input(input);
         let result = verify_messages(&ruleset, messages);
 
         assert_eq!(result, 3);
@@ -488,8 +489,8 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
 
     #[test]
     fn full_test_with_recursive_rules() {
-        let mut input = &TEST_INPUT_1;
-        let (mut ruleset, messages) = parse_input(&mut input);
+        let input = &TEST_INPUT_1;
+        let (mut ruleset, messages) = parse_input(input);
 
         patch_ruleset_for_part2(&mut ruleset);
         println!("Ruleset:\n{:?}", &ruleset);

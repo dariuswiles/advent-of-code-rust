@@ -37,9 +37,9 @@ type Tiles = HashMap<Id, Tile>;
 type TileMatches = HashMap<(Id, Direction), (Id, Direction, bool)>;
 
 const SEA_MONSTER: [&str; 3] = [
-    &"                  # ",
-    &"#    ##    ##    ###",
-    &" #  #  #  #  #  #   ",
+    "                  # ",
+    "#    ##    ##    ###",
+    " #  #  #  #  #  #   ",
 ];
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -78,27 +78,21 @@ impl Tile {
             .unwrap();
 
         let mut cells = Vec::new();
-        let mut lines_read = 0;
 
-        loop {
-            if let Some(line) = lines.next() {
-                if line == "" {
-                    if lines_read == TILE_SIZE {
-                        break;
-                    } else {
-                        panic!("Input contained a tile with an unexpected number of rows");
-                    }
+        for (lines_read, line) in lines.enumerate() {
+            if line.is_empty() {
+                if lines_read == TILE_SIZE {
+                    break;
+                } else {
+                    panic!("Input contained a tile with an unexpected number of rows");
                 }
-
-                if line.len() != TILE_SIZE {
-                    panic!("Input contained a tile row with an unexpected number of columns");
-                }
-
-                cells.push(line.to_owned());
-                lines_read += 1;
-            } else {
-                break;
             }
+
+            if line.len() != TILE_SIZE {
+                panic!("Input contained a tile row with an unexpected number of columns");
+            }
+
+            cells.push(line.to_owned());
         }
 
         let mut left = String::new();
@@ -204,18 +198,18 @@ impl GridTile {
                 if self.flip {
                     r = max_index - r;
                 }
-                return tiles[&self.tile_id].cells[r].to_string();
+                tiles[&self.tile_id].cells[r].to_string()
             }
             2 => {
                 let mut r = max_index - row;
                 if self.flip {
                     r = max_index - r;
                 }
-                return tiles[&self.tile_id].cells[r]
+                tiles[&self.tile_id].cells[r]
                     .chars()
                     .rev()
                     .collect::<String>()
-                    .to_string();
+                    .to_string()
             }
             1 => {
                 let mut col = row;
@@ -223,12 +217,12 @@ impl GridTile {
                 if self.flip {
                     col = max_index - col;
                 }
-                return tiles[&self.tile_id]
+                tiles[&self.tile_id]
                     .column_to_string(col)
                     .chars()
                     .rev()
                     .collect::<String>()
-                    .to_string();
+                    .to_string()
             }
             3 => {
                 let mut col = max_index - row;
@@ -236,7 +230,7 @@ impl GridTile {
                 if self.flip {
                     col = max_index - col;
                 }
-                return tiles[&self.tile_id].column_to_string(col).to_string();
+                tiles[&self.tile_id].column_to_string(col).to_string()
             }
             _ => {
                 panic!("GridTile.row_to_string() failed because rotation not in range 0..4");
@@ -265,10 +259,10 @@ impl Grid {
     /// Panics if `corner_id` is not a corner tile, i.e., it does not have exactly two borders
     /// matching other tiles.
     fn new(tile_matches: &TileMatches, corner_tile_id: Id) -> Self {
-        let corner_top_connects = tile_matches.get(&(corner_tile_id, TOP)) != None;
-        let corner_right_connects = tile_matches.get(&(corner_tile_id, RIGHT)) != None;
-        let corner_bottom_connects = tile_matches.get(&(corner_tile_id, BOTTOM)) != None;
-        let corner_left_connects = tile_matches.get(&(corner_tile_id, LEFT)) != None;
+        let corner_top_connects = tile_matches.get(&(corner_tile_id, TOP)).is_some();
+        let corner_right_connects = tile_matches.get(&(corner_tile_id, RIGHT)).is_some();
+        let corner_bottom_connects = tile_matches.get(&(corner_tile_id, BOTTOM)).is_some();
+        let corner_left_connects = tile_matches.get(&(corner_tile_id, LEFT)).is_some();
 
         let mut rotation = usize::MAX;
         if corner_right_connects && corner_bottom_connects {
@@ -316,7 +310,7 @@ impl Grid {
     fn get_border_for_pos(&self, pos: &Position, dir: CompassDir) -> Direction {
         let grid_tile = &self.tile_grid[pos];
 
-        let mut result = (dir as usize + 4 - grid_tile.rotation as usize) % 4;
+        let mut result = (dir + 4 - grid_tile.rotation) % 4;
 
         if grid_tile.flip && (dir == NORTH || dir == SOUTH) {
             result = (result + 2) % 4;
@@ -339,7 +333,9 @@ impl Grid {
     ///     - the `x` and `y` coordinates are 0, 0.
     fn add_tile_to_grid(&mut self, tile_matches: &TileMatches, pos: &Position) {
         assert!(
-            self.tile_grid.get(&Position { x: pos.x, y: pos.y }) == None,
+            !self
+                .tile_grid
+                .contains_key(&Position { x: pos.x, y: pos.y }),
             "Cannot add tile to grid because position ({}, {}) is occupied",
             pos.x,
             pos.y
@@ -385,15 +381,13 @@ impl Grid {
             } else {
                 self.tile_grid.insert(*pos, tile_west);
             }
+        } else if let Some(tile_north) = grid_tile_based_on_tile_north {
+            self.tile_grid.insert(*pos, tile_north);
         } else {
-            if let Some(tile_north) = grid_tile_based_on_tile_north {
-                self.tile_grid.insert(*pos, tile_north);
-            } else {
-                panic!(
-                    "Cannot determine tile at position ({}, {}) from adjacent tiles",
-                    pos.x, pos.y
-                );
-            }
+            panic!(
+                "Cannot determine tile at position ({}, {}) from adjacent tiles",
+                pos.x, pos.y
+            );
         }
 
         // println!("Contents of Grid with addition of tile at ({}, {}):\n{:?}", pos.x, pos.y,
@@ -450,16 +444,16 @@ impl Grid {
                     adj_rotation = (compass_dir + 6 - adj_tile_border) % 4;
                 }
 
-                return Some(GridTile {
+                Some(GridTile {
                     tile_id: *adj_tile_id,
                     rotation: adj_rotation,
                     flip: tile_is_flipped,
-                });
+                })
             } else {
-                return None;
+                None
             }
         } else {
-            return None;
+            None
         }
     }
 
@@ -625,7 +619,7 @@ impl ImageMask {
 
         for p_y in 0..pattern_height {
             for p_x in 0..pattern_width {
-                if pattern.pattern[p_y].iter().nth(p_x).unwrap() == &'#' {
+                if pattern.pattern[p_y].get(p_x).unwrap() == &'#' {
                     self.mask[pos.y + p_y][pos.x + p_x] = true;
                 }
             }
@@ -697,7 +691,7 @@ fn parse_input(input: &str) -> HashMap<Id, Tile> {
             // println!("tile_start = {}", tile_start);
         }
 
-        if lines[i] == "" {
+        if lines[i].is_empty() {
             let tile_block = lines[tile_start..i].join("\n");
             // println!("parse_input about to call from_string with data\n{:#?}", &tile_block);
 
@@ -1425,7 +1419,7 @@ Tile 7777:
 
     #[test]
     fn solve_test_puzzle() {
-        let answer = do_challenge(&TEST_INPUT, &SEA_MONSTER);
+        let answer = do_challenge(TEST_INPUT, &SEA_MONSTER);
         assert_eq!(answer, 273);
     }
 }

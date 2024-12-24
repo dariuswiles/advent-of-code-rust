@@ -55,8 +55,8 @@ impl Game {
         let mut destination_id = value_at_current_cup_index - 1;
         let mut picked_up_cups = remove_three(&mut self.cups, self.current_cup_index + 1);
 
-        while (picked_up_cups.contains(&destination_id)) || (destination_id <= 0) {
-            if destination_id <= 0 {
+        while (picked_up_cups.contains(&destination_id)) || (destination_id == 0) {
+            if destination_id == 0 {
                 destination_id = *self.cups.iter().max().unwrap();
             } else {
                 destination_id -= 1;
@@ -105,7 +105,7 @@ fn remove_three<T>(v: &mut Vec<T>, position: usize) -> Vec<T> {
 
     let mut pos = position;
     if position < (v.len() - 3) {
-        return v.splice(pos..pos + 3, iter::empty()).collect::<Vec<T>>();
+        v.splice(pos..pos + 3, iter::empty()).collect::<Vec<T>>()
     } else {
         let mut result = Vec::new();
 
@@ -116,7 +116,7 @@ fn remove_three<T>(v: &mut Vec<T>, position: usize) -> Vec<T> {
         pos %= v.len();
         result.push(v.remove(pos));
 
-        return result;
+        result
     }
 }
 
@@ -133,7 +133,7 @@ fn insert_three<T: Clone>(v: &mut Vec<T>, position: usize, elements: &mut Vec<T>
         v.append(elements);
     } else {
         let p = position + 1;
-        v.splice(p..p, elements.iter().cloned().collect::<Vec<T>>());
+        v.splice(p..p, elements.to_vec());
     }
 }
 
@@ -234,7 +234,7 @@ mod tests {
     #[test]
     fn test_one_move() {
         let cups_len = 9;
-        let mut game = Game::load_game(&TEST_INPUT, cups_len);
+        let mut game = Game::load_game(TEST_INPUT, cups_len);
 
         game.perform_one_move();
         assert_eq!(
@@ -331,7 +331,7 @@ mod tests {
     #[test]
     fn play_game() {
         let cups_len = 9;
-        let mut game = Game::load_game(&TEST_INPUT, cups_len);
+        let mut game = Game::load_game(TEST_INPUT, cups_len);
         let mut game_move = game.clone();
 
         game.play_game(1);
@@ -343,7 +343,7 @@ mod tests {
     #[test]
     fn play_part1_game() {
         let cups_len = 9;
-        let mut game = Game::load_game(&TEST_INPUT, cups_len);
+        let mut game = Game::load_game(TEST_INPUT, cups_len);
         game.play_game(100);
         assert_eq!(
             Game {
@@ -357,7 +357,7 @@ mod tests {
 
     #[test]
     fn play_part2_game() {
-        let mut game = Game::load_game(&TEST_INPUT, TOTAL_CUPS);
+        let mut game = Game::load_game(TEST_INPUT, TOTAL_CUPS);
 
         assert!(game.cups.len() == TOTAL_CUPS);
         game.play_game(GAME_ROUNDS);

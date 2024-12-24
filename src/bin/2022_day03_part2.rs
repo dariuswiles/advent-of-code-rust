@@ -23,7 +23,7 @@ fn parse_input(input: &str) -> Vec<Backpack> {
     let mut backpacks = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             backpacks.push(line);
         }
     }
@@ -35,12 +35,9 @@ fn parse_input(input: &str) -> Vec<Backpack> {
 /// Returns the first `char` in `first` that also appears in `second` and `third`. Returns `None`
 /// if no `char` appears in all three strings.
 fn find_common_item(first: &str, second: &str, third: &str) -> Option<char> {
-    for c in first.chars() {
-        if second.contains(c) && third.contains(c) {
-            return Some(c);
-        }
-    }
-    None
+    first
+        .chars()
+        .find(|&c| second.contains(c) && third.contains(c))
 }
 
 /// Returns the priority of the given `item`, following the challenge rules. Returns None if
@@ -59,7 +56,7 @@ fn item_priority(item: char) -> Option<u32> {
 
 /// Returns the sum of the priorities for each common item for each backpack. Backpacks are
 /// examined for common items in groups of 3, as per the challenge.
-fn sum_all_item_priorities(backpacks: &Vec<Backpack>) -> u32 {
+fn sum_all_item_priorities(backpacks: &[Backpack]) -> u32 {
     let mut total_priority = 0;
 
     for i in (0..backpacks.len()).step_by(3) {

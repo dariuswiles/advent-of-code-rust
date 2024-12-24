@@ -45,7 +45,7 @@ impl Buses {
             }
         }
 
-        Self { buses: buses }
+        Self { buses }
     }
 
     /// Sort the `buses` vector by bus `id`, largest to smallest.
@@ -134,7 +134,7 @@ mod tests {
 
     #[test]
     fn test_0() {
-        let mut buses = Buses::from_input(&TEST_INPUT_0);
+        let mut buses = Buses::from_input(TEST_INPUT_0);
         buses.sort_descending();
         let answer = find_challenge_answer(&buses);
 
@@ -143,7 +143,7 @@ mod tests {
 
     #[test]
     fn test_1() {
-        let mut buses = Buses::from_input(&TEST_INPUT_1);
+        let mut buses = Buses::from_input(TEST_INPUT_1);
         buses.sort_descending();
         let answer = find_challenge_answer(&buses);
 
@@ -152,7 +152,7 @@ mod tests {
 
     #[test]
     fn test_2() {
-        let mut buses = Buses::from_input(&TEST_INPUT_2);
+        let mut buses = Buses::from_input(TEST_INPUT_2);
         buses.sort_descending();
         let answer = find_challenge_answer(&buses);
 
@@ -161,7 +161,7 @@ mod tests {
 
     #[test]
     fn test_3() {
-        let mut buses = Buses::from_input(&TEST_INPUT_3);
+        let mut buses = Buses::from_input(TEST_INPUT_3);
         buses.sort_descending();
         let answer = find_challenge_answer(&buses);
 
@@ -170,7 +170,7 @@ mod tests {
 
     #[test]
     fn test_4() {
-        let mut buses = Buses::from_input(&TEST_INPUT_4);
+        let mut buses = Buses::from_input(TEST_INPUT_4);
         buses.sort_descending();
         let answer = find_challenge_answer(&buses);
 
@@ -179,7 +179,7 @@ mod tests {
 
     #[test]
     fn test_5() {
-        let mut buses = Buses::from_input(&TEST_INPUT_5);
+        let mut buses = Buses::from_input(TEST_INPUT_5);
         buses.sort_descending();
         let answer = find_challenge_answer(&buses);
 
@@ -188,7 +188,7 @@ mod tests {
 
     #[test]
     fn bus_parse() {
-        let buses = Buses::from_input(&TEST_INPUT_0);
+        let buses = Buses::from_input(TEST_INPUT_0);
 
         assert_eq!(
             buses,
@@ -206,7 +206,7 @@ mod tests {
 
     #[test]
     fn bus_sort() {
-        let mut buses = Buses::from_input(&TEST_INPUT_0);
+        let mut buses = Buses::from_input(TEST_INPUT_0);
         buses.sort_descending();
 
         assert_eq!(

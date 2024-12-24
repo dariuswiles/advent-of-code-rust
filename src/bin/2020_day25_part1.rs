@@ -82,7 +82,7 @@ mod tests {
 
     #[test]
     fn test_read_keys() {
-        let keys = read_keys(&TEST_INPUT);
+        let keys = read_keys(TEST_INPUT);
 
         assert_eq!((5764801, 17807724), keys);
     }
@@ -95,7 +95,7 @@ mod tests {
 
     #[test]
     fn generate_encryption_keys() {
-        let (card_pk, door_pk) = read_keys(&TEST_INPUT);
+        let (card_pk, door_pk) = read_keys(TEST_INPUT);
         assert_eq!(5764801, card_pk);
         assert_eq!(17807724, door_pk);
 

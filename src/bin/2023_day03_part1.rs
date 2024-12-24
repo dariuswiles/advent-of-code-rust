@@ -37,7 +37,7 @@ impl Schematic {
         let mut width = None;
 
         for line in input.lines() {
-            if line == "" {
+            if line.is_empty() {
                 continue;
             }
 
@@ -55,8 +55,8 @@ impl Schematic {
             for c in &chars {
                 if c == &CELL_EMPTY {
                     row.push(Cell::Empty);
-                } else if c.is_digit(10) {
-                    row.push(Cell::Digit(c.to_digit(10).unwrap() as u32));
+                } else if c.is_ascii_digit() {
+                    row.push(Cell::Digit(c.to_digit(10).unwrap()));
                 } else {
                     row.push(Cell::Symbol);
                 };
@@ -111,6 +111,7 @@ impl Schematic {
 
                     // Set the adjacency mask for the cell containing the symbol and all the 8
                     // adjacent cells, providing they are within the bounds of the cell grid.
+                    #[allow(clippy::needless_range_loop)]
                     for r in min_row..=max_row {
                         for c in min_column..=max_column {
                             mask[r][c] = true;
@@ -127,9 +128,10 @@ impl Schematic {
     /// symbols. The adjacency check is performed using the mask passed in the `m` argument. See
     /// the `create_symbol_adjacency_mask()` method for more details. Returns the sum of adjacent
     /// numbers.
-    fn sum_adjacent_numbers(&self, m: &Vec<Vec<bool>>) -> u32 {
+    fn sum_adjacent_numbers(&self, m: &[Vec<bool>]) -> u32 {
         let mut total = 0;
 
+        #[allow(clippy::needless_range_loop)]
         for row in 0..self.cells.len() {
             let mut n = 0;
             let mut adjacent = false;
@@ -137,15 +139,13 @@ impl Schematic {
                 if let Cell::Digit(d) = self.cells[row][column] {
                     n = n * 10 + d;
                     adjacent |= m[row][column];
-                } else {
-                    if n > 0 {
-                        if adjacent {
-                            total += n;
-                        }
-
-                        n = 0;
-                        adjacent = false;
+                } else if n > 0 {
+                    if adjacent {
+                        total += n;
                     }
+
+                    n = 0;
+                    adjacent = false;
                 }
             }
 
@@ -193,7 +193,7 @@ mod tests {
 
     #[test]
     fn schematic_from_string() {
-        let s = Schematic::from_string(&TEST_INPUT);
+        let s = Schematic::from_string(TEST_INPUT);
 
         assert_eq!(Cell::Digit(4), s.cells[0][0]);
         assert_eq!(Cell::Digit(6), s.cells[0][1]);
@@ -221,7 +221,7 @@ mod tests {
 
     #[test]
     fn test_create_symbol_adjacency_mask() {
-        let s = Schematic::from_string(&TEST_INPUT);
+        let s = Schematic::from_string(TEST_INPUT);
         let m = s.create_symbol_adjacency_mask();
 
         assert_eq!(
@@ -242,7 +242,7 @@ mod tests {
 
     #[test]
     fn test_sum_adjacent_numbers() {
-        let s = Schematic::from_string(&TEST_INPUT);
+        let s = Schematic::from_string(TEST_INPUT);
         let m = s.create_symbol_adjacency_mask();
 
         assert_eq!(4361, s.sum_adjacent_numbers(&m));
@@ -250,6 +250,6 @@ mod tests {
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(4361, do_challenge(&TEST_INPUT));
+        assert_eq!(4361, do_challenge(TEST_INPUT));
     }
 }

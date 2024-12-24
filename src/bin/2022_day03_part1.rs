@@ -27,7 +27,7 @@ fn parse_input(input: &str) -> Vec<Backpack> {
     let mut backpacks = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             backpacks.push((&line[..line.len() / 2], &line[line.len() / 2..]));
         }
     }
@@ -37,12 +37,7 @@ fn parse_input(input: &str) -> Vec<Backpack> {
 /// Returns the first `char` in `first` that also appears in `second`. Returns `None` if no `char`
 /// appears in both strings.
 fn find_common_item(first: &str, second: &str) -> Option<char> {
-    for c in first.chars() {
-        if second.contains(c) {
-            return Some(c);
-        }
-    }
-    None
+    first.chars().find(|&c| second.contains(c))
 }
 
 /// Returns the priority of the given `item`, following the challenge rules. Returns None if

@@ -21,7 +21,7 @@ fn parse_input(input: &str) -> Vec<(RangeInclusive<u32>, RangeInclusive<u32>)> {
     let mut ranges = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             let both_ranges: Vec<&str> = line.split(',').collect();
             assert_eq!(both_ranges.len(), 2);
 
@@ -51,7 +51,7 @@ fn is_range_a_subset(a: &RangeInclusive<u32>, b: &RangeInclusive<u32>) -> bool {
 
 /// Returns the number of pairs of ranges in the `Vec` passed where one range is the subset of the
 /// other.
-fn count_subsets(range_pairs: &Vec<(RangeInclusive<u32>, RangeInclusive<u32>)>) -> u32 {
+fn count_subsets(range_pairs: &[(RangeInclusive<u32>, RangeInclusive<u32>)]) -> u32 {
     range_pairs
         .iter()
         .filter(|rp| is_range_a_subset(&rp.0, &rp.1))
@@ -93,10 +93,10 @@ mod tests {
 
     #[test]
     fn test_is_range_a_subset() {
-        assert_eq!(is_range_a_subset(&(1..=4), &(2..=5)), false);
-        assert_eq!(is_range_a_subset(&(3..=6), &(2..=5)), false);
-        assert_eq!(is_range_a_subset(&(1..=6), &(2..=5)), true);
-        assert_eq!(is_range_a_subset(&(4..=4), &(4..=9)), true);
+        assert!(!is_range_a_subset(&(1..=4), &(2..=5)));
+        assert!(!is_range_a_subset(&(3..=6), &(2..=5)));
+        assert!(is_range_a_subset(&(1..=6), &(2..=5)));
+        assert!(is_range_a_subset(&(4..=4), &(4..=9)));
     }
 
     #[test]

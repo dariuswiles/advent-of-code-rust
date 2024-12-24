@@ -29,11 +29,11 @@ fn parse_input(input: &str) -> FlippedTileGrid {
     let mut grid = FlippedTileGrid::new();
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
-        flip_tile(&mut grid, &parse_one_line(&line));
+        flip_tile(&mut grid, &parse_one_line(line));
     }
     grid
 }
@@ -100,7 +100,7 @@ fn parse_one_line(line: &str) -> Position {
 /// Flips the tile at position `pos` within `grid`. If the tile is already present in `grid`,
 /// this flip will return it to its starting orientation, and it is therefore removed from `grid`.
 fn flip_tile(grid: &mut FlippedTileGrid, pos: &Position) {
-    if let Some(_) = grid.get(pos) {
+    if grid.get(pos).is_some() {
         grid.remove(pos);
     } else {
         grid.insert(*pos);
@@ -144,23 +144,23 @@ wseweeenwnesenwwwswnew";
 
     #[test]
     fn test_parse_one_line() {
-        assert_eq!(Position { x: 1, y: -1 }, parse_one_line(&"esew"));
-        assert_eq!(Position { x: 0, y: 0 }, parse_one_line(&"nwwswee"));
+        assert_eq!(Position { x: 1, y: -1 }, parse_one_line("esew"));
+        assert_eq!(Position { x: 0, y: 0 }, parse_one_line("nwwswee"));
 
         assert_eq!(
             Position { x: -4, y: -2 },
-            parse_one_line(&"sesenwnenenewseeswwswswwnenewsewsw")
+            parse_one_line("sesenwnenenewseeswwswswwnenewsewsw")
         );
 
         assert_eq!(
             Position { x: -1, y: 3 },
-            parse_one_line(&"neeenesenwnwwswnenewnwwsewnenwseswesw")
+            parse_one_line("neeenesenwnwwswnenewnwwsewnenwseswesw")
         );
     }
 
     #[test]
     fn test_parse_file() {
-        let grid = parse_input(&TEST_INPUT);
+        let grid = parse_input(TEST_INPUT);
 
         assert_eq!(10, grid.len());
     }

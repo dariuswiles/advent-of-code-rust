@@ -140,7 +140,7 @@ CN -> C";
 
     #[test]
     fn test_parse_input() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
 
         assert_eq!(template, "NNCB");
         assert_eq!(ruleset.rules[&['C', 'H']], 'B');
@@ -163,7 +163,7 @@ CN -> C";
 
     #[test]
     fn test_apply_rules() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
         let output1 = ruleset.apply_rules(template);
         assert_eq!(output1, "NCNBCHB".to_string());
 
@@ -202,7 +202,7 @@ CN -> C";
 
     #[test]
     fn test_apply_rules_repeatedly() {
-        let (template, ruleset) = parse_input(&TEST_INPUT);
+        let (template, ruleset) = parse_input(TEST_INPUT);
         let output = ruleset.apply_rules_repeatedly(template, ITERATIONS);
         let frequencies = count_letter_frequencies(&output);
 

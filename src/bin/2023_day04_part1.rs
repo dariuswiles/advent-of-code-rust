@@ -36,8 +36,9 @@ impl Card {
         assert_eq!(2, card_and_numbers.len(), "Malformed input in: {s}");
 
         let card_id_text = card_and_numbers[0].strip_prefix("Card").unwrap().trim();
-        let card_id =
-            u8::from_str_radix(card_id_text, 10).expect("Problem parsing card id '{card_id_text}'");
+        let card_id = card_id_text
+            .parse()
+            .expect("Problem parsing card id '{card_id_text}'");
 
         let winning_and_our_numbers: Vec<&str> = card_and_numbers[1].split(" | ").collect();
         assert_eq!(
@@ -47,20 +48,19 @@ impl Card {
         );
 
         for w in winning_and_our_numbers[0].split(' ') {
-            if w == "" {
+            if w.is_empty() {
                 continue;
             }
 
-            winning_numbers
-                .insert(u8::from_str_radix(w, 10).expect("Error parsing winning number '{w}'"));
+            winning_numbers.insert(w.parse().expect("Error parsing winning number '{w}'"));
         }
 
         for w in winning_and_our_numbers[1].split(' ') {
-            if w == "" {
+            if w.is_empty() {
                 continue;
             }
 
-            our_numbers.insert(u8::from_str_radix(w, 10).expect("Error parsing our number '{w}'"));
+            our_numbers.insert(w.parse().expect("Error parsing our number '{w}'"));
         }
 
         Card {
@@ -77,9 +77,9 @@ impl Card {
         let number_matches = self.winning_numbers.intersection(&self.our_numbers).count();
 
         if number_matches == 0 {
-            return 0;
+            0
         } else {
-            return u32::pow(2, number_matches as u32 - 1);
+            u32::pow(2, number_matches as u32 - 1)
         }
     }
 }
@@ -107,11 +107,11 @@ fn parse_cards_from_input(input: &str) -> Vec<Card> {
     let mut cards = Vec::new();
 
     for card in input.lines() {
-        if card == "" {
+        if card.is_empty() {
             continue;
         }
 
-        cards.push(Card::from_str(&card));
+        cards.push(Card::from_str(card));
     }
 
     cards
@@ -145,7 +145,7 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 
     #[test]
     fn test_parse_cards_from_input() {
-        let cards = parse_cards_from_input(&TEST_INPUT);
+        let cards = parse_cards_from_input(TEST_INPUT);
 
         assert_eq!(
             vec![
@@ -197,6 +197,6 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(13, do_challenge(&TEST_INPUT));
+        assert_eq!(13, do_challenge(TEST_INPUT));
     }
 }

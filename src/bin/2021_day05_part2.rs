@@ -9,6 +9,7 @@
 //! number of lines that pass through it. The challenge answer is the number of cells that have
 //! more than one line passing through.
 
+use std::cmp::Ordering;
 use std::fmt::{Display, Error, Formatter};
 use std::fs;
 
@@ -37,8 +38,8 @@ impl Coordinate {
         }
 
         Self {
-            x: usize::from_str_radix(tokens[0], 10).unwrap(),
-            y: usize::from_str_radix(tokens[1], 10).unwrap(),
+            x: tokens[0].parse::<usize>().unwrap(),
+            y: tokens[1].parse::<usize>().unwrap(),
         }
     }
 }
@@ -55,8 +56,7 @@ impl Map {
         let mut cells = Vec::new();
 
         for _ in 0..size {
-            let mut row = Vec::new();
-            row.resize(size, 0);
+            let row = vec![0; size];
             cells.push(row);
         }
 
@@ -76,27 +76,35 @@ impl Map {
 
         let mut col_offset: i64 = 0;
 
-        if start.y == end.y {
-            if start.x < end.x {
-                for col in start.x..=end.x {
-                    self.cells[start.y][col] += 1;
-                }
-            } else {
-                for col in end.x..=start.x {
-                    self.cells[start.y][col] += 1;
+        match start.y.cmp(&end.y) {
+            Ordering::Equal => {
+                if start.x < end.x {
+                    for col in start.x..=end.x {
+                        self.cells[start.y][col] += 1;
+                    }
+                } else {
+                    for col in end.x..=start.x {
+                        self.cells[start.y][col] += 1;
+                    }
                 }
             }
-        } else {
-            if start.x < end.x {
-                col_offset = 1;
-            } else if start.x > end.x {
-                col_offset = -1;
-            }
+            _ => {
+                match start.x.cmp(&end.x) {
+                    Ordering::Less => {
+                        col_offset = 1;
+                    }
+                    _ => {
+                        if start.x > end.x {
+                            col_offset = -1;
+                        }
+                    }
+                }
 
-            let mut col = start.x;
-            for row in start.y..=end.y {
-                self.cells[row][col] += 1;
-                col = (col as i64 + col_offset) as usize;
+                let mut col = start.x;
+                for row in start.y..=end.y {
+                    self.cells[row][col] += 1;
+                    col = (col as i64 + col_offset) as usize;
+                }
             }
         }
     }
@@ -144,7 +152,7 @@ fn parse_input(input: &str) -> Vec<Line> {
     let mut coords = Vec::new();
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
@@ -195,7 +203,7 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let coords = parse_input(&TEST_INPUT);
+        let coords = parse_input(TEST_INPUT);
 
         assert_eq!(coords.len(), 10);
         assert_eq!(
@@ -231,7 +239,7 @@ mod tests {
     #[test]
     fn test_answer() {
         let mut map = Map::new(10);
-        let coords = parse_input(&TEST_INPUT);
+        let coords = parse_input(TEST_INPUT);
 
         for l in &coords {
             map.draw_line(l);

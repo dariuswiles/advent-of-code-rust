@@ -60,7 +60,7 @@ impl SeatingGrid {
         let mut grid = Vec::new();
 
         for line in input.lines() {
-            if line.len() == 0 {
+            if line.is_empty() {
                 continue;
             }
 
@@ -88,31 +88,18 @@ impl SeatingGrid {
 
     /// Returns how many of the 8 seats adjacent to the given seat are occupied.
     fn occupied_adjacent_seats(&self, row: usize, col: usize) -> u32 {
-        let top;
-        let bottom;
-        let left;
-        let right;
-
-        if row > 0 {
-            top = row - 1;
+        let top = if row > 0 { row - 1 } else { row };
+        let left = if col > 0 { col - 1 } else { col };
+        let bottom = if row < self.seats.len() - 1 {
+            row + 1
         } else {
-            top = row
-        }
-        if col > 0 {
-            left = col - 1;
+            row
+        };
+        let right = if col < self.seats[0].len() - 1 {
+            col + 1
         } else {
-            left = col
-        }
-        if row < self.seats.len() - 1 {
-            bottom = row + 1;
-        } else {
-            bottom = row
-        }
-        if col < self.seats[0].len() - 1 {
-            right = col + 1;
-        } else {
-            right = col
-        }
+            col
+        };
 
         let mut occupied_total = 0;
         for r in top..=bottom {
@@ -274,7 +261,7 @@ L.#.L..#..
 
     #[test]
     fn test_0() {
-        let sg = SeatingGrid::from_str(&TEST_INPUT_0);
+        let sg = SeatingGrid::from_str(TEST_INPUT_0);
 
         assert_eq!(sg.seats[0][0], Cell::Seat(SeatState::Empty));
         assert_eq!(sg.seats[0][4], Cell::Floor);
@@ -283,47 +270,47 @@ L.#.L..#..
 
     #[test]
     fn test_1() {
-        let sg = SeatingGrid::from_str(&TEST_INPUT_0);
+        let sg = SeatingGrid::from_str(TEST_INPUT_0);
         let sg_round_1 = sg.apply_rules_once();
 
-        let sg_expected_1 = SeatingGrid::from_str(&TEST_INPUT_1);
+        let sg_expected_1 = SeatingGrid::from_str(TEST_INPUT_1);
         assert_eq!(&sg_round_1, &sg_expected_1);
     }
 
     #[test]
     fn test_2() {
-        let sg = SeatingGrid::from_str(&TEST_INPUT_0);
+        let sg = SeatingGrid::from_str(TEST_INPUT_0);
         let sg_round_2 = sg.apply_rules_once().apply_rules_once();
 
-        let sg_expected_2 = SeatingGrid::from_str(&TEST_INPUT_2);
+        let sg_expected_2 = SeatingGrid::from_str(TEST_INPUT_2);
         assert_eq!(&sg_round_2, &sg_expected_2);
     }
 
     #[test]
     fn test_3() {
-        let sg = SeatingGrid::from_str(&TEST_INPUT_0);
+        let sg = SeatingGrid::from_str(TEST_INPUT_0);
         let sg_round_3 = sg.apply_rules_once().apply_rules_once().apply_rules_once();
 
-        let sg_expected_3 = SeatingGrid::from_str(&TEST_INPUT_3);
+        let sg_expected_3 = SeatingGrid::from_str(TEST_INPUT_3);
         assert_eq!(&sg_round_3, &sg_expected_3);
     }
 
     #[test]
     fn test_4() {
-        let sg = SeatingGrid::from_str(&TEST_INPUT_0);
+        let sg = SeatingGrid::from_str(TEST_INPUT_0);
         let sg_round_4 = sg
             .apply_rules_once()
             .apply_rules_once()
             .apply_rules_once()
             .apply_rules_once();
 
-        let sg_expected_4 = SeatingGrid::from_str(&TEST_INPUT_4);
+        let sg_expected_4 = SeatingGrid::from_str(TEST_INPUT_4);
         assert_eq!(&sg_round_4, &sg_expected_4);
     }
 
     #[test]
     fn test_5() {
-        let sg = SeatingGrid::from_str(&TEST_INPUT_0);
+        let sg = SeatingGrid::from_str(TEST_INPUT_0);
         let sg_round_5 = sg
             .apply_rules_once()
             .apply_rules_once()
@@ -331,13 +318,13 @@ L.#.L..#..
             .apply_rules_once()
             .apply_rules_once();
 
-        let sg_expected_5 = SeatingGrid::from_str(&TEST_INPUT_5);
+        let sg_expected_5 = SeatingGrid::from_str(TEST_INPUT_5);
         assert_eq!(&sg_round_5, &sg_expected_5);
     }
 
     #[test]
     fn test_challenge() {
-        let mut sg = SeatingGrid::from_str(&TEST_INPUT_0);
+        let mut sg = SeatingGrid::from_str(TEST_INPUT_0);
         let sg_challenge = sg.apply_rules_until_stable();
 
         assert_eq!(sg_challenge, 37);
@@ -345,7 +332,7 @@ L.#.L..#..
 
     #[test]
     fn seating_grid_clone_and_eq() {
-        let sg1 = SeatingGrid::from_str(&TEST_INPUT_0);
+        let sg1 = SeatingGrid::from_str(TEST_INPUT_0);
         let sg2 = sg1.clone();
 
         assert_eq!(&sg1, &sg2);
@@ -353,7 +340,7 @@ L.#.L..#..
 
     #[test]
     fn seating_grid_clone_and_ne() {
-        let sg1 = SeatingGrid::from_str(&TEST_INPUT_0);
+        let sg1 = SeatingGrid::from_str(TEST_INPUT_0);
         let mut sg2 = sg1.clone();
 
         sg2.seats[2][2] = Cell::Seat(SeatState::Occupied);
@@ -362,7 +349,7 @@ L.#.L..#..
 
     #[test]
     fn seating_grid_count_occupied() {
-        let sg = SeatingGrid::from_str(&TEST_INPUT_3);
+        let sg = SeatingGrid::from_str(TEST_INPUT_3);
 
         assert_eq!(sg.occupied_adjacent_seats(1, 6), 2);
         assert_eq!(sg.occupied_adjacent_seats(5, 9), 1);
@@ -372,31 +359,31 @@ L.#.L..#..
 
     #[test]
     fn test_count_occupied_seats_0() {
-        let sg = SeatingGrid::from_str(&TEST_INPUT_0);
+        let sg = SeatingGrid::from_str(TEST_INPUT_0);
         assert_eq!(sg.count_occupied_seats(), 0);
     }
 
     #[test]
     fn test_count_occupied_seats_1() {
-        let sg = SeatingGrid::from_str(&TEST_INPUT_1);
+        let sg = SeatingGrid::from_str(TEST_INPUT_1);
         assert_eq!(sg.count_occupied_seats(), 71);
     }
 
     #[test]
     fn test_count_occupied_seats_2() {
-        let sg = SeatingGrid::from_str(&TEST_INPUT_2);
+        let sg = SeatingGrid::from_str(TEST_INPUT_2);
         assert_eq!(sg.count_occupied_seats(), 20);
     }
 
     #[test]
     fn test_count_occupied_seats_3() {
-        let sg = SeatingGrid::from_str(&TEST_INPUT_3);
+        let sg = SeatingGrid::from_str(TEST_INPUT_3);
         assert_eq!(sg.count_occupied_seats(), 51);
     }
 
     #[test]
     fn test_count_occupied_seats_4() {
-        let sg = SeatingGrid::from_str(&TEST_INPUT_4);
+        let sg = SeatingGrid::from_str(TEST_INPUT_4);
         assert_eq!(sg.count_occupied_seats(), 30);
     }
 }

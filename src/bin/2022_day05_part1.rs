@@ -38,7 +38,7 @@ impl Stacks {
         let mut rows = Vec::new();
 
         for line in input.lines() {
-            if line == "" {
+            if line.is_empty() {
                 break;
             }
 
@@ -60,7 +60,7 @@ impl Stacks {
                 }
             }
 
-            if row.len() > 0 {
+            if !row.is_empty() {
                 rows.push(row);
             }
         }
@@ -149,11 +149,11 @@ impl Move {
         let mut tokens = input.split(" ");
 
         assert_eq!(tokens.next(), Some("move"));
-        let num_crates = usize::from_str_radix(tokens.next().unwrap(), 10).unwrap();
+        let num_crates = tokens.next().unwrap().parse().unwrap();
         assert_eq!(tokens.next(), Some("from"));
-        let from_stack = usize::from_str_radix(tokens.next().unwrap(), 10).unwrap();
+        let from_stack = tokens.next().unwrap().parse().unwrap();
         assert_eq!(tokens.next(), Some("to"));
-        let to_stack = usize::from_str_radix(tokens.next().unwrap(), 10).unwrap();
+        let to_stack = tokens.next().unwrap().parse().unwrap();
 
         Self {
             num_crates,
@@ -167,7 +167,7 @@ impl Move {
 fn parse_moves(input: &str) -> Vec<Move> {
     let mut moves = Vec::new();
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             moves.push(Move::new(line));
         }
     }
@@ -190,7 +190,7 @@ fn parse_input(input: &str) -> (Stacks, Vec<Move>) {
 /// passed.
 fn make_moves(stacks: &mut Stacks, moves: &Vec<Move>) {
     for m in moves {
-        stacks.move_crates(&m);
+        stacks.move_crates(m);
     }
 }
 
@@ -221,7 +221,7 @@ mod tests {
 
     #[test]
     fn test_input_parsing() {
-        let stacks = Stacks::new(&TEST_INPUT);
+        let stacks = Stacks::new(TEST_INPUT);
 
         assert_eq!(
             stacks,
@@ -283,7 +283,7 @@ mod tests {
 
     #[test]
     fn test_parse_input() {
-        let (stacks, moves) = parse_input(&TEST_INPUT);
+        let (stacks, moves) = parse_input(TEST_INPUT);
 
         assert_eq!(
             stacks,
@@ -320,7 +320,7 @@ mod tests {
 
     #[test]
     fn test_move_crate() {
-        let (mut stacks, _moves) = parse_input(&TEST_INPUT);
+        let (mut stacks, _moves) = parse_input(TEST_INPUT);
 
         stacks.move_crate(1, 3);
         stacks.move_crate(1, 3);
@@ -345,7 +345,7 @@ mod tests {
 
     #[test]
     fn test_move_crates() {
-        let (mut stacks, _moves) = parse_input(&TEST_INPUT);
+        let (mut stacks, _moves) = parse_input(TEST_INPUT);
 
         stacks.move_crates(&Move {
             num_crates: 2,
@@ -384,7 +384,7 @@ mod tests {
 
     #[test]
     fn test_make_moves() {
-        let (mut stacks, moves) = parse_input(&TEST_INPUT);
+        let (mut stacks, moves) = parse_input(TEST_INPUT);
         make_moves(&mut stacks, &moves);
         assert_eq!(
             stacks,
@@ -396,7 +396,7 @@ mod tests {
 
     #[test]
     fn test_top_crates_to_string() {
-        let (mut stacks, moves) = parse_input(&TEST_INPUT);
+        let (mut stacks, moves) = parse_input(TEST_INPUT);
         make_moves(&mut stacks, &moves);
         assert_eq!(stacks.top_crates_to_string(), "CMZ");
     }

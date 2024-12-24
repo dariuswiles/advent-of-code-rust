@@ -13,16 +13,16 @@ use std::fs;
 const INPUT_FILENAME: &str = "2021_day08_input.txt";
 
 const SEGMENT_PATTERNS: [&str; 10] = [
-    &"abcefg",  // Digit 0,  6 segments
-    &"cf",      // Digit 1,  2 segments
-    &"acdeg",   // Digit 2,  5 segments
-    &"acdfg",   // Digit 3,  5 segments
-    &"bcdf",    // Digit 4,  4 segments
-    &"abdfg",   // Digit 5,  5 segments
-    &"abdefg",  // Digit 6,  6 segments
-    &"acf",     // Digit 7,  3 segments
-    &"abcdefg", // Digit 8,  7 segments
-    &"abcdfg",  // Digit 9,  6 segments
+    "abcefg",  // Digit 0,  6 segments
+    "cf",      // Digit 1,  2 segments
+    "acdeg",   // Digit 2,  5 segments
+    "acdfg",   // Digit 3,  5 segments
+    "bcdf",    // Digit 4,  4 segments
+    "abdfg",   // Digit 5,  5 segments
+    "abdefg",  // Digit 6,  6 segments
+    "acf",     // Digit 7,  3 segments
+    "abcdefg", // Digit 8,  7 segments
+    "abcdfg",  // Digit 9,  6 segments
 ];
 
 #[derive(Debug, PartialEq)]
@@ -35,7 +35,7 @@ impl ActiveWireSet {
         let mut wires = HashSet::new();
 
         for c in input.chars() {
-            wires.insert(c.clone());
+            wires.insert(c);
         }
         Self { wires }
     }
@@ -53,7 +53,7 @@ fn parse_input(input: &str) -> Vec<(Vec<ActiveWireSet>, Vec<ActiveWireSet>)> {
     let mut output = Vec::new();
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
@@ -62,19 +62,13 @@ fn parse_input(input: &str) -> Vec<(Vec<ActiveWireSet>, Vec<ActiveWireSet>)> {
             panic!("Malformed input in: {}", line);
         }
 
-        let left: Vec<ActiveWireSet> = left_right[0]
-            .split(' ')
-            .map(|s| ActiveWireSet::new(s))
-            .collect();
+        let left: Vec<ActiveWireSet> = left_right[0].split(' ').map(ActiveWireSet::new).collect();
 
         if left.len() != 10 {
             panic!("Malformed input with left segments in: {}", line);
         }
 
-        let right: Vec<ActiveWireSet> = left_right[1]
-            .split(' ')
-            .map(|s| ActiveWireSet::new(s))
-            .collect();
+        let right: Vec<ActiveWireSet> = left_right[1].split(' ').map(ActiveWireSet::new).collect();
 
         if right.len() != 4 {
             panic!("Malformed input with right segments in: {}", line);
@@ -325,39 +319,34 @@ fn deduce_all_wires(wire_sets: &Vec<ActiveWireSet>) -> HashMap<char, char> {
     }
 
     let mut s2w = HashMap::new(); // Key is segment, value is wire
-    s2w.insert('a', deduce_wire_a(&two_active, &three_active));
+    s2w.insert('a', deduce_wire_a(two_active, three_active));
     s2w.insert(
         'd',
-        deduce_wire_d(
-            &four_active,
-            &five_active[0],
-            &five_active[1],
-            &five_active[2],
-        ),
+        deduce_wire_d(four_active, five_active[0], five_active[1], five_active[2]),
     );
     s2w.insert(
         'g',
         deduce_wire_g(
-            &five_active[0],
-            &five_active[1],
-            &five_active[2],
+            five_active[0],
+            five_active[1],
+            five_active[2],
             &s2w[&'a'],
             &s2w[&'d'],
         ),
     );
-    s2w.insert('b', deduce_wire_b(&two_active, &four_active, &s2w[&'d']));
+    s2w.insert('b', deduce_wire_b(two_active, four_active, &s2w[&'d']));
     s2w.insert(
         'f',
         deduce_wire_f(
-            &six_active[0],
-            &six_active[1],
-            &six_active[2],
+            six_active[0],
+            six_active[1],
+            six_active[2],
             &s2w[&'a'],
             &s2w[&'b'],
             &s2w[&'g'],
         ),
     );
-    s2w.insert('c', deduce_wire_c(&two_active, &s2w[&'f']));
+    s2w.insert('c', deduce_wire_c(two_active, &s2w[&'f']));
     s2w.insert(
         'e',
         deduce_wire_e(
@@ -416,7 +405,7 @@ fn wire_set_to_digit(map: &HashMap<char, char>, wire_set: &ActiveWireSet) -> u8 
 
     SEGMENT_PATTERNS
         .iter()
-        .position(|sp| sp == &&segments)
+        .position(|sp| sp == &segments)
         .unwrap() as u8
 }
 
@@ -430,7 +419,7 @@ fn sum_all_output_digits(wire_sets: &Vec<(Vec<ActiveWireSet>, Vec<ActiveWireSet>
 
         let mut subtotal = 0;
         for output in &ws.1 {
-            subtotal = subtotal * 10 + wire_set_to_digit(&map, &output) as u64;
+            subtotal = subtotal * 10 + wire_set_to_digit(&map, output) as u64;
         }
 
         total += subtotal;
@@ -471,7 +460,7 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
     #[test]
     fn parse_test_input() {
-        let wire_sets = parse_input(&TEST_INPUT);
+        let wire_sets = parse_input(TEST_INPUT);
 
         assert_eq!(wire_sets[0].0[0], ActiveWireSet::new("be"));
         assert_eq!(wire_sets[0].0[4], ActiveWireSet::new("cgeb"));
@@ -551,7 +540,7 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
     #[test]
     fn test_deduce_all_wires() {
-        let wire_sets = parse_input(&TEST_INPUT);
+        let wire_sets = parse_input(TEST_INPUT);
         let result = deduce_all_wires(&wire_sets[0].0);
 
         let mut expected = HashMap::new();
@@ -568,7 +557,7 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
     #[test]
     fn test_wire_set_to_segment_set() {
-        let wire_sets = parse_input(&TEST_INPUT);
+        let wire_sets = parse_input(TEST_INPUT);
         let map = deduce_all_wires(&wire_sets[0].0);
 
         assert_eq!(wire_set_to_segment_set(&map, &wire_sets[0].1[0]), "abcdefg");
@@ -579,7 +568,7 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
     #[test]
     fn test_wire_set_to_digit_one_liner() {
-        let wire_sets = parse_input(&TEST_INPUT_ONE_LINE);
+        let wire_sets = parse_input(TEST_INPUT_ONE_LINE);
         let map = deduce_all_wires(&wire_sets[0].0);
 
         assert_eq!(wire_set_to_digit(&map, &wire_sets[0].1[0]), 5);
@@ -590,7 +579,7 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
     #[test]
     fn test_wire_set_to_digit() {
-        let wire_sets = parse_input(&TEST_INPUT);
+        let wire_sets = parse_input(TEST_INPUT);
         let map = deduce_all_wires(&wire_sets[0].0);
 
         assert_eq!(wire_set_to_digit(&map, &wire_sets[0].1[0]), 8);
@@ -601,7 +590,7 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
     #[test]
     fn challenge_answer() {
-        let wire_sets = parse_input(&TEST_INPUT);
+        let wire_sets = parse_input(TEST_INPUT);
 
         assert_eq!(sum_all_output_digits(&wire_sets), 61229);
     }

@@ -24,7 +24,7 @@ impl HeightMap {
         let mut line_length = None;
 
         for line in input.lines() {
-            if line == "" {
+            if line.is_empty() {
                 continue;
             }
 
@@ -51,28 +51,20 @@ impl HeightMap {
     fn is_lowest(&self, row: usize, col: usize) -> Option<CellData> {
         let value = self.cells[row][col];
 
-        if col > 0 {
-            if value >= self.cells[row][col - 1] {
-                return None;
-            }
+        if col > 0 && value >= self.cells[row][col - 1] {
+            return None;
         }
 
-        if col < self.cells[row].len() - 1 {
-            if value >= self.cells[row][col + 1] {
-                return None;
-            }
+        if col < self.cells[row].len() - 1 && value >= self.cells[row][col + 1] {
+            return None;
         }
 
-        if row > 0 {
-            if value >= self.cells[row - 1][col] {
-                return None;
-            }
+        if row > 0 && value >= self.cells[row - 1][col] {
+            return None;
         }
 
-        if row < self.cells.len() - 1 {
-            if value >= self.cells[row + 1][col] {
-                return None;
-            }
+        if row < self.cells.len() - 1 && value >= self.cells[row + 1][col] {
+            return None;
         }
 
         Some(value)
@@ -96,7 +88,7 @@ impl HeightMap {
 
 /// Returns the total risk by summing the value of low point, plus one, as per the challenge
 /// instructions.
-fn calculate_risk(low_points: &Vec<CellData>) -> u32 {
+fn calculate_risk(low_points: &[CellData]) -> u32 {
     low_points.iter().fold(0, |acc, &i| acc + (i as u32) + 1)
 }
 
@@ -131,7 +123,7 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let hm = HeightMap::new(&TEST_INPUT);
+        let hm = HeightMap::new(TEST_INPUT);
 
         assert_eq!(hm.cells.len(), 5);
         assert_eq!(hm.cells[0].len(), 10);
@@ -139,7 +131,7 @@ mod tests {
 
     #[test]
     fn test_find_low_points() {
-        let hm = HeightMap::new(&TEST_INPUT);
+        let hm = HeightMap::new(TEST_INPUT);
         let mut low_points = hm.find_low_points();
 
         assert_eq!(low_points.len(), 4);
@@ -150,13 +142,13 @@ mod tests {
 
     #[test]
     fn test_calculate_risk() {
-        let hm = HeightMap::new(&TEST_INPUT);
+        let hm = HeightMap::new(TEST_INPUT);
         assert_eq!(calculate_risk(&hm.find_low_points()), 15);
     }
 
     #[test]
     #[should_panic]
     fn different_line_lengths() {
-        let _ = HeightMap::new(&TEST_INPUT_BAD_LENGTH);
+        let _ = HeightMap::new(TEST_INPUT_BAD_LENGTH);
     }
 }

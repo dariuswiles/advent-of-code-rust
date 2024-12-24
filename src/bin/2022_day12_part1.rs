@@ -55,7 +55,7 @@ impl Heightmap {
 
         let mut height = 0;
         for line in input.lines() {
-            if line != "" {
+            if !line.is_empty() {
                 let mut row: Vec<char> = line.chars().collect();
 
                 if let Some(start_column) = row.iter().position(|&c| c == 'S') {
@@ -87,7 +87,7 @@ impl Heightmap {
         );
 
         assert!(
-            map.iter().all(|c| ('a'..='z').contains(c)),
+            map.iter().all(|c| c.is_ascii_lowercase()),
             "Error: invalid character found in input"
         );
 
@@ -203,7 +203,7 @@ fn find_shortest_path(fm: &FlatMap) -> usize {
     // starting point for the shortest path search.
     visited_last_turn.insert(fm.start);
 
-    while visited_last_turn.get(&fm.end).is_none() {
+    while !visited_last_turn.contains(&fm.end) {
         turn += 1;
         let mut visited_this_turn = HashSet::new();
 
@@ -288,7 +288,7 @@ abdefghi
 
     #[test]
     fn test_create_heightmap() {
-        let hm = Heightmap::from_str(&TEST_INPUT);
+        let hm = Heightmap::from_str(TEST_INPUT);
 
         assert_eq!(
             hm,
@@ -304,7 +304,7 @@ abdefghi
 
     #[test]
     fn test_heightmap_display() {
-        let hm = Heightmap::from_str(&TEST_INPUT);
+        let hm = Heightmap::from_str(TEST_INPUT);
 
         assert_eq!(
             hm.to_string(),
@@ -314,7 +314,7 @@ abdefghi
 
     #[test]
     fn test_create_flatmap() {
-        let hm = Heightmap::from_str(&TEST_INPUT);
+        let hm = Heightmap::from_str(TEST_INPUT);
 
         assert_eq!(
             FlatMap::new(&hm),
@@ -576,7 +576,7 @@ abdefghi
 
     #[test]
     fn test_find_shortest_path() {
-        let hm = Heightmap::from_str(&TEST_INPUT);
+        let hm = Heightmap::from_str(TEST_INPUT);
         let fm = FlatMap::new(&hm);
 
         assert_eq!(find_shortest_path(&fm), 31);

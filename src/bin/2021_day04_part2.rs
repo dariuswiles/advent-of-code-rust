@@ -107,10 +107,7 @@ impl Board {
 fn parse_called_numbers(input: &str) -> Vec<BingoNum> {
     let mut called_numbers = Vec::new();
 
-    for num in input
-        .split(',')
-        .map(|i| BingoNum::from_str_radix(i, 10).unwrap())
-    {
+    for num in input.split(',').map(|i| i.parse().unwrap()) {
         called_numbers.push(num);
     }
 
@@ -129,7 +126,7 @@ fn parse_input(input: &str) -> (Vec<BingoNum>, Vec<Board>) {
     let mut line_idx = 1;
 
     while line_idx < lines_len {
-        if lines[line_idx].len() != 0 {
+        if !lines[line_idx].is_empty() {
             panic!("Malformed input. Each board must be preceded by a blank line.");
         }
         line_idx += 1;
@@ -146,7 +143,7 @@ fn parse_input(input: &str) -> (Vec<BingoNum>, Vec<Board>) {
 }
 
 /// Marks `called_num` on all `boards` passed and returns a vec of winning boards.
-fn mark_all_boards(boards: &mut Vec<Board>, called_num: BingoNum) -> Vec<usize> {
+fn mark_all_boards(boards: &mut [Board], called_num: BingoNum) -> Vec<usize> {
     let mut winners = Vec::new();
     for (idx, b) in boards.iter_mut().enumerate() {
         if b.mark_number(called_num) {
@@ -227,7 +224,7 @@ mod tests {
         ];
 
         let mut input = TEST_INPUT.lines();
-        assert_eq!(parse_called_numbers(&mut input.next().unwrap()), expected);
+        assert_eq!(parse_called_numbers(input.next().unwrap()), expected);
     }
 
     #[test]
@@ -256,7 +253,7 @@ mod tests {
             3, 26, 1,
         ];
 
-        let (called_numbers, boards) = parse_input(&TEST_INPUT);
+        let (called_numbers, boards) = parse_input(TEST_INPUT);
 
         assert_eq!(called_numbers, expected_called_numbers);
         assert_eq!(boards.len(), 3);
@@ -267,18 +264,18 @@ mod tests {
 
     #[test]
     fn test_mark_board() {
-        let (_, mut boards) = parse_input(&TEST_INPUT);
+        let (_, mut boards) = parse_input(TEST_INPUT);
 
-        assert_eq!(boards[0].mark_number(17), false);
-        assert_eq!(boards[0].mark_number(3), false);
-        assert_eq!(boards[0].mark_number(14), false);
-        assert_eq!(boards[0].mark_number(20), false);
-        assert_eq!(boards[0].mark_number(23), true);
+        assert!(!boards[0].mark_number(17));
+        assert!(!boards[0].mark_number(3));
+        assert!(!boards[0].mark_number(14));
+        assert!(!boards[0].mark_number(20));
+        assert!(boards[0].mark_number(23));
     }
 
     #[test]
     fn challenge_answer() {
-        let (called_numbers, mut boards) = parse_input(&TEST_INPUT);
+        let (called_numbers, mut boards) = parse_input(TEST_INPUT);
         assert_eq!(mark_numbers_until_win(called_numbers, &mut boards), 1924);
     }
 }

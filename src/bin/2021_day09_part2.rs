@@ -33,7 +33,7 @@ impl HeightMap {
         let mut line_length = None;
 
         for line in input.lines() {
-            if line == "" {
+            if line.is_empty() {
                 continue;
             }
 
@@ -60,28 +60,20 @@ impl HeightMap {
     fn is_lowest(&self, row: usize, col: usize) -> bool {
         let value = self.cells[row][col];
 
-        if col > 0 {
-            if value >= self.cells[row][col - 1] {
-                return false;
-            }
+        if col > 0 && value >= self.cells[row][col - 1] {
+            return false;
         }
 
-        if col < self.cells[row].len() - 1 {
-            if value >= self.cells[row][col + 1] {
-                return false;
-            }
+        if col < self.cells[row].len() - 1 && value >= self.cells[row][col + 1] {
+            return false;
         }
 
-        if row > 0 {
-            if value >= self.cells[row - 1][col] {
-                return false;
-            }
+        if row > 0 && value >= self.cells[row - 1][col] {
+            return false;
         }
 
-        if row < self.cells.len() - 1 {
-            if value >= self.cells[row + 1][col] {
-                return false;
-            }
+        if row < self.cells.len() - 1 && value >= self.cells[row + 1][col] {
+            return false;
         }
 
         true
@@ -186,7 +178,7 @@ fn main() {
 
     println!(
         "The answer to the challenge is {}",
-        biggest_basins.iter().fold(1, |acc, bb| acc * bb)
+        biggest_basins.iter().product::<u32>()
     );
 }
 
@@ -211,7 +203,7 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let hm = HeightMap::new(&TEST_INPUT);
+        let hm = HeightMap::new(TEST_INPUT);
 
         assert_eq!(hm.cells.len(), 5);
         assert_eq!(hm.cells[0].len(), 10);
@@ -219,7 +211,7 @@ mod tests {
 
     #[test]
     fn test_find_low_points() {
-        let hm = HeightMap::new(&TEST_INPUT);
+        let hm = HeightMap::new(TEST_INPUT);
         let mut low_points = hm.find_low_points();
 
         assert_eq!(low_points.len(), 4);
@@ -230,7 +222,7 @@ mod tests {
 
     #[test]
     fn test_basin_size() {
-        let hm = HeightMap::new(&TEST_INPUT);
+        let hm = HeightMap::new(TEST_INPUT);
 
         assert_eq!(hm.basin_size(0, 1), 3);
         assert_eq!(hm.basin_size(0, 9), 9);
@@ -240,16 +232,16 @@ mod tests {
 
     #[test]
     fn challenge_answer() {
-        let hm = HeightMap::new(&TEST_INPUT);
+        let hm = HeightMap::new(TEST_INPUT);
         let basin_sizes = hm.all_basin_sizes();
         let biggest_basins = &basin_sizes[..3];
 
-        assert_eq!(biggest_basins.iter().fold(1, |acc, bb| acc * bb), 1134);
+        assert_eq!(biggest_basins.iter().product::<u32>(), 1134);
     }
 
     #[test]
     #[should_panic]
     fn different_line_lengths() {
-        let _ = HeightMap::new(&TEST_INPUT_BAD_LENGTH);
+        let _ = HeightMap::new(TEST_INPUT_BAD_LENGTH);
     }
 }

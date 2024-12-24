@@ -57,7 +57,7 @@ fn parse_input(input: &str) -> Vec<(Shape, Shape)> {
     let mut moves = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             assert_eq!(line.len(), 3);
 
             let mut chars = line.chars();

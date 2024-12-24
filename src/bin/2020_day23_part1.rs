@@ -43,8 +43,8 @@ impl Game {
         let mut destination_id = value_at_current_cup_index - 1;
         let mut picked_up_cups = remove_three(&mut self.cups, self.current_cup_index + 1);
 
-        while (picked_up_cups.contains(&destination_id)) || (destination_id <= 0) {
-            if destination_id <= 0 {
+        while (picked_up_cups.contains(&destination_id)) || (destination_id == 0) {
+            if destination_id == 0 {
                 destination_id = *self.cups.iter().max().unwrap();
             } else {
                 destination_id -= 1;
@@ -107,7 +107,7 @@ fn remove_three<T>(v: &mut Vec<T>, position: usize) -> Vec<T> {
 
     let mut pos = position;
     if position < (v.len() - 3) {
-        return v.splice(pos..pos + 3, iter::empty()).collect::<Vec<T>>();
+        v.splice(pos..pos + 3, iter::empty()).collect::<Vec<T>>()
     } else {
         let mut result = Vec::new();
 
@@ -118,7 +118,7 @@ fn remove_three<T>(v: &mut Vec<T>, position: usize) -> Vec<T> {
         pos %= v.len();
         result.push(v.remove(pos));
 
-        return result;
+        result
     }
 }
 
@@ -135,7 +135,7 @@ fn insert_three<T: Clone>(v: &mut Vec<T>, position: usize, elements: &mut Vec<T>
         v.append(elements);
     } else {
         let p = position + 1;
-        v.splice(p..p, elements.iter().cloned().collect::<Vec<T>>());
+        v.splice(p..p, elements.to_vec());
     }
 }
 
@@ -157,7 +157,7 @@ mod tests {
 
     #[test]
     fn test_load_game() {
-        let game = Game::load_game(&TEST_INPUT);
+        let game = Game::load_game(TEST_INPUT);
 
         let expected = Game {
             cups: vec![3, 8, 9, 1, 2, 5, 4, 6, 7],
@@ -216,7 +216,7 @@ mod tests {
 
     #[test]
     fn test_one_move() {
-        let mut game = Game::load_game(&TEST_INPUT);
+        let mut game = Game::load_game(TEST_INPUT);
 
         game.perform_one_move();
         assert_eq!(
@@ -302,7 +302,7 @@ mod tests {
 
     #[test]
     fn test_play_game() {
-        let mut game = Game::load_game(&TEST_INPUT);
+        let mut game = Game::load_game(TEST_INPUT);
 
         game.play_game(GAME_ROUNDS);
         assert_eq!("67384529", game.get_challenge_answer());

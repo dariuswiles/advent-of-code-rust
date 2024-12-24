@@ -32,7 +32,7 @@ impl Program {
         for line in code.lines() {
             // println!("Parsing line: {}", &line);
 
-            if line == "" {
+            if line.is_empty() {
                 println!("\tSkipping blank line");
                 continue;
             }
@@ -64,9 +64,7 @@ impl Program {
             }
         }
 
-        Self {
-            instructions: instructions,
-        }
+        Self { instructions }
     }
 
     /// Executes given instruction and updates the accumulator `acc`, if necessary. Returns the
@@ -111,6 +109,7 @@ impl Program {
             // println!("After executing instruction, `ip`={} and `acc`={}\n", ip, acc);
         }
 
+        #[allow(clippy::needless_range_loop)]
         for line in 0..program_length {
             if !initial_run[line] {
                 // println!("\nNot modifying line {} because it is never run", line);
@@ -191,7 +190,7 @@ acc +6
 
     #[test]
     fn test_program() {
-        let program = Program::parse_program(&TEST_PROGRAM);
+        let program = Program::parse_program(TEST_PROGRAM);
         println!("{:#?}", program);
 
         let result = program.correct_and_run_program();

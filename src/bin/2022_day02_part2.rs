@@ -59,7 +59,7 @@ fn parse_input(input: &str) -> Vec<(Shape, GameResult)> {
     let mut moves = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             assert_eq!(line.len(), 3);
 
             let mut chars = line.chars();
@@ -86,31 +86,17 @@ fn parse_input(input: &str) -> Vec<(Shape, GameResult)> {
 fn choose_response(opponent_move: Shape, desired_outcome: GameResult) -> Shape {
     match desired_outcome {
         GameResult::Lose => match opponent_move {
-            Shape::Rock => {
-                return Shape::Scissors;
-            }
-            Shape::Paper => {
-                return Shape::Rock;
-            }
-            Shape::Scissors => {
-                return Shape::Paper;
-            }
+            Shape::Rock => Shape::Scissors,
+            Shape::Paper => Shape::Rock,
+            Shape::Scissors => Shape::Paper,
         },
 
-        GameResult::Draw => {
-            return opponent_move;
-        }
+        GameResult::Draw => opponent_move,
 
         GameResult::Win => match opponent_move {
-            Shape::Rock => {
-                return Shape::Paper;
-            }
-            Shape::Paper => {
-                return Shape::Scissors;
-            }
-            Shape::Scissors => {
-                return Shape::Rock;
-            }
+            Shape::Rock => Shape::Paper,
+            Shape::Paper => Shape::Scissors,
+            Shape::Scissors => Shape::Rock,
         },
     }
 }

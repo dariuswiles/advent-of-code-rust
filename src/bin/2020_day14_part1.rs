@@ -80,7 +80,7 @@ fn execute_input(input: &str) -> HashMap<u32, u64> {
     let mut memory = HashMap::new();
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
@@ -90,9 +90,9 @@ fn execute_input(input: &str) -> HashMap<u32, u64> {
         }
 
         if token[0].starts_with("mask") {
-            mask = Bitmask::from_str(&line.strip_prefix("mask = ").unwrap());
+            mask = Bitmask::from_str(line.strip_prefix("mask = ").unwrap());
         } else if token[0].starts_with("mem") {
-            let loc_val = parse_mem_command(&token[0], &token[1]);
+            let loc_val = parse_mem_command(token[0], token[1]);
 
             let masked_val = mask.apply_bitmask(loc_val.1);
             memory.insert(loc_val.0, masked_val);
@@ -140,7 +140,7 @@ mem[8] = 0";
 
     #[test]
     fn test_execute_input() {
-        let mem = execute_input(&TEST_INPUT_0);
+        let mem = execute_input(TEST_INPUT_0);
 
         assert_eq!(mem[&7], 101);
         assert_eq!(mem[&8], 64);

@@ -26,7 +26,7 @@ fn parse_input(input: &str) -> Fish {
 
     let individual_fish = input.lines().collect::<Vec<&str>>()[0]
         .split(",")
-        .map(|i| DaysToSpawn::from_str_radix(i, 10).unwrap());
+        .map(|i| i.parse::<DaysToSpawn>().unwrap());
 
     for i in individual_fish {
         fish[i as usize] += 1;
@@ -54,7 +54,7 @@ fn run_simulation(fish: &mut Fish, days: usize) -> u64 {
         decrement_fish(fish);
     }
 
-    fish.iter().fold(0, |acc, f| acc + f)
+    fish.iter().sum::<u64>()
 }
 
 fn main() {
@@ -76,14 +76,14 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let fish = parse_input(&TEST_INPUT);
+        let fish = parse_input(TEST_INPUT);
 
         assert_eq!(fish, [0, 1, 1, 2, 1, 0, 0, 0, 0]);
     }
 
     #[test]
     fn test_two_decrements() {
-        let mut fish = parse_input(&TEST_INPUT);
+        let mut fish = parse_input(TEST_INPUT);
 
         decrement_fish(&mut fish);
         assert_eq!(fish, [1, 1, 2, 1, 0, 0, 0, 0, 0]);
@@ -94,7 +94,7 @@ mod tests {
 
     #[test]
     fn test_18_decrements() {
-        let mut fish = parse_input(&TEST_INPUT);
+        let mut fish = parse_input(TEST_INPUT);
 
         for _ in 0..18 {
             decrement_fish(&mut fish);
@@ -105,7 +105,7 @@ mod tests {
 
     #[test]
     fn challenge_answer() {
-        let mut fish = parse_input(&TEST_INPUT);
+        let mut fish = parse_input(TEST_INPUT);
 
         assert_eq!(
             run_simulation(&mut fish, CHALLENGE_DAYS as usize),

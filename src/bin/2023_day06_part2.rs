@@ -37,8 +37,8 @@ impl Race {
     /// Panics if the input is malformed.
     fn from_str(s: &str) -> Self {
         let mut lines = s.lines();
-        let time = parse_time(&lines.next().unwrap());
-        let distance = parse_distance(&lines.next().unwrap());
+        let time = parse_time(lines.next().unwrap());
+        let distance = parse_distance(lines.next().unwrap());
 
         Self { time, distance }
     }
@@ -89,7 +89,7 @@ fn parse_time(time: &str) -> u64 {
         .expect("The first line of input must begin with 'Time: '")
         .replace(' ', "");
 
-    u64::from_str_radix(&t, 10).expect("Could not parse '{t}' as a time")
+    t.parse().expect("Could not parse '{t}' as a time")
 }
 
 /// Returns the race distance in the given string, applying the new rule in part 2 of the challenge
@@ -104,7 +104,7 @@ fn parse_distance(distance: &str) -> u64 {
         .expect("The second line of input must begin with 'Distance: '")
         .replace(' ', "");
 
-    u64::from_str_radix(&d, 10).expect("Could not parse '{t}' as a distance")
+    d.parse().expect("Could not parse '{d}' as a distance")
 }
 
 // Test data based on examples on the challenge page.
@@ -124,12 +124,12 @@ Distance:  9  40  200
                 time: 71530,
                 distance: 940200,
             },
-            Race::from_str(&TEST_INPUT)
+            Race::from_str(TEST_INPUT)
         );
     }
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(71503, do_challenge(&TEST_INPUT));
+        assert_eq!(71503, do_challenge(TEST_INPUT));
     }
 }

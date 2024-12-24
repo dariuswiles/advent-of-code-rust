@@ -58,7 +58,7 @@ impl Image {
         let mut row_num: usize = 0;
 
         for line in input.lines() {
-            if line == "" {
+            if line.is_empty() {
                 continue;
             }
 
@@ -73,12 +73,12 @@ impl Image {
             }
 
             for (col_num, pixel) in chars.iter().enumerate() {
-                match pixel {
-                    &LIGHT => {
+                match *pixel {
+                    LIGHT => {
                         light_pixels
                             .insert(Position(row_num as PositionInt, col_num as PositionInt));
                     }
-                    &DARK => {}
+                    DARK => {}
                     _ => {
                         panic!(
                             "Row {} of the image contains unknown character '{}'",
@@ -148,7 +148,7 @@ impl Image {
                     continue;
                 }
 
-                if self.light_pixels.get(&Position(r, c)).is_some() {
+                if self.light_pixels.contains(&Position(r, c)) {
                     output += 1;
                 }
             }
@@ -180,14 +180,10 @@ impl Image {
         // is also LIGHT, the outside pixels remain light for all further iterations. If its DARK,
         // outside pixels are LIGHT on odd iterations and DARK on even iterations.
         let mut outside = DARK;
-        if algo.data[0] == LIGHT {
-            if algo.data[IMAGE_ENHANCEMENT_LEN - 1] == LIGHT {
-                outside = LIGHT;
-            } else {
-                if self.enhancement_count % 2 == 1 {
-                    outside = LIGHT;
-                }
-            }
+        if algo.data[0] == LIGHT
+            && ((algo.data[IMAGE_ENHANCEMENT_LEN - 1] == LIGHT) || self.enhancement_count % 2 == 1)
+        {
+            outside = LIGHT;
         }
 
         for row in -iteration - 1..=self.initial_size as PositionInt + iteration {
@@ -216,7 +212,7 @@ impl fmt::Display for Image {
             for col in left..=right {
                 let p = Position(row, col);
 
-                if self.light_pixels.get(&p).is_some() {
+                if self.light_pixels.contains(&p) {
                     let _ = write!(f, "#");
                 } else {
                     let _ = write!(f, ".");
@@ -272,7 +268,7 @@ mod tests {
     #[test]
     fn test_enhancement_from_string() {
         let enhancement = ImageEnhancementAlgorithm::from_string(
-            &TEST_INPUT.lines().collect::<Vec<&str>>().first().unwrap(),
+            TEST_INPUT.lines().collect::<Vec<&str>>().first().unwrap(),
         );
 
         assert_eq!(enhancement.data.len(), IMAGE_ENHANCEMENT_LEN);
@@ -341,7 +337,7 @@ mod tests {
 
     #[test]
     fn test_enhance_pixel() {
-        let (enhancement, image) = parse_input(&TEST_INPUT);
+        let (enhancement, image) = parse_input(TEST_INPUT);
         let result = image.enhance_pixel(&Position(2, 2), &enhancement, DARK);
 
         assert_eq!(result, LIGHT);
@@ -349,7 +345,7 @@ mod tests {
 
     #[test]
     fn test_enhance_1() {
-        let (enhancement, image0) = parse_input(&TEST_INPUT);
+        let (enhancement, image0) = parse_input(TEST_INPUT);
         let image1 = image0.enhance(&enhancement);
 
         assert_eq!(image1.light_pixels.len(), 24);
@@ -381,7 +377,7 @@ mod tests {
 
     #[test]
     fn test_enhance_2() {
-        let (enhancement, image0) = parse_input(&TEST_INPUT);
+        let (enhancement, image0) = parse_input(TEST_INPUT);
         let image2 = image0.enhance(&enhancement).enhance(&enhancement);
 
         assert_eq!(image2.light_pixels.len(), 35);

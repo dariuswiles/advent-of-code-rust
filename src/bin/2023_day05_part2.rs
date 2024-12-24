@@ -70,11 +70,11 @@ impl DataRange {
             "Could not find exactly 3 numbers in range: {s}"
         );
 
-        let source_range_start = u64::from_str_radix(nums[1], 10).unwrap();
-        let range_length = u64::from_str_radix(nums[2], 10).unwrap();
+        let source_range_start = nums[1].parse().unwrap();
+        let range_length: u64 = nums[2].parse().unwrap();
 
         Self {
-            destination_range_start: u64::from_str_radix(nums[0], 10).unwrap(),
+            destination_range_start: nums[0].parse().unwrap(),
             source_range: source_range_start..source_range_start + range_length,
         }
     }
@@ -110,7 +110,7 @@ impl Map {
 
         match input_lines.next() {
             Some(line) => {
-                (source_type, destination_type) = parse_map_type(&line);
+                (source_type, destination_type) = parse_map_type(line);
             }
             None => {
                 return None;
@@ -120,7 +120,7 @@ impl Map {
         let mut ranges = Vec::new();
 
         for line in input_lines {
-            if line == "" {
+            if line.is_empty() {
                 break;
             }
 
@@ -210,7 +210,7 @@ fn do_challenge(input: &str) -> u64 {
 /// Panics if the input is malformed.
 fn parse_input(input: &str) -> (Vec<Range<u64>>, HashMap<DataType, Map>) {
     let mut lines = input.lines();
-    let seeds = parse_seeds(&lines.next().unwrap());
+    let seeds = parse_seeds(lines.next().unwrap());
     assert_eq!(
         Some(""),
         lines.next(),
@@ -218,15 +218,8 @@ fn parse_input(input: &str) -> (Vec<Range<u64>>, HashMap<DataType, Map>) {
     );
 
     let mut maps: HashMap<DataType, _> = HashMap::new();
-    loop {
-        match Map::from_lines(&mut lines) {
-            Some(map) => {
-                maps.insert(map.source_type, map);
-            }
-            None => {
-                break;
-            }
-        }
+    while let Some(map) = Map::from_lines(&mut lines) {
+        maps.insert(map.source_type, map);
     }
 
     (seeds, maps)
@@ -249,8 +242,8 @@ fn parse_seeds(s: &str) -> Vec<Range<u64>> {
 
     let mut result = Vec::new();
     for pair in tokens.chunks(2) {
-        let range_start = u64::from_str_radix(pair[0], 10).unwrap();
-        let range_length = u64::from_str_radix(pair[1], 10).unwrap();
+        let range_start = pair[0].parse().unwrap();
+        let range_length: u64 = pair[1].parse().unwrap();
 
         result.push(range_start..(range_start + range_length));
     }
@@ -279,9 +272,9 @@ fn parse_map_type(s: &str) -> (DataType, DataType) {
 
 /// Maps the given `Range`s of one `seed` through mappings in `maps`, from source to destination
 /// `DataType`s until the "Location" DataType is reached. Returns the resulting "Location" ranges.
-fn do_full_mapping(maps: &HashMap<DataType, Map>, seeds: &Vec<Range<u64>>) -> Vec<Range<u64>> {
+fn do_full_mapping(maps: &HashMap<DataType, Map>, seeds: &[Range<u64>]) -> Vec<Range<u64>> {
     let mut current_data_type = DataType::Seed;
-    let mut current_value = seeds.clone();
+    let mut current_value = seeds.to_vec();
 
     while let Some(map) = maps.get(&current_data_type) {
         current_value = map.convert(current_value);
@@ -312,11 +305,13 @@ fn remove_range(r1: &Range<u64>, r2: &Range<u64>) -> (Vec<Range<u64>>, Option<Ra
 
     // The lower end of `r1` overlaps `r2`
     if r1.start > r2.start {
+        #[allow(clippy::single_range_in_vec_init)]
         return (vec![r2.end..r1.end], Some(r1.start..r2.end));
     }
 
     // The upper end of `r1` overlaps `r2`
-    return (vec![r1.start..r2.start], Some(r2.start..r1.end));
+    #[allow(clippy::single_range_in_vec_init)]
+    (vec![r1.start..r2.start], Some(r2.start..r1.end))
 }
 
 // Test data based on examples on the challenge page.
@@ -440,7 +435,7 @@ seed-to-soil map:
 
     #[test]
     fn test_parse_input() {
-        let (seeds, maps) = parse_input(&TEST_INPUT);
+        let (seeds, maps) = parse_input(TEST_INPUT);
 
         assert_eq!(vec![79..93, 55..68], seeds);
 
@@ -630,13 +625,13 @@ seed-to-soil map:
 
     #[test]
     fn test_do_full_mapping() {
-        let (_, maps) = parse_input(&TEST_INPUT);
+        let (_, maps) = parse_input(TEST_INPUT);
 
         assert_eq!(vec![46..47], do_full_mapping(&maps, &vec![82..83]));
     }
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(46, do_challenge(&TEST_INPUT));
+        assert_eq!(46, do_challenge(TEST_INPUT));
     }
 }

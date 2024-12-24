@@ -57,12 +57,12 @@ fn parse_line(input: &str) -> Sensor {
 
     Sensor {
         location: Coordinate {
-            x: AxisType::from_str_radix(sensor_x, 10).unwrap(),
-            y: AxisType::from_str_radix(sensor_y, 10).unwrap(),
+            x: sensor_x.parse().unwrap(),
+            y: sensor_y.parse().unwrap(),
         },
         closest_beacon: Coordinate {
-            x: AxisType::from_str_radix(beacon_x, 10).unwrap(),
-            y: AxisType::from_str_radix(beacon_y, 10).unwrap(),
+            x: beacon_x.parse().unwrap(),
+            y: beacon_y.parse().unwrap(),
         },
     }
 }
@@ -76,11 +76,11 @@ fn parse_line(input: &str) -> Sensor {
 fn parse_lines(input: &str) -> Vec<Sensor> {
     let mut sensors = Vec::new();
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
-        sensors.push(parse_line(&line));
+        sensors.push(parse_line(line));
     }
 
     sensors

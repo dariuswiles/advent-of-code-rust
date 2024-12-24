@@ -7,6 +7,7 @@
 //! models the positions of the rope's head and tail, and outputs the number of unique positions
 //! the tail visited.
 
+use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::fs;
 
@@ -100,17 +101,17 @@ impl Rope {
             return;
         }
 
-        if rope_offset_vertical < 0 {
-            self.tail.y -= 1;
-        } else if rope_offset_vertical > 0 {
-            self.tail.y += 1;
-        }
+        self.tail.y += match rope_offset_vertical.cmp(&0) {
+            Ordering::Greater => 1,
+            Ordering::Less => -1,
+            _ => 0,
+        };
 
-        if rope_offset_horizontal < 0 {
-            self.tail.x -= 1;
-        } else if rope_offset_horizontal > 0 {
-            self.tail.x += 1;
-        }
+        self.tail.x += match rope_offset_horizontal.cmp(&0) {
+            Ordering::Greater => 1,
+            Ordering::Less => -1,
+            _ => 0,
+        };
 
         self.history.insert(self.tail.clone());
     }
@@ -126,11 +127,11 @@ fn parse_input(input: &str) -> Vec<Motion> {
     let mut motion = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             let tokens: Vec<&str> = line.split(' ').collect();
             assert_eq!(tokens.len(), 2);
 
-            let distance = Distance::from_str_radix(tokens[1], 10).unwrap();
+            let distance = tokens[1].parse().unwrap();
             match tokens[0] {
                 "D" => {
                     motion.push(Motion::Down(distance));
@@ -158,7 +159,7 @@ fn parse_input(input: &str) -> Vec<Motion> {
 /// the tail passed through.
 fn challenge_answer(motions: &Vec<Motion>) -> usize {
     let mut rope = Rope::new();
-    rope.execute_motions(&motions);
+    rope.execute_motions(motions);
 
     rope.history.len()
 }

@@ -33,7 +33,7 @@ impl PartialEq for CubeGrid {
         }
 
         for cube in &self.active_cubes {
-            if other.active_cubes.get(&cube) == None {
+            if !other.active_cubes.contains(cube) {
                 return false;
             }
         }
@@ -58,7 +58,7 @@ impl fmt::Display for CubeGrid {
             for y in active_box.0.y..=active_box.1.y {
                 let mut output = Vec::new();
                 for x in active_box.0.x..=active_box.1.x {
-                    if self.active_cubes.contains(&Position { x: x, y: y, z: z }) {
+                    if self.active_cubes.contains(&Position { x, y, z }) {
                         output.push(STATE_ACTIVE);
                     } else {
                         output.push(STATE_INACTIVE);
@@ -66,9 +66,9 @@ impl fmt::Display for CubeGrid {
                 }
                 writeln!(f, "{}", output.iter().collect::<String>()).unwrap();
             }
-            writeln!(f, "").unwrap();
+            writeln!(f).unwrap();
         }
-        writeln!(f, "")
+        writeln!(f)
     }
 }
 
@@ -88,7 +88,7 @@ impl CubeGrid {
             let mut y = grid_start;
 
             for line in s.lines() {
-                if line == "" {
+                if line.is_empty() {
                     continue;
                 }
 
@@ -106,9 +106,7 @@ impl CubeGrid {
             z += 1;
         }
 
-        CubeGrid {
-            active_cubes: active_cubes,
-        }
+        CubeGrid { active_cubes }
     }
 
     // Returns a tuple containing two `Position`s. The first contains the minimum `x`, `y` and `z`
@@ -151,10 +149,10 @@ impl CubeGrid {
         for z in p.z - 1..=p.z + 1 {
             for y in p.y - 1..=p.y + 1 {
                 for x in p.x - 1..=p.x + 1 {
-                    if !((x == p.x) && (y == p.y) && (z == p.z)) {
-                        if self.active_cubes.contains(&Position { x: x, y: y, z: z }) {
-                            active_total += 1;
-                        }
+                    if !((x == p.x) && (y == p.y) && (z == p.z))
+                        && self.active_cubes.contains(&Position { x, y, z })
+                    {
+                        active_total += 1;
                     }
                 }
             }
@@ -173,7 +171,7 @@ impl CubeGrid {
         for z in active_box.0.z - 1..=active_box.1.z + 1 {
             for y in active_box.0.y - 1..=active_box.1.y + 1 {
                 for x in active_box.0.x - 1..=active_box.1.x + 1 {
-                    let p = Position { x: x, y: y, z: z };
+                    let p = Position { x, y, z };
                     let currently_active = self.active_cubes.contains(&p);
                     let active_adjacent = self.active_adjacent_cubes(&p);
 
@@ -185,11 +183,9 @@ impl CubeGrid {
                             // println!("{:?} is active and remains so.", &p);
                             new_state.insert(p);
                         }
-                    } else {
-                        if active_adjacent == 3 {
-                            // println!("{:?} is inactive but becomes active.", &p);
-                            new_state.insert(p);
-                        }
+                    } else if active_adjacent == 3 {
+                        // println!("{:?} is inactive but becomes active.", &p);
+                        new_state.insert(p);
                     }
                 }
             }

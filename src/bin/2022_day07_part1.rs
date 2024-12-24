@@ -125,14 +125,10 @@ impl Display for Tree {
                     parent: _,
                     children,
                 } => {
-                    if let Err(err) = write!(f, "{0:>1$} {name} (dir)\n", "-", 2 * depth + 1) {
-                        return Err(err);
-                    }
+                    writeln!(f, "{0:>1$} {name} (dir)", "-", 2 * depth + 1)?;
 
                     for child in children.iter() {
-                        if let Err(err) = recurse(tree, f, *child, depth + 1) {
-                            return Err(err);
-                        }
+                        recurse(tree, f, *child, depth + 1)?
                     }
                     Ok(())
                 }
@@ -141,12 +137,12 @@ impl Display for Tree {
                     parent: _,
                     file_size,
                 } => {
-                    return write!(
+                    writeln!(
                         f,
-                        "{0:>1$} {name} (file, size={file_size})\n",
+                        "{0:>1$} {name} (file, size={file_size})",
                         "-",
                         2 * depth + 1
-                    );
+                    )
                 }
             }
         }
@@ -167,18 +163,14 @@ impl Display for Tree {
 /// Panics if `dir_name` is empty or if `current_dir_id` is not a `Directory` node.
 fn do_cd(tree: &mut Tree, current_dir_id: NodeId, dir_name: &str) -> NodeId {
     assert!(
-        dir_name.len() > 0,
+        !dir_name.is_empty(),
         "cd must be called with a directory name"
     );
 
     match dir_name {
-        "/" => {
-            return ROOT_NODE_ID;
-        }
+        "/" => ROOT_NODE_ID,
         ".." => match tree.t[current_dir_id] {
-            Node::Directory { parent, .. } => {
-                return parent;
-            }
+            Node::Directory { parent, .. } => parent,
             _ => {
                 panic!("Internal error: do_cd was called with a non-directory node");
             }
@@ -192,7 +184,7 @@ fn do_cd(tree: &mut Tree, current_dir_id: NodeId, dir_name: &str) -> NodeId {
                         }
                     }
                 }
-                return tree.add_directory_node(dir_name, current_dir_id);
+                tree.add_directory_node(dir_name, current_dir_id)
             }
             _ => {
                 panic!("Internal error: do_cd was called with a non-directory node");
@@ -268,7 +260,7 @@ fn parse_input(input: &str) -> Tree {
     let mut cwd = ROOT_NODE_ID; // current working directory
 
     for line in input.lines() {
-        if line != "" {
+        if !line.is_empty() {
             if line.starts_with("$ cd ") {
                 let dir_name = line.strip_prefix("$ cd ").unwrap().trim();
                 cwd = do_cd(&mut tree, cwd, dir_name);
@@ -279,7 +271,7 @@ fn parse_input(input: &str) -> Tree {
                 // No action required.
             } else {
                 let (file_size_str, file_name) = line.split_once(' ').unwrap();
-                let file_size = FileSize::from_str_radix(file_size_str, 10).unwrap();
+                let file_size = file_size_str.parse().unwrap();
                 _ = tree.add_file_node(file_name, cwd, file_size);
             }
         }

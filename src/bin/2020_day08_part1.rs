@@ -12,6 +12,7 @@ use std::fs;
 const INPUT_FILENAME: &str = "2020_day08_input.txt";
 
 #[derive(Clone, Copy, Debug)]
+#[allow(dead_code)]
 enum Instruction {
     Acc(i32),
     Jmp(i32),
@@ -30,7 +31,7 @@ impl Program {
         for line in code.lines() {
             // println!("Parsing line: {}", &line);
 
-            if line == "" {
+            if line.is_empty() {
                 println!("\tSkipping blank line");
                 continue;
             }
@@ -62,9 +63,7 @@ impl Program {
             }
         }
 
-        Self {
-            instructions: instructions,
-        }
+        Self { instructions }
     }
 
     /// Executes given instruction and updates the accumulator `acc`, if necessary. Returns the
@@ -103,7 +102,7 @@ impl Program {
             // println!("After executing instruction, `ip`={} and `acc`={}\n", ip, acc);
         }
 
-        return acc;
+        acc
     }
 }
 
@@ -138,7 +137,7 @@ acc +6
 
     #[test]
     fn test_program_0() {
-        let mut program = Program::parse_program(&TEST_PROGRAM);
+        let mut program = Program::parse_program(TEST_PROGRAM);
         println!("{:#?}", program);
 
         let result = program.run_until_infinite_loop();

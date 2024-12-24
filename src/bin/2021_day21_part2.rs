@@ -158,7 +158,7 @@ impl GameState {
         }
 
         Self {
-            turn: turn,
+            turn,
             most_recent_player: player,
             p1_wins: new_p1_wins,
             p2_wins: new_p2_wins,
@@ -198,7 +198,7 @@ fn parse_input(input: &str) -> (Position, Position) {
 fn play_game(p1_start: u8, p2_start: u8) -> (u64, u64) {
     let mut game = GameState::new(p1_start, p2_start);
 
-    while game.perms.len() != 0 {
+    while !game.perms.is_empty() {
         game = game.make_move();
     }
 
@@ -231,7 +231,7 @@ Player 2 starting position: 8";
 
     #[test]
     fn parse_test_input() {
-        let (p1_start, p2_start) = parse_input(&TEST_INPUT);
+        let (p1_start, p2_start) = parse_input(TEST_INPUT);
 
         assert_eq!(p1_start, 4);
         assert_eq!(p2_start, 8);
@@ -239,7 +239,7 @@ Player 2 starting position: 8";
 
     #[test]
     fn test_play_game() {
-        let (p1_start, p2_start) = parse_input(&TEST_INPUT);
+        let (p1_start, p2_start) = parse_input(TEST_INPUT);
         let wins = play_game(p1_start, p2_start);
         println!(
             "Player 1 wins {} times and Player 2 wins {} times",

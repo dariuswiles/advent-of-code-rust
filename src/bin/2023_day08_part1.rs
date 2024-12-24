@@ -74,7 +74,7 @@ fn main() {
 
 /// Returns the number of steps required to get from the start node to the end node.
 fn do_challenge(input: &str) -> u64 {
-    let (instructions, nodes) = parse_input(&input);
+    let (instructions, nodes) = parse_input(input);
 
     follow_instructions(instructions, nodes)
 }
@@ -96,7 +96,7 @@ fn parse_input(input: &str) -> (&str, HashMap<&str, Node>) {
 
     let mut nodes = HashMap::new();
     for line in lines {
-        let node = Node::from_str(&line);
+        let node = Node::from_str(line);
         nodes.insert(node.label, node);
     }
 
@@ -172,9 +172,9 @@ ZZZ = (ZZZ, ZZZ)
     fn test_node_from_str() {
         assert_eq!(
             Node {
-                label: &"AAA",
-                left: &"BBB",
-                right: &"CCC",
+                label: "AAA",
+                left: "BBB",
+                right: "CCC",
             },
             Node::from_str("AAA = (BBB, CCC)")
         );
@@ -188,63 +188,63 @@ ZZZ = (ZZZ, ZZZ)
 
     #[test]
     fn test_parse_input_0() {
-        let (instructions, nodes) = parse_input(&TEST_INPUT_0);
+        let (instructions, nodes) = parse_input(TEST_INPUT_0);
 
         assert_eq!("RL", instructions);
         assert_eq!(7, nodes.len());
         assert_eq!(
             Some(&Node {
-                label: &"AAA",
-                left: &"BBB",
-                right: &"CCC",
+                label: "AAA",
+                left: "BBB",
+                right: "CCC",
             }),
             nodes.get(&"AAA")
         );
         assert_eq!(
             Some(&Node {
-                label: &"BBB",
-                left: &"DDD",
-                right: &"EEE",
+                label: "BBB",
+                left: "DDD",
+                right: "EEE",
             }),
             nodes.get(&"BBB")
         );
         assert_eq!(
             Some(&Node {
-                label: &"CCC",
-                left: &"ZZZ",
-                right: &"GGG",
+                label: "CCC",
+                left: "ZZZ",
+                right: "GGG",
             }),
             nodes.get(&"CCC")
         );
         assert_eq!(
             Some(&Node {
-                label: &"DDD",
-                left: &"DDD",
-                right: &"DDD",
+                label: "DDD",
+                left: "DDD",
+                right: "DDD",
             }),
             nodes.get(&"DDD")
         );
         assert_eq!(
             Some(&Node {
-                label: &"EEE",
-                left: &"EEE",
-                right: &"EEE",
+                label: "EEE",
+                left: "EEE",
+                right: "EEE",
             }),
             nodes.get(&"EEE")
         );
         assert_eq!(
             Some(&Node {
-                label: &"GGG",
-                left: &"GGG",
-                right: &"GGG",
+                label: "GGG",
+                left: "GGG",
+                right: "GGG",
             }),
             nodes.get(&"GGG")
         );
         assert_eq!(
             Some(&Node {
-                label: &"ZZZ",
-                left: &"ZZZ",
-                right: &"ZZZ",
+                label: "ZZZ",
+                left: "ZZZ",
+                right: "ZZZ",
             }),
             nodes.get(&"ZZZ")
         );
@@ -252,31 +252,31 @@ ZZZ = (ZZZ, ZZZ)
 
     #[test]
     fn test_parse_input_1() {
-        let (instructions, nodes) = parse_input(&TEST_INPUT_1);
+        let (instructions, nodes) = parse_input(TEST_INPUT_1);
 
         assert_eq!("LLR", instructions);
         assert_eq!(3, nodes.len());
         assert_eq!(
             Some(&Node {
-                label: &"AAA",
-                left: &"BBB",
-                right: &"BBB",
+                label: "AAA",
+                left: "BBB",
+                right: "BBB",
             }),
             nodes.get(&"AAA")
         );
         assert_eq!(
             Some(&Node {
-                label: &"BBB",
-                left: &"AAA",
-                right: &"ZZZ",
+                label: "BBB",
+                left: "AAA",
+                right: "ZZZ",
             }),
             nodes.get(&"BBB")
         );
         assert_eq!(
             Some(&Node {
-                label: &"ZZZ",
-                left: &"ZZZ",
-                right: &"ZZZ",
+                label: "ZZZ",
+                left: "ZZZ",
+                right: "ZZZ",
             }),
             nodes.get(&"ZZZ")
         );
@@ -284,11 +284,11 @@ ZZZ = (ZZZ, ZZZ)
 
     #[test]
     fn test_do_challenge_0() {
-        assert_eq!(2, do_challenge(&TEST_INPUT_0));
+        assert_eq!(2, do_challenge(TEST_INPUT_0));
     }
 
     #[test]
     fn test_do_challenge_1() {
-        assert_eq!(6, do_challenge(&TEST_INPUT_1));
+        assert_eq!(6, do_challenge(TEST_INPUT_1));
     }
 }

@@ -41,9 +41,9 @@ impl Position {
         }
 
         Self {
-            x: PositionInt::from_str_radix(tokens[0], 10).unwrap(),
-            y: PositionInt::from_str_radix(tokens[1], 10).unwrap(),
-            z: PositionInt::from_str_radix(tokens[2], 10).unwrap(),
+            x: tokens[0].parse().unwrap(),
+            y: tokens[1].parse().unwrap(),
+            z: tokens[2].parse().unwrap(),
         }
     }
 
@@ -87,30 +87,28 @@ impl Position {
     /// that needs to be considered.
     fn orient(&self, face: u8, rotations: u8) -> Self {
         match face {
-            0 => {
-                return Self::rotate_around_y_axis(self, rotations);
-            }
+            0 => Self::rotate_around_y_axis(self, rotations),
             1 => {
                 let xr = Self::rotate_around_x_axis(self, 1);
-                return Self::rotate_around_y_axis(&xr, rotations);
+                Self::rotate_around_y_axis(&xr, rotations)
             }
             2 => {
                 let xr = Self::rotate_around_x_axis(self, 2);
-                return Self::rotate_around_y_axis(&xr, rotations);
+                Self::rotate_around_y_axis(&xr, rotations)
             }
             3 => {
                 let xr = Self::rotate_around_x_axis(self, 3);
-                return Self::rotate_around_y_axis(&xr, rotations);
+                Self::rotate_around_y_axis(&xr, rotations)
             }
             4 => {
                 let yr = Self::rotate_around_y_axis(self, 1);
                 let yxr = Self::rotate_around_x_axis(&yr, 1);
-                return Self::rotate_around_y_axis(&yxr, rotations);
+                Self::rotate_around_y_axis(&yxr, rotations)
             }
             5 => {
                 let yr = Self::rotate_around_y_axis(self, 3);
                 let yxr = Self::rotate_around_x_axis(&yr, 1);
-                return Self::rotate_around_y_axis(&yxr, rotations);
+                Self::rotate_around_y_axis(&yxr, rotations)
             }
             _ => panic!("reorient called with invalid face '{}'", face),
         }
@@ -163,7 +161,7 @@ impl Scanner {
                 && tokens[1] == SCANNER_INPUT_KEYWORD
                 && tokens[3] == SCANNER_INPUT_START_END
             {
-                id = usize::from_str_radix(tokens[2], 10).unwrap();
+                id = tokens[2].parse().unwrap();
             } else {
                 panic!("Expecting scanner header in input, but found {}", line);
             }
@@ -173,9 +171,9 @@ impl Scanner {
 
         let mut rel_beacons = HashSet::new();
 
-        while let Some(line) = input.next() {
-            if line == "" {
-                if rel_beacons.len() > 0 {
+        for line in input.by_ref() {
+            if line.is_empty() {
+                if !rel_beacons.is_empty() {
                     break;
                 } else {
                     panic!(
@@ -250,7 +248,7 @@ impl Scanner {
                     let mut absolute_beacon_positions = HashSet::new();
 
                     for b in obs {
-                        absolute_beacon_positions.insert(b.add(&other_scanner_position));
+                        absolute_beacon_positions.insert(b.add(other_scanner_position));
                     }
 
                     return Some((*other_scanner_position, absolute_beacon_positions));
@@ -293,14 +291,14 @@ impl Scanner {
 
 /// Determines the absolute positions of all scanners and beacons, and updates `scanners` with
 /// this information.
-fn fix_all_scanner_positions(scanners: &mut Vec<Scanner>) {
+fn fix_all_scanner_positions(scanners: &mut [Scanner]) {
     let scanners_len = scanners.len();
     let mut scanners_to_do: HashSet<_> = (0..scanners_len).collect();
 
     scanners[0].abs_beacons = Some(scanners[0].rel_beacons.clone());
     scanners[0].abs_position = Some(Position::new("0,0,0"));
 
-    while scanners_to_do.len() > 0 {
+    while !scanners_to_do.is_empty() {
         for known_idx in scanners_to_do.clone() {
             if scanners[known_idx].abs_beacons.is_none() {
                 continue;
@@ -337,9 +335,9 @@ fn fix_all_scanner_positions(scanners: &mut Vec<Scanner>) {
 /// # Panics
 ///
 /// Panics if any `scanner` does not have absolute positions for its beacons.
-fn all_beacon_positions(scanners: &Vec<Scanner>) -> HashSet<Position> {
+fn all_beacon_positions(scanners: &mut [Scanner]) -> HashSet<Position> {
     scanners.iter().fold(HashSet::new(), |b, s| {
-        b.union(&s.abs_beacons.as_ref().unwrap()).cloned().collect()
+        b.union(s.abs_beacons.as_ref().unwrap()).cloned().collect()
     })
 }
 
@@ -362,7 +360,7 @@ fn main() {
     let mut scanners = parse_input(&input_file);
 
     fix_all_scanner_positions(&mut scanners);
-    let result_beacon_set = all_beacon_positions(&scanners);
+    let result_beacon_set = all_beacon_positions(&mut scanners);
 
     println!("There are {} unique beacons", result_beacon_set.len());
 }
@@ -539,18 +537,18 @@ mod tests {
 
         assert_eq!(scanner.id, 0);
         assert_eq!(scanner.rel_beacons.len(), 6);
-        assert!(scanner.rel_beacons.get(&Position::new("-1,-1,1")).is_some());
-        assert!(scanner.rel_beacons.get(&Position::new("-2,-2,2")).is_some());
-        assert!(scanner.rel_beacons.get(&Position::new("-3,-3,3")).is_some());
-        assert!(scanner.rel_beacons.get(&Position::new("-2,-3,1")).is_some());
-        assert!(scanner.rel_beacons.get(&Position::new("5,6,-4")).is_some());
-        assert!(scanner.rel_beacons.get(&Position::new("8,0,7")).is_some());
-        assert!(scanner.rel_beacons.get(&Position::new("1,1,1")).is_none());
+        assert!(scanner.rel_beacons.contains(&Position::new("-1,-1,1")));
+        assert!(scanner.rel_beacons.contains(&Position::new("-2,-2,2")));
+        assert!(scanner.rel_beacons.contains(&Position::new("-3,-3,3")));
+        assert!(scanner.rel_beacons.contains(&Position::new("-2,-3,1")));
+        assert!(scanner.rel_beacons.contains(&Position::new("5,6,-4")));
+        assert!(scanner.rel_beacons.contains(&Position::new("8,0,7")));
+        assert!(!scanner.rel_beacons.contains(&Position::new("1,1,1")));
     }
 
     #[test]
     fn create_multiple_scanners() {
-        let scanners = parse_input(&TEST_INPUT);
+        let scanners = parse_input(TEST_INPUT);
 
         assert_eq!(scanners.len(), 5);
         assert_eq!(scanners[0].id, 0);
@@ -559,40 +557,31 @@ mod tests {
         assert_eq!(scanners[4].rel_beacons.len(), 26);
         assert!(scanners[0]
             .rel_beacons
-            .get(&Position::new("-345,-311,381"))
-            .is_some());
+            .contains(&Position::new("-345,-311,381")));
+        assert!(!scanners[1]
+            .rel_beacons
+            .contains(&Position::new("-345,-311,381")));
         assert!(scanners[1]
             .rel_beacons
-            .get(&Position::new("-345,-311,381"))
-            .is_none());
+            .contains(&Position::new("686,422,578")));
         assert!(scanners[1]
             .rel_beacons
-            .get(&Position::new("686,422,578"))
-            .is_some());
-        assert!(scanners[1]
-            .rel_beacons
-            .get(&Position::new("553,889,-390"))
-            .is_some());
+            .contains(&Position::new("553,889,-390")));
         assert!(scanners[2]
             .rel_beacons
-            .get(&Position::new("-675,-892,-343"))
-            .is_some());
+            .contains(&Position::new("-675,-892,-343")));
         assert!(scanners[2]
             .rel_beacons
-            .get(&Position::new("697,-426,-610"))
-            .is_some());
+            .contains(&Position::new("697,-426,-610")));
         assert!(scanners[3]
             .rel_beacons
-            .get(&Position::new("-500,565,-823"))
-            .is_some());
+            .contains(&Position::new("-500,565,-823")));
         assert!(scanners[3]
             .rel_beacons
-            .get(&Position::new("595,780,-596"))
-            .is_some());
+            .contains(&Position::new("595,780,-596")));
         assert!(scanners[4]
             .rel_beacons
-            .get(&Position::new("30,-46,-14"))
-            .is_some());
+            .contains(&Position::new("30,-46,-14")));
     }
 
     #[test]
@@ -615,11 +604,11 @@ mod tests {
             }
         }
 
-        assert!(results.get(&Position::new("8,0,7")).is_some());
-        assert!(results.get(&Position::new("-8,-7,0")).is_some());
-        assert!(results.get(&Position::new("-7,0,8")).is_some());
-        assert!(results.get(&Position::new("7,0,8")).is_some());
-        assert!(results.get(&Position::new("0,7,-8")).is_some());
+        assert!(results.contains(&Position::new("8,0,7")));
+        assert!(results.contains(&Position::new("-8,-7,0")));
+        assert!(results.contains(&Position::new("-7,0,8")));
+        assert!(results.contains(&Position::new("7,0,8")));
+        assert!(results.contains(&Position::new("0,7,-8")));
     }
 
     #[test]
@@ -632,78 +621,78 @@ mod tests {
 
     #[test]
     fn test_all_scanner0_orientations() {
-        let scanners = parse_input(&TEST_INPUT);
+        let scanners = parse_input(TEST_INPUT);
         let results: HashSet<Position> = scanners[0]
             .all_beacon_orientations()
             .iter()
-            .cloned()
             .flatten()
+            .cloned()
             .collect();
 
-        assert!(results.get(&Position::new("-618,-824,-621")).is_some());
-        assert!(results.get(&Position::new("-537,-823,-458")).is_some());
-        assert!(results.get(&Position::new("-447,-329,318")).is_some());
-        assert!(results.get(&Position::new("404,-588,-901")).is_some());
-        assert!(results.get(&Position::new("544,-627,-890")).is_some());
-        assert!(results.get(&Position::new("528,-643,409")).is_some());
-        assert!(results.get(&Position::new("-661,-816,-575")).is_some());
-        assert!(results.get(&Position::new("390,-675,-793")).is_some());
-        assert!(results.get(&Position::new("423,-701,434")).is_some());
-        assert!(results.get(&Position::new("-345,-311,381")).is_some());
-        assert!(results.get(&Position::new("459,-707,401")).is_some());
-        assert!(results.get(&Position::new("-485,-357,347")).is_some());
+        assert!(results.contains(&Position::new("-618,-824,-621")));
+        assert!(results.contains(&Position::new("-537,-823,-458")));
+        assert!(results.contains(&Position::new("-447,-329,318")));
+        assert!(results.contains(&Position::new("404,-588,-901")));
+        assert!(results.contains(&Position::new("544,-627,-890")));
+        assert!(results.contains(&Position::new("528,-643,409")));
+        assert!(results.contains(&Position::new("-661,-816,-575")));
+        assert!(results.contains(&Position::new("390,-675,-793")));
+        assert!(results.contains(&Position::new("423,-701,434")));
+        assert!(results.contains(&Position::new("-345,-311,381")));
+        assert!(results.contains(&Position::new("459,-707,401")));
+        assert!(results.contains(&Position::new("-485,-357,347")));
     }
 
     #[test]
     fn test_all_scanner1_orientations() {
-        let scanners = parse_input(&TEST_INPUT);
+        let scanners = parse_input(TEST_INPUT);
         let results: HashSet<Position> = scanners[1]
             .all_beacon_orientations()
             .iter()
-            .cloned()
             .flatten()
+            .cloned()
             .collect();
 
-        assert!(results.get(&Position::new("686,422,578")).is_some());
-        assert!(results.get(&Position::new("605,423,415")).is_some());
-        assert!(results.get(&Position::new("515,917,-361")).is_some());
-        assert!(results.get(&Position::new("-336,658,858")).is_some());
-        assert!(results.get(&Position::new("-476,619,847")).is_some());
-        assert!(results.get(&Position::new("-460,603,-452")).is_some());
-        assert!(results.get(&Position::new("729,430,532")).is_some());
-        assert!(results.get(&Position::new("-322,571,750")).is_some());
-        assert!(results.get(&Position::new("-355,545,-477")).is_some());
-        assert!(results.get(&Position::new("413,935,-424")).is_some());
-        assert!(results.get(&Position::new("-391,539,-444")).is_some());
-        assert!(results.get(&Position::new("553,889,-390")).is_some());
+        assert!(results.contains(&Position::new("686,422,578")));
+        assert!(results.contains(&Position::new("605,423,415")));
+        assert!(results.contains(&Position::new("515,917,-361")));
+        assert!(results.contains(&Position::new("-336,658,858")));
+        assert!(results.contains(&Position::new("-476,619,847")));
+        assert!(results.contains(&Position::new("-460,603,-452")));
+        assert!(results.contains(&Position::new("729,430,532")));
+        assert!(results.contains(&Position::new("-322,571,750")));
+        assert!(results.contains(&Position::new("-355,545,-477")));
+        assert!(results.contains(&Position::new("413,935,-424")));
+        assert!(results.contains(&Position::new("-391,539,-444")));
+        assert!(results.contains(&Position::new("553,889,-390")));
     }
 
     #[test]
     fn test_find_overlap_0_1() {
-        let mut scanners = parse_input(&TEST_INPUT);
+        let mut scanners = parse_input(TEST_INPUT);
         scanners[0].abs_beacons = Some(scanners[0].rel_beacons.clone());
 
         let overlap_result = scanners[0].find_overlap(&scanners[1]).unwrap();
         let (overlap_position, results) = overlap_result;
 
         assert_eq!(overlap_position, Position::new("68,-1246,-43"));
-        assert!(results.get(&Position::new("-618,-824,-621")).is_some());
-        assert!(results.get(&Position::new("-537,-823,-458")).is_some());
-        assert!(results.get(&Position::new("-447,-329,318")).is_some());
-        assert!(results.get(&Position::new("404,-588,-901")).is_some());
-        assert!(results.get(&Position::new("544,-627,-890")).is_some());
-        assert!(results.get(&Position::new("528,-643,409")).is_some());
-        assert!(results.get(&Position::new("-661,-816,-575")).is_some());
-        assert!(results.get(&Position::new("390,-675,-793")).is_some());
-        assert!(results.get(&Position::new("423,-701,434")).is_some());
-        assert!(results.get(&Position::new("-345,-311,381")).is_some());
-        assert!(results.get(&Position::new("459,-707,401")).is_some());
-        assert!(results.get(&Position::new("-485,-357,347")).is_some());
+        assert!(results.contains(&Position::new("-618,-824,-621")));
+        assert!(results.contains(&Position::new("-537,-823,-458")));
+        assert!(results.contains(&Position::new("-447,-329,318")));
+        assert!(results.contains(&Position::new("404,-588,-901")));
+        assert!(results.contains(&Position::new("544,-627,-890")));
+        assert!(results.contains(&Position::new("528,-643,409")));
+        assert!(results.contains(&Position::new("-661,-816,-575")));
+        assert!(results.contains(&Position::new("390,-675,-793")));
+        assert!(results.contains(&Position::new("423,-701,434")));
+        assert!(results.contains(&Position::new("-345,-311,381")));
+        assert!(results.contains(&Position::new("459,-707,401")));
+        assert!(results.contains(&Position::new("-485,-357,347")));
     }
 
     #[test]
     fn test_find_overlap_0_1_4() {
-        let mut scanners = parse_input(&TEST_INPUT);
+        let mut scanners = parse_input(TEST_INPUT);
         scanners[0].abs_beacons = Some(scanners[0].rel_beacons.clone());
 
         let result_0_1 = scanners[0].find_overlap(&scanners[1]).unwrap();
@@ -715,23 +704,23 @@ mod tests {
         let (overlap_position_4, result_1_4) = overlap_result_1_4;
 
         assert_eq!(overlap_position_4, Position::new("-20,-1133,1061"));
-        assert!(result_1_4.get(&Position::new("459,-707,401")).is_some());
-        assert!(result_1_4.get(&Position::new("-739,-1745,668")).is_some());
-        assert!(result_1_4.get(&Position::new("-485,-357,347")).is_some());
-        assert!(result_1_4.get(&Position::new("432,-2009,850")).is_some());
-        assert!(result_1_4.get(&Position::new("528,-643,409")).is_some());
-        assert!(result_1_4.get(&Position::new("423,-701,434")).is_some());
-        assert!(result_1_4.get(&Position::new("-345,-311,381")).is_some());
-        assert!(result_1_4.get(&Position::new("408,-1815,803")).is_some());
-        assert!(result_1_4.get(&Position::new("534,-1912,768")).is_some());
-        assert!(result_1_4.get(&Position::new("-687,-1600,576")).is_some());
-        assert!(result_1_4.get(&Position::new("-447,-329,318")).is_some());
-        assert!(result_1_4.get(&Position::new("-635,-1737,486")).is_some());
+        assert!(result_1_4.contains(&Position::new("459,-707,401")));
+        assert!(result_1_4.contains(&Position::new("-739,-1745,668")));
+        assert!(result_1_4.contains(&Position::new("-485,-357,347")));
+        assert!(result_1_4.contains(&Position::new("432,-2009,850")));
+        assert!(result_1_4.contains(&Position::new("528,-643,409")));
+        assert!(result_1_4.contains(&Position::new("423,-701,434")));
+        assert!(result_1_4.contains(&Position::new("-345,-311,381")));
+        assert!(result_1_4.contains(&Position::new("408,-1815,803")));
+        assert!(result_1_4.contains(&Position::new("534,-1912,768")));
+        assert!(result_1_4.contains(&Position::new("-687,-1600,576")));
+        assert!(result_1_4.contains(&Position::new("-447,-329,318")));
+        assert!(result_1_4.contains(&Position::new("-635,-1737,486")));
     }
 
     #[test]
     fn test_fix_all() {
-        let mut scanners = parse_input(&TEST_INPUT);
+        let mut scanners = parse_input(TEST_INPUT);
 
         fix_all_scanner_positions(&mut scanners);
 
@@ -1160,10 +1149,10 @@ mod tests {
             .cloned()
             .collect();
 
-        let mut scanners = parse_input(&TEST_INPUT);
+        let mut scanners = parse_input(TEST_INPUT);
 
         fix_all_scanner_positions(&mut scanners);
-        let result_beacon_set = all_beacon_positions(&scanners);
+        let result_beacon_set = all_beacon_positions(&mut scanners);
 
         assert_eq!(result_beacon_set.len(), 79);
         assert_eq!(result_beacon_set, expected_beacons);

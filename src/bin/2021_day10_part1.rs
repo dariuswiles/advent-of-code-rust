@@ -38,23 +38,21 @@ fn validate_line(line: &str) -> Validity {
     for c in line.chars() {
         if OPENERS.contains(c) {
             stack.push(c);
-        } else {
-            if CLOSERS.contains(c) {
-                if let Some(opening) = stack.pop() {
-                    if ((opening == '(') && (c != ')'))
-                        || ((opening == '[') && (c != ']'))
-                        || ((opening == '{') && (c != '}'))
-                        || ((opening == '<') && (c != '>'))
-                    {
-                        return Validity::Corrupted(c);
-                    }
-                } else {
-                    // Stack is empty, so there is no matching opening symbol.
+        } else if CLOSERS.contains(c) {
+            if let Some(opening) = stack.pop() {
+                if ((opening == '(') && (c != ')'))
+                    || ((opening == '[') && (c != ']'))
+                    || ((opening == '{') && (c != '}'))
+                    || ((opening == '<') && (c != '>'))
+                {
                     return Validity::Corrupted(c);
                 }
             } else {
-                panic!("Unexpected symbol '{}' found in input", c);
+                // Stack is empty, so there is no matching opening symbol.
+                return Validity::Corrupted(c);
             }
+        } else {
+            panic!("Unexpected symbol '{}' found in input", c);
         }
     }
 
@@ -68,18 +66,10 @@ fn validate_line(line: &str) -> Validity {
 /// Return the scoring value of the bad closing character passed.
 fn score_bad_closer(c: char) -> u32 {
     match c {
-        ')' => {
-            return SCORE_PARENTHESIS;
-        }
-        ']' => {
-            return SCORE_BRACKET;
-        }
-        '}' => {
-            return SCORE_BRACE;
-        }
-        '>' => {
-            return SCORE_ANGLE_BRACKET;
-        }
+        ')' => SCORE_PARENTHESIS,
+        ']' => SCORE_BRACKET,
+        '}' => SCORE_BRACE,
+        '>' => SCORE_ANGLE_BRACKET,
         _ => {
             panic!("Unrecognized closing symbol '{}'", c);
         }
@@ -92,11 +82,11 @@ fn score_corrupted_lines(input: &str) -> u32 {
     let mut total = 0;
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
-        let result = validate_line(&line);
+        let result = validate_line(line);
         if let Validity::Corrupted(bad_closer) = result {
             // println!("Line '{}' is corrupted due to closing symbol '{}'", &line, bad_closer);
             total += score_bad_closer(bad_closer);
@@ -139,16 +129,16 @@ mod tests {
 
     #[test]
     fn test_corrupted_lines() {
-        assert_eq!(validate_line(&TEST_LINE_0), Validity::Corrupted('}'));
-        assert_eq!(validate_line(&TEST_LINE_1), Validity::Corrupted(')'));
-        assert_eq!(validate_line(&TEST_LINE_2), Validity::Corrupted(']'));
-        assert_eq!(validate_line(&TEST_LINE_3), Validity::Corrupted(')'));
-        assert_eq!(validate_line(&TEST_LINE_4), Validity::Corrupted('>'));
+        assert_eq!(validate_line(TEST_LINE_0), Validity::Corrupted('}'));
+        assert_eq!(validate_line(TEST_LINE_1), Validity::Corrupted(')'));
+        assert_eq!(validate_line(TEST_LINE_2), Validity::Corrupted(']'));
+        assert_eq!(validate_line(TEST_LINE_3), Validity::Corrupted(')'));
+        assert_eq!(validate_line(TEST_LINE_4), Validity::Corrupted('>'));
     }
 
     #[test]
     fn test_score_corrupted_lines() {
-        assert_eq!(score_corrupted_lines(&TEST_INPUT), 26397);
+        assert_eq!(score_corrupted_lines(TEST_INPUT), 26397);
     }
 
     #[test]

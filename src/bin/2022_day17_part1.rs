@@ -77,16 +77,14 @@ impl Display for Chamber {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let cavern_row_count = self.cavern.len();
 
-        let top_rows;
-
-        if cavern_row_count > 20 {
-            top_rows = &self.cavern[cavern_row_count - 20..];
+        let top_rows = if cavern_row_count > 20 {
+            &self.cavern[cavern_row_count - 20..]
         } else {
-            top_rows = &self.cavern[..];
-        }
+            &self.cavern[..]
+        };
 
         for row in top_rows.iter().rev() {
-            _ = write!(f, "|{}|\n", row.iter().collect::<String>());
+            _ = writeln!(f, "|{}|", row.iter().collect::<String>());
         }
 
         if cavern_row_count > 20 {
@@ -128,7 +126,7 @@ impl Chamber {
         for (y, rock_row) in rock_cells.iter().enumerate() {
             for (x, cell) in rock_row.chars().enumerate() {
                 if cell == '#' {
-                    self.cavern[y + bottom_edge as usize][x + left_edge as usize] = cell;
+                    self.cavern[y + bottom_edge][x + left_edge as usize] = cell;
                 }
             }
         }
@@ -148,7 +146,7 @@ impl Chamber {
         let chamber_height = self.cavern.len();
 
         for (y, rock_row) in rock_cells.iter().enumerate() {
-            if y + bottom_edge as usize >= chamber_height {
+            if y + bottom_edge >= chamber_height {
                 break;
             }
 
@@ -158,7 +156,7 @@ impl Chamber {
                     return true;
                 }
 
-                if cell == '#' && self.cavern[y + bottom_edge as usize][offset_x] == '#' {
+                if cell == '#' && self.cavern[y + bottom_edge][offset_x] == '#' {
                     return true;
                 }
             }
@@ -212,10 +210,9 @@ impl FallingRock {
     /// colliding with an existing rock in the 'chamber', or the chamber's left wall. If there is a
     /// collision, make no changes to the position of this `FallingRock`.
     fn move_left(&mut self, chamber: &Chamber) {
-        if self.left_edge > 0 {
-            if !chamber.overlaps(self.shape, self.left_edge - 1, self.bottom_edge) {
-                self.left_edge -= 1;
-            }
+        if self.left_edge > 0 && !chamber.overlaps(self.shape, self.left_edge - 1, self.bottom_edge)
+        {
+            self.left_edge -= 1;
         }
     }
 
@@ -230,10 +227,10 @@ impl FallingRock {
             RockShape::Square => ROCK_SQUARE[0].len(),
         };
 
-        if self.left_edge as usize + shape_width < CHAMBER_WIDTH as usize {
-            if !chamber.overlaps(self.shape, self.left_edge + 1, self.bottom_edge) {
-                self.left_edge += 1;
-            }
+        if self.left_edge as usize + shape_width < CHAMBER_WIDTH as usize
+            && !chamber.overlaps(self.shape, self.left_edge + 1, self.bottom_edge)
+        {
+            self.left_edge += 1;
         }
     }
 
@@ -267,17 +264,17 @@ fn land_one_rock(chamber: &mut Chamber, mut rock: FallingRock, jets: &mut Cycle<
     loop {
         match jets.next().unwrap() {
             '<' => {
-                rock.move_left(&chamber);
+                rock.move_left(chamber);
             }
             '>' => {
-                rock.move_right(&chamber);
+                rock.move_right(chamber);
             }
             _ => {
                 panic!("Unexpected character found in input");
             }
         }
 
-        if !rock.move_down(&chamber) {
+        if !rock.move_down(chamber) {
             rock.place(chamber);
             return;
         }
@@ -305,7 +302,7 @@ fn do_challenge(input: &str, count: usize) -> Chamber {
 fn main() {
     let input_file = fs::read_to_string(INPUT_FILENAME).expect("Error reading input file");
 
-    let chamber = do_challenge(&input_file.trim(), REPETITIONS);
+    let chamber = do_challenge(input_file.trim(), REPETITIONS);
 
     println!(
         "The number of rows in the cavern containing rocks is {}",
@@ -377,15 +374,15 @@ mod tests {
     #[test]
     fn test_overlaps() {
         let empty_chamber = Chamber::new();
-        assert_eq!(empty_chamber.overlaps(RockShape::Plus, 2, 3), false);
+        assert!(!empty_chamber.overlaps(RockShape::Plus, 2, 3));
 
         let mut chamber_vertical_rock = Chamber::new();
         chamber_vertical_rock.put_rock(RockShape::VerticalLine, 4, 0);
-        assert_eq!(chamber_vertical_rock.overlaps(RockShape::Plus, 0, 0), false);
-        assert_eq!(chamber_vertical_rock.overlaps(RockShape::Plus, 1, 0), false);
-        assert_eq!(chamber_vertical_rock.overlaps(RockShape::Plus, 2, 0), true);
-        assert_eq!(chamber_vertical_rock.overlaps(RockShape::Plus, 2, 2), true);
-        assert_eq!(chamber_vertical_rock.overlaps(RockShape::Plus, 2, 3), false);
+        assert!(!chamber_vertical_rock.overlaps(RockShape::Plus, 0, 0));
+        assert!(!chamber_vertical_rock.overlaps(RockShape::Plus, 1, 0));
+        assert!(chamber_vertical_rock.overlaps(RockShape::Plus, 2, 0));
+        assert!(chamber_vertical_rock.overlaps(RockShape::Plus, 2, 2));
+        assert!(!chamber_vertical_rock.overlaps(RockShape::Plus, 2, 3));
     }
 
     #[test]
@@ -577,7 +574,7 @@ mod tests {
 
     #[test]
     fn test_do_challenge_2() {
-        let chamber = do_challenge(&INPUT, 2);
+        let chamber = do_challenge(INPUT, 2);
         let result = format!("{}", chamber);
         let result_lines: Vec<_> = result.lines().rev().collect();
 
@@ -590,7 +587,7 @@ mod tests {
 
     #[test]
     fn test_do_challenge_3() {
-        let chamber = do_challenge(&INPUT, 3);
+        let chamber = do_challenge(INPUT, 3);
         let result = format!("{}", chamber);
         let result_lines: Vec<_> = result.lines().rev().collect();
 
@@ -605,7 +602,7 @@ mod tests {
 
     #[test]
     fn test_do_challenge_4() {
-        let chamber = do_challenge(&INPUT, 4);
+        let chamber = do_challenge(INPUT, 4);
         let result = format!("{}", chamber);
         let result_lines: Vec<_> = result.lines().rev().collect();
 
@@ -621,7 +618,7 @@ mod tests {
 
     #[test]
     fn test_do_challenge_5() {
-        let chamber = do_challenge(&INPUT, 5);
+        let chamber = do_challenge(INPUT, 5);
         let result = format!("{}", chamber);
         let result_lines: Vec<_> = result.lines().rev().collect();
 
@@ -639,7 +636,7 @@ mod tests {
 
     #[test]
     fn test_do_challenge_6() {
-        let chamber = do_challenge(&INPUT, 6);
+        let chamber = do_challenge(INPUT, 6);
         let result = format!("{}", chamber);
         let result_lines: Vec<_> = result.lines().rev().collect();
 
@@ -658,7 +655,7 @@ mod tests {
 
     #[test]
     fn test_do_challenge_7() {
-        let chamber = do_challenge(&INPUT, 7);
+        let chamber = do_challenge(INPUT, 7);
         let result = format!("{}", chamber);
         let result_lines: Vec<_> = result.lines().rev().collect();
 
@@ -680,7 +677,7 @@ mod tests {
 
     #[test]
     fn test_do_challenge_8() {
-        let chamber = do_challenge(&INPUT, 8);
+        let chamber = do_challenge(INPUT, 8);
         let result = format!("{}", chamber);
         let result_lines: Vec<_> = result.lines().rev().collect();
 
@@ -704,7 +701,7 @@ mod tests {
 
     #[test]
     fn test_do_challenge_9() {
-        let chamber = do_challenge(&INPUT, 9);
+        let chamber = do_challenge(INPUT, 9);
         let result = format!("{}", chamber);
         let result_lines: Vec<_> = result.lines().rev().collect();
 
@@ -730,7 +727,7 @@ mod tests {
 
     #[test]
     fn test_do_challenge_10() {
-        let chamber = do_challenge(&INPUT, 10);
+        let chamber = do_challenge(INPUT, 10);
         let result = format!("{}", chamber);
         let result_lines: Vec<_> = result.lines().rev().collect();
 
@@ -756,7 +753,7 @@ mod tests {
 
     #[test]
     fn test_do_challenge() {
-        let chamber = do_challenge(&INPUT, 2022);
+        let chamber = do_challenge(INPUT, 2022);
 
         assert_eq!(chamber.lowest_empty_row(), 3068);
     }

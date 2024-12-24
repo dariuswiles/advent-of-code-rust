@@ -30,7 +30,7 @@ impl<'a> TokenizedInput<'a> {
         let mut foods = vec![];
 
         for row in input.lines() {
-            if row == "" {
+            if row.is_empty() {
                 continue;
             }
 
@@ -60,7 +60,7 @@ impl<'a> TokenizedInput<'a> {
     /// occur multiple times in the input file appear the same number of times in this function's
     /// output. The output is sorted alphabetically.
     fn all_ingredients(&self) -> Vec<&Ingredient> {
-        let mut result: Vec<&Ingredient> = self.foods.iter().map(|(i, _)| i).flatten().collect();
+        let mut result: Vec<&Ingredient> = self.foods.iter().flat_map(|(i, _)| i).collect();
         result.sort_unstable();
         result
     }
@@ -69,9 +69,9 @@ impl<'a> TokenizedInput<'a> {
     /// passed in `allergic_ingredients`. Ingredients that occur multiple times in the input file
     /// appear the same number of times in this function's output. The output is sorted
     /// alphabetically.
-    fn safe_ingredients(&self, allergic_ingredients: &Vec<&Ingredient>) -> Vec<&Ingredient> {
+    fn safe_ingredients(&self, allergic_ingredients: &[&Ingredient]) -> Vec<&Ingredient> {
         let mut safe_ingredients = self.all_ingredients().clone();
-        safe_ingredients.retain(|i| !allergic_ingredients.contains(&i));
+        safe_ingredients.retain(|i| !allergic_ingredients.contains(i));
         safe_ingredients
     }
 }
@@ -96,7 +96,7 @@ impl<'a> IngredientSets<'a> {
                 if let Some(a2i) = allergens_to_ingredients.get_mut(allergen) {
                     a2i.push(ingredients.clone());
                 } else {
-                    allergens_to_ingredients.insert(&allergen, vec![ingredients.clone()]);
+                    allergens_to_ingredients.insert(allergen, vec![ingredients.clone()]);
                 }
             }
         }
@@ -151,7 +151,7 @@ impl<'a> AllergenMapTransition<'a> {
             let mut solved_this_turn: HashSet<&str> = HashSet::new();
 
             for (allergen, ingredients) in &self.map {
-                if solved_allergens.get(allergen) != None {
+                if solved_allergens.contains_key(allergen) {
                     continue;
                 }
 
@@ -162,7 +162,7 @@ impl<'a> AllergenMapTransition<'a> {
             }
 
             assert!(
-                solved_this_turn.len() != 0,
+                !solved_this_turn.is_empty(),
                 "Could not uniquely map allergens to ingredients"
             );
 
@@ -189,7 +189,7 @@ fn do_challenge(input: &str) -> usize {
     let ing_sets = IngredientSets::map_allergens(&foods);
     let initial_mapping = AllergenMapTransition::new(&ing_sets);
     let mapping = initial_mapping.solve();
-    let unsafe_ingredients = mapping.values().collect();
+    let unsafe_ingredients: Vec<_> = mapping.values().collect();
     let safe_ingredients = foods.safe_ingredients(&unsafe_ingredients);
 
     safe_ingredients.len()
@@ -219,7 +219,7 @@ sqjhc mxmxvkd sbzzf (contains fish)";
 
     #[test]
     fn test_parse_input() {
-        let foods = TokenizedInput::parse_input(&TEST_INPUT);
+        let foods = TokenizedInput::parse_input(TEST_INPUT);
         let ing_sets = IngredientSets::map_allergens(&foods);
 
         assert_eq!(
@@ -258,7 +258,7 @@ sqjhc mxmxvkd sbzzf (contains fish)";
 
     #[test]
     fn initial_mapping() {
-        let foods = TokenizedInput::parse_input(&TEST_INPUT);
+        let foods = TokenizedInput::parse_input(TEST_INPUT);
         let ing_sets = IngredientSets::map_allergens(&foods);
         let initial_mapping = AllergenMapTransition::new(&ing_sets);
 
@@ -280,7 +280,7 @@ sqjhc mxmxvkd sbzzf (contains fish)";
 
     #[test]
     fn determine_allergen_to_ingredient_map() {
-        let foods = TokenizedInput::parse_input(&TEST_INPUT);
+        let foods = TokenizedInput::parse_input(TEST_INPUT);
         let ing_sets = IngredientSets::map_allergens(&foods);
         let initial_mapping = AllergenMapTransition::new(&ing_sets);
         let mapping = initial_mapping.solve();
@@ -292,7 +292,7 @@ sqjhc mxmxvkd sbzzf (contains fish)";
 
     #[test]
     fn test_all_ingredients() {
-        let foods = TokenizedInput::parse_input(&TEST_INPUT);
+        let foods = TokenizedInput::parse_input(TEST_INPUT);
         let all_ingredients = foods.all_ingredients();
 
         let expected = vec![
@@ -305,11 +305,11 @@ sqjhc mxmxvkd sbzzf (contains fish)";
 
     #[test]
     fn safe_ingredients() {
-        let foods = TokenizedInput::parse_input(&TEST_INPUT);
+        let foods = TokenizedInput::parse_input(TEST_INPUT);
         let ing_sets = IngredientSets::map_allergens(&foods);
         let initial_mapping = AllergenMapTransition::new(&ing_sets);
         let mapping = initial_mapping.solve();
-        let unsafe_ingredients = mapping.values().collect();
+        let unsafe_ingredients: Vec<_> = mapping.values().collect();
         println!("unsafe_ingredients = {:#?}", unsafe_ingredients);
 
         let safe_ingredients = foods.safe_ingredients(&unsafe_ingredients);

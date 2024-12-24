@@ -18,22 +18,20 @@ fn calculate_gamma_epsilon(input: &str) -> (String, String) {
     let mut bits_per_line = None;
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
         line_count += 1;
 
-        if bits_per_line == None {
+        if bits_per_line.is_none() {
             bits_per_line = Some(line.len());
 
             for i in 0..bits_per_line.unwrap() {
                 count_of_ones.insert(i, 0);
             }
-        } else {
-            if bits_per_line.unwrap() != line.len() {
-                panic!("All input lines must contain the same number of bits");
-            }
+        } else if bits_per_line.unwrap() != line.len() {
+            panic!("All input lines must contain the same number of bits");
         }
 
         for (position, bit) in line.chars().enumerate() {
@@ -61,7 +59,7 @@ fn calculate_gamma_epsilon(input: &str) -> (String, String) {
 }
 
 fn multiply_gamma_epsilon(gamma: &str, epsilon: &str) -> u32 {
-    u32::from_str_radix(&gamma, 2).unwrap() * u32::from_str_radix(&epsilon, 2).unwrap()
+    u32::from_str_radix(gamma, 2).unwrap() * u32::from_str_radix(epsilon, 2).unwrap()
 }
 
 fn main() {
@@ -102,7 +100,7 @@ mod tests {
 
     #[test]
     fn parse_test_input() {
-        let (gamma, epsilon) = calculate_gamma_epsilon(&TEST_INPUT);
+        let (gamma, epsilon) = calculate_gamma_epsilon(TEST_INPUT);
 
         assert_eq!(gamma, "10110");
         assert_eq!(epsilon, "01001");
@@ -110,13 +108,13 @@ mod tests {
 
     #[test]
     fn result() {
-        let (gamma, epsilon) = calculate_gamma_epsilon(&TEST_INPUT);
+        let (gamma, epsilon) = calculate_gamma_epsilon(TEST_INPUT);
         assert_eq!(multiply_gamma_epsilon(&gamma, &epsilon), 198);
     }
 
     #[test]
     #[should_panic]
     fn different_line_lengths() {
-        calculate_gamma_epsilon(&TEST_INPUT_BAD_LENGTH);
+        calculate_gamma_epsilon(TEST_INPUT_BAD_LENGTH);
     }
 }

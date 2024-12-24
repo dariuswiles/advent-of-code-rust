@@ -51,7 +51,7 @@ mod tests {
 
     #[test]
     fn verify_test_input() {
-        assert_eq!(count_greater_ints(&TEST_INPUT), 7);
+        assert_eq!(count_greater_ints(TEST_INPUT), 7);
     }
 
     #[test]

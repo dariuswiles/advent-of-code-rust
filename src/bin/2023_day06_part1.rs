@@ -71,8 +71,8 @@ fn do_challenge(input: &str) -> u32 {
 /// Panics if the input is malformed.
 fn parse_input(input: &str) -> Vec<Race> {
     let mut lines = input.lines();
-    let times = parse_times(&lines.next().unwrap());
-    let distances = parse_distances(&lines.next().unwrap());
+    let times = parse_times(lines.next().unwrap());
+    let distances = parse_distances(lines.next().unwrap());
 
     assert_eq!(
         times.len(),
@@ -100,11 +100,11 @@ fn parse_times(times: &str) -> Vec<u32> {
 
     let mut times = Vec::new();
     for token in t.split(' ') {
-        if token == "" {
+        if token.is_empty() {
             continue;
         }
 
-        times.push(u32::from_str_radix(token, 10).expect("Could not parse '{token}' as a time"));
+        times.push(token.parse().expect("Could not parse '{token}' as a time"));
     }
 
     times
@@ -122,12 +122,15 @@ fn parse_distances(distances: &str) -> Vec<u32> {
 
     let mut distances = Vec::new();
     for token in d.split(' ') {
-        if token == "" {
+        if token.is_empty() {
             continue;
         }
 
-        distances
-            .push(u32::from_str_radix(token, 10).expect("Could not parse '{token}' as a distance"));
+        distances.push(
+            token
+                .parse()
+                .expect("Could not parse '{token}' as a distance"),
+        );
     }
 
     distances
@@ -160,12 +163,12 @@ Distance:  9  40  200
                     distance: 200
                 },
             ],
-            parse_input(&TEST_INPUT)
+            parse_input(TEST_INPUT)
         );
     }
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(288, do_challenge(&TEST_INPUT));
+        assert_eq!(288, do_challenge(TEST_INPUT));
     }
 }

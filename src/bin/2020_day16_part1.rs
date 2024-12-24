@@ -50,7 +50,7 @@ impl ChallengeData {
         let mut defns = Vec::new();
 
         for line in input_lines {
-            if line == "" {
+            if line.is_empty() {
                 break;
             }
 
@@ -133,7 +133,7 @@ impl ChallengeData {
 fn perform_work(input: &str) -> u32 {
     let mut answer = 0;
 
-    let data = ChallengeData::from_string(&input);
+    let data = ChallengeData::from_string(input);
     let all_ranges = data.aggregate_ranges();
 
     for ticket in data.nearby_tickets {
@@ -175,7 +175,7 @@ nearby tickets:
 
     #[test]
     fn test_game_init_and_aggregation() {
-        let data = ChallengeData::from_string(&TEST_INPUT_0);
+        let data = ChallengeData::from_string(TEST_INPUT_0);
 
         println!("{:#?}", data);
 
@@ -196,7 +196,7 @@ nearby tickets:
 
     #[test]
     fn test_game_full() {
-        let answer = perform_work(&TEST_INPUT_0);
+        let answer = perform_work(TEST_INPUT_0);
 
         assert_eq!(answer, 71);
     }

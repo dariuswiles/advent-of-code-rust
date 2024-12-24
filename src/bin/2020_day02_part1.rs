@@ -36,8 +36,8 @@ fn validate_input(input: &str) -> u32 {
             break;
         }
 
-        let repeat_range: Vec<&str> = line_fields.get(0).unwrap().split('-').collect();
-        let range_lower: usize = repeat_range.get(0).unwrap().parse().unwrap();
+        let repeat_range: Vec<&str> = line_fields.first().unwrap().split('-').collect();
+        let range_lower: usize = repeat_range.first().unwrap().parse().unwrap();
         let range_upper: usize = repeat_range.get(1).unwrap().parse().unwrap();
         // println!("\tRange is from {} to {} (inclusive)", range_lower, range_upper);
 

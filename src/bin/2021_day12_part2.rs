@@ -22,8 +22,8 @@ impl<'a> Cave<'a> {
     fn new(name: &'a str, connection: &'a str) -> Self {
         Cave {
             name,
-            big: name.chars().fold(true, |acc, c| acc && c.is_uppercase()),
-            connections: vec![connection].iter().cloned().collect(),
+            big: name.chars().all(|c| c.is_uppercase()),
+            connections: [connection].iter().cloned().collect(),
         }
     }
 }
@@ -37,7 +37,7 @@ fn parse_input(input: &str) -> HashMap<String, Cave> {
     let mut caves: HashMap<String, Cave> = HashMap::new();
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
@@ -51,7 +51,7 @@ fn parse_input(input: &str) -> HashMap<String, Cave> {
         } else {
             caves.insert(
                 end_points[0].to_string(),
-                Cave::new(end_points[0], &end_points[1]),
+                Cave::new(end_points[0], end_points[1]),
             );
         }
     }
@@ -118,7 +118,7 @@ fn walk_paths_int<'a>(
             }
         }
 
-        let mut paths = walk_paths_int(caves, &this_path, &next_cave, small_cave_twice);
+        let mut paths = walk_paths_int(caves, &this_path, next_cave, small_cave_twice);
         if !paths.is_empty() {
             completed_paths.append(&mut paths);
         }
@@ -136,7 +136,7 @@ fn walk_paths(caves: &HashMap<String, Cave>) -> Vec<String> {
         if c.big || c.name == "start" || c.name == "end" {
             continue;
         }
-        let paths = walk_paths_int(caves, &Vec::new(), &caves["start"], &c.name);
+        let paths = walk_paths_int(caves, &Vec::new(), &caves["start"], c.name);
 
         for p in paths {
             results.push(convert_cave_list_to_string(&p));
@@ -208,62 +208,59 @@ start-RW";
 
     #[test]
     fn create_caves() {
-        let cave1 = Cave::new(&"AA", "bb");
+        let cave1 = Cave::new("AA", "bb");
         assert_eq!(cave1.name, "AA");
-        assert_eq!(cave1.big, true);
-        assert_eq!(cave1.connections, vec!["bb"].iter().cloned().collect());
+        assert!(cave1.big);
+        assert_eq!(cave1.connections, ["bb"].iter().cloned().collect());
 
-        let cave2 = Cave::new(&"bb", "CC");
+        let cave2 = Cave::new("bb", "CC");
         assert_eq!(cave2.name, "bb");
-        assert_eq!(cave2.big, false);
-        assert_eq!(cave2.connections, vec!["CC"].iter().cloned().collect());
+        assert!(!cave2.big);
+        assert_eq!(cave2.connections, ["CC"].iter().cloned().collect());
     }
 
     #[test]
     fn parse_test_input() {
-        let caves = parse_input(&TEST_INPUT_1);
+        let caves = parse_input(TEST_INPUT_1);
 
         let start_cave = &caves["start"];
         assert_eq!(start_cave.name, "start");
-        assert_eq!(start_cave.big, false);
-        assert_eq!(
-            start_cave.connections,
-            vec!["A", "b"].iter().cloned().collect()
-        );
+        assert!(!start_cave.big);
+        assert_eq!(start_cave.connections, ["A", "b"].iter().cloned().collect());
 
         let cave_a = &caves["A"];
         assert_eq!(cave_a.name, "A");
-        assert_eq!(cave_a.big, true);
+        assert!(cave_a.big);
         assert_eq!(
             cave_a.connections,
-            vec!["b", "c", "end"].iter().cloned().collect()
+            ["b", "c", "end"].iter().cloned().collect()
         );
     }
 
     #[test]
     fn test_reverse_connections() {
-        let mut caves = parse_input(&TEST_INPUT_1);
+        let mut caves = parse_input(TEST_INPUT_1);
         add_reverse_connections(&mut caves);
 
         assert_eq!(
             caves["start"].connections,
-            vec!["A", "b"].iter().cloned().collect()
+            ["A", "b"].iter().cloned().collect()
         );
         assert_eq!(
             caves["A"].connections,
-            vec!["b", "c", "end"].iter().cloned().collect()
+            ["b", "c", "end"].iter().cloned().collect()
         );
         assert_eq!(
             caves["b"].connections,
-            vec!["A", "d", "end"].iter().cloned().collect()
+            ["A", "d", "end"].iter().cloned().collect()
         );
-        assert_eq!(caves["c"].connections, vec!["A"].iter().cloned().collect());
-        assert_eq!(caves["d"].connections, vec!["b"].iter().cloned().collect());
+        assert_eq!(caves["c"].connections, ["A"].iter().cloned().collect());
+        assert_eq!(caves["d"].connections, ["b"].iter().cloned().collect());
     }
 
     #[test]
     fn test_convert_cave_list_to_string() {
-        let mut caves = parse_input(&TEST_INPUT_1);
+        let mut caves = parse_input(TEST_INPUT_1);
         add_reverse_connections(&mut caves);
         let path: Vec<&Cave> = vec![&caves["start"], &caves["b"], &caves["A"], &caves["end"]];
 
@@ -272,7 +269,7 @@ start-RW";
 
     #[test]
     fn test_walk_paths_1() {
-        let mut caves = parse_input(&TEST_INPUT_1);
+        let mut caves = parse_input(TEST_INPUT_1);
         add_reverse_connections(&mut caves);
         assert_eq!(
             walk_paths(&caves),
@@ -319,14 +316,14 @@ start-RW";
 
     #[test]
     fn test_walk_paths_2() {
-        let mut caves = parse_input(&TEST_INPUT_2);
+        let mut caves = parse_input(TEST_INPUT_2);
         add_reverse_connections(&mut caves);
         assert_eq!(walk_paths(&caves).len(), 103);
     }
 
     #[test]
     fn test_walk_paths_3() {
-        let mut caves = parse_input(&TEST_INPUT_3);
+        let mut caves = parse_input(TEST_INPUT_3);
         add_reverse_connections(&mut caves);
         assert_eq!(walk_paths(&caves).len(), 3509);
     }

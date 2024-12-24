@@ -62,7 +62,7 @@ fn parse_line(input: &str) -> Valve {
 
     Valve {
         identifier,
-        rate: FlowRateType::from_str_radix(flow_rate, 10).unwrap(),
+        rate: flow_rate.parse().unwrap(),
         connected_valves,
     }
 }
@@ -76,11 +76,11 @@ fn parse_line(input: &str) -> Valve {
 fn parse_lines(input: &str) -> HashMap<&str, Valve> {
     let mut valves = HashMap::new();
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
-        let v = parse_line(&line);
+        let v = parse_line(line);
         valves.insert(v.identifier, v);
     }
 
@@ -101,7 +101,7 @@ impl<'a> ValveDistances<'a> {
     ) -> ValveDistances<'a> {
         let mut valve_distances: HashMap<(&str, &str), Distance> = HashMap::new();
 
-        for (_, v) in valves {
+        for v in valves.values() {
             let mut d = 0u8;
             let mut visited = HashSet::new();
             let mut leading_edge = HashSet::new();
@@ -202,12 +202,12 @@ fn score_valves<'a>(
 /// results in the highest flow. It doesn't matter which entities are passed in `entity0` versus
 /// `entity1`.
 /// Returns the maximum flow that can be achieved from the starting conditions passed.
-fn make_move<'a>(
+fn make_move(
     entity0: &EntityState,
     entity1: &EntityState,
     valves: &HashMap<&str, Valve>,
     valve_distances: &ValveDistances,
-    closed_valve_ids: &HashSet<&'a str>,
+    closed_valve_ids: &HashSet<&str>,
     total_flow: FlowRateType,
 ) -> FlowRateType {
     let time = u8::min(entity0.busy_until, entity1.busy_until) + 1;
@@ -229,7 +229,7 @@ fn make_move<'a>(
     }
 
     let choices = score_valves(
-        &decision_entity.destination,
+        decision_entity.destination,
         time,
         valves,
         valve_distances,
@@ -240,19 +240,19 @@ fn make_move<'a>(
     for (choice_valve_id, choice_flow_rate) in choices {
         results.push(make_move(
             &EntityState {
-                destination: &choice_valve_id,
+                destination: choice_valve_id,
                 busy_until: time
                     + valve_distances.distance(decision_entity.destination, choice_valve_id),
             },
             other_entity,
-            &valves,
-            &valve_distances,
+            valves,
+            valve_distances,
             &(closed_valve_ids - &HashSet::from([choice_valve_id])),
             total_flow + choice_flow_rate,
         ));
     }
 
-    if results.len() > 0 {
+    if !results.is_empty() {
         return *results.iter().max().unwrap();
     }
 
@@ -263,7 +263,7 @@ fn make_move<'a>(
 /// between the `Valve`s, and calls the logic that determines the most fluid that can be made to
 /// flow by opening the `Valve`s in the optimal order. Returns the optimal result.
 fn do_challenge(input: &str) -> FlowRateType {
-    let valves = parse_lines(&input);
+    let valves = parse_lines(input);
     let valve_distance_lookup = ValveDistances::generate_valve_distance_lookup_table(&valves);
 
     let valves_with_non_zero_flow: HashSet<&str> = valves
@@ -272,11 +272,11 @@ fn do_challenge(input: &str) -> FlowRateType {
         .collect();
 
     let us = EntityState {
-        destination: &"AA",
+        destination: "AA",
         busy_until: 0,
     };
     let elephant = EntityState {
-        destination: &"AA",
+        destination: "AA",
         busy_until: 0,
     };
 
@@ -632,7 +632,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
         let valve_distance_lookup = ValveDistances::generate_valve_distance_lookup_table(&valves);
 
         let result0 = score_valves(
-            &"AA",
+            "AA",
             0,
             &valves,
             &valve_distance_lookup,
@@ -661,11 +661,11 @@ Valve JJ has flow rate=21; tunnel leads to valve II
         assert_eq!(
             make_move(
                 &EntityState {
-                    destination: &"AA",
+                    destination: "AA",
                     busy_until: 23
                 },
                 &EntityState {
-                    destination: &"AA",
+                    destination: "AA",
                     busy_until: 23
                 },
                 &valves,
@@ -685,11 +685,11 @@ Valve JJ has flow rate=21; tunnel leads to valve II
         assert_eq!(
             make_move(
                 &EntityState {
-                    destination: &"AA",
+                    destination: "AA",
                     busy_until: 22
                 },
                 &EntityState {
-                    destination: &"AA",
+                    destination: "AA",
                     busy_until: 22
                 },
                 &valves,
@@ -709,11 +709,11 @@ Valve JJ has flow rate=21; tunnel leads to valve II
         assert_eq!(
             make_move(
                 &EntityState {
-                    destination: &"AA",
+                    destination: "AA",
                     busy_until: 21
                 },
                 &EntityState {
-                    destination: &"AA",
+                    destination: "AA",
                     busy_until: 21
                 },
                 &valves,
@@ -733,11 +733,11 @@ Valve JJ has flow rate=21; tunnel leads to valve II
         assert_eq!(
             make_move(
                 &EntityState {
-                    destination: &"AA",
+                    destination: "AA",
                     busy_until: 20
                 },
                 &EntityState {
-                    destination: &"AA",
+                    destination: "AA",
                     busy_until: 20
                 },
                 &valves,
@@ -757,11 +757,11 @@ Valve JJ has flow rate=21; tunnel leads to valve II
         assert_eq!(
             make_move(
                 &EntityState {
-                    destination: &"AA",
+                    destination: "AA",
                     busy_until: 19
                 },
                 &EntityState {
-                    destination: &"AA",
+                    destination: "AA",
                     busy_until: 19
                 },
                 &valves,
@@ -781,11 +781,11 @@ Valve JJ has flow rate=21; tunnel leads to valve II
         assert_eq!(
             make_move(
                 &EntityState {
-                    destination: &"AA",
+                    destination: "AA",
                     busy_until: 0
                 },
                 &EntityState {
-                    destination: &"AA",
+                    destination: "AA",
                     busy_until: 0
                 },
                 &valves,
@@ -799,6 +799,6 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(do_challenge(&TEST_INPUT), 1707);
+        assert_eq!(do_challenge(TEST_INPUT), 1707);
     }
 }

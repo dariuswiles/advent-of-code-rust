@@ -45,7 +45,7 @@ fn find_earliest_bus(buses: &Vec<u16>, timestamp: u32) -> (u16, u32) {
 fn do_challenge(input: &str) -> u32 {
     let mut lines = input.lines();
     let timestamp = lines.next().unwrap().parse::<u32>().unwrap();
-    let buses = parse_buses(&lines.next().unwrap());
+    let buses = parse_buses(lines.next().unwrap());
 
     // println!("Timestamp: {}", timestamp);
     // println!("Buses: {:?}", &buses);
@@ -75,7 +75,7 @@ mod tests {
 
     #[test]
     fn test_0() {
-        let answer = do_challenge(&TEST_INPUT);
+        let answer = do_challenge(TEST_INPUT);
         assert_eq!(answer, 295);
     }
 }

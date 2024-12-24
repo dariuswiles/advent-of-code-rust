@@ -50,7 +50,7 @@ impl Bitmask {
 
         Self {
             always_set: set,
-            wildcard: wildcard,
+            wildcard,
         }
     }
 
@@ -122,7 +122,7 @@ fn execute_input(input: &str) -> HashMap<usize, u64> {
     let mut memory = HashMap::new();
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             continue;
         }
 
@@ -132,14 +132,14 @@ fn execute_input(input: &str) -> HashMap<usize, u64> {
         }
 
         if token[0].starts_with("mask") {
-            mask = Bitmask::from_str(&line.strip_prefix("mask = ").unwrap());
+            mask = Bitmask::from_str(line.strip_prefix("mask = ").unwrap());
         } else if token[0].starts_with("mem") {
-            let loc_val = parse_mem_command(&token[0], &token[1]);
+            let loc_val = parse_mem_command(token[0], token[1]);
 
             let masked_locations = mask.apply_bitmask(loc_val.0);
 
             for loc in masked_locations {
-                memory.insert(loc as usize, loc_val.1);
+                memory.insert(loc, loc_val.1);
                 // println!("Set memory location {} to value {}", loc, loc_val.1);
             }
         } else {
@@ -185,7 +185,7 @@ mem[26] = 1";
 
     #[test]
     fn test_execute_input() {
-        let mem = execute_input(&TEST_INPUT_0);
+        let mem = execute_input(TEST_INPUT_0);
 
         assert_eq!(mem.len(), 10);
         assert_eq!(mem[&16], 1);
@@ -202,7 +202,7 @@ mem[26] = 1";
 
     #[test]
     fn test_challenge() {
-        let mem = execute_input(&TEST_INPUT_0);
+        let mem = execute_input(TEST_INPUT_0);
         let answer: u64 = mem.values().sum();
 
         assert_eq!(answer, 208);

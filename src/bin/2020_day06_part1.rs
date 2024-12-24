@@ -51,11 +51,11 @@ fn parse_question_sets(input: &str) -> Vec<QuestionSet> {
     let mut question_set = QuestionSet::new();
 
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             question_vec.push(question_set);
             question_set = QuestionSet::new();
         } else {
-            question_set.add_string_of_questions(&line);
+            question_set.add_string_of_questions(line);
         }
     }
     question_vec.push(question_set);
@@ -100,26 +100,26 @@ a";
 
     #[test]
     fn set_0() {
-        assert_eq!(parse_question_sets(&QUESTION_SET_0)[0].as_string(), "abc");
+        assert_eq!(parse_question_sets(QUESTION_SET_0)[0].as_string(), "abc");
     }
 
     #[test]
     fn set_1() {
-        assert_eq!(parse_question_sets(&QUESTION_SET_1)[0].as_string(), "abc");
+        assert_eq!(parse_question_sets(QUESTION_SET_1)[0].as_string(), "abc");
     }
 
     #[test]
     fn set_2() {
-        assert_eq!(parse_question_sets(&QUESTION_SET_2)[0].as_string(), "abc");
+        assert_eq!(parse_question_sets(QUESTION_SET_2)[0].as_string(), "abc");
     }
 
     #[test]
     fn set_3() {
-        assert_eq!(parse_question_sets(&QUESTION_SET_3)[0].as_string(), "a");
+        assert_eq!(parse_question_sets(QUESTION_SET_3)[0].as_string(), "a");
     }
 
     #[test]
     fn set_4() {
-        assert_eq!(parse_question_sets(&QUESTION_SET_4)[0].as_string(), "b");
+        assert_eq!(parse_question_sets(QUESTION_SET_4)[0].as_string(), "b");
     }
 }

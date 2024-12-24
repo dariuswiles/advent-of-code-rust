@@ -191,10 +191,8 @@ impl Chamber {
         for (y, rock_row) in rock_cells.iter().enumerate() {
             for (x, cell) in rock_row.chars().enumerate() {
                 if cell == '#' {
-                    self.cavern[y + bottom_edge as usize].contents[x + left_edge as usize] = cell;
-                    self.cavern[y + bottom_edge as usize]
-                        .rock_ids
-                        .insert(rock_id);
+                    self.cavern[y + bottom_edge].contents[x + left_edge as usize] = cell;
+                    self.cavern[y + bottom_edge].rock_ids.insert(rock_id);
                 }
             }
         }
@@ -214,7 +212,7 @@ impl Chamber {
         let chamber_height = self.cavern.len();
 
         for (y, rock_row) in rock_cells.iter().enumerate() {
-            if y + bottom_edge as usize >= chamber_height {
+            if y + bottom_edge >= chamber_height {
                 break;
             }
 
@@ -224,7 +222,7 @@ impl Chamber {
                     return true;
                 }
 
-                if cell == '#' && self.cavern[y + bottom_edge as usize].contents[offset_x] == '#' {
+                if cell == '#' && self.cavern[y + bottom_edge].contents[offset_x] == '#' {
                     return true;
                 }
             }
@@ -587,18 +585,18 @@ mod tests {
     #[test]
     fn test_overlaps() {
         let empty_chamber = Chamber::new();
-        assert_eq!(empty_chamber.overlaps(RockShape::Plus, 2, 3), false);
+        assert!(!empty_chamber.overlaps(RockShape::Plus, 2, 3));
 
         let mut chamber_vertical_rock = Chamber::new();
         chamber_vertical_rock.put_rock(3 /* RockShape::VerticalLine */, 4, 0);
 
         println!("{chamber_vertical_rock}");
 
-        assert_eq!(chamber_vertical_rock.overlaps(RockShape::Plus, 0, 0), false);
-        assert_eq!(chamber_vertical_rock.overlaps(RockShape::Plus, 1, 0), false);
-        assert_eq!(chamber_vertical_rock.overlaps(RockShape::Plus, 2, 0), true);
-        assert_eq!(chamber_vertical_rock.overlaps(RockShape::Plus, 2, 2), true);
-        assert_eq!(chamber_vertical_rock.overlaps(RockShape::Plus, 2, 3), false);
+        assert!(!chamber_vertical_rock.overlaps(RockShape::Plus, 0, 0));
+        assert!(!chamber_vertical_rock.overlaps(RockShape::Plus, 1, 0));
+        assert!(chamber_vertical_rock.overlaps(RockShape::Plus, 2, 0));
+        assert!(chamber_vertical_rock.overlaps(RockShape::Plus, 2, 2));
+        assert!(!chamber_vertical_rock.overlaps(RockShape::Plus, 2, 3));
     }
 
     #[test]
@@ -1158,6 +1156,6 @@ mod tests {
 
     #[test]
     fn test_do_challenge() {
-        assert_eq!(do_challenge(&INPUT, 1_000_000_000_000), 1514285714288);
+        assert_eq!(do_challenge(INPUT, 1_000_000_000_000), 1514285714288);
     }
 }

@@ -19,8 +19,8 @@ fn parse_input(input: &str) -> Vec<Vec<Calories>> {
     let mut calories_vec = Vec::new();
 
     for line in input.lines() {
-        if line != "" {
-            calories_vec.push(Calories::from_str_radix(line, 10).unwrap());
+        if !line.is_empty() {
+            calories_vec.push(line.parse().unwrap());
         } else {
             all_elves.push(calories_vec);
             calories_vec = Vec::new();
