@@ -1,5 +1,5 @@
-//! Advent of Code 2020 Day 06
-//! https://adventofcode.com/2020/day/6
+//! Advent of Code 2024 Day 06
+//! https://adventofcode.com/2024/day/6
 //!
 //! Challenge part 2
 //!
