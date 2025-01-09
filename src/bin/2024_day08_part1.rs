@@ -82,13 +82,11 @@ fn parse_input(input: &str) -> Grid {
 
 /// Returns a `HashSet` containing the `Position` of all antinodes, calculated from the `Position`s
 /// of all the antennas in the given `Grid`. Each antinode is located on a line drawn between a
-/// pair of antennas. Its distance from the nearest antenna is the same as the distance between
-/// this antenna and the second antenna in the pair. Antinodes that would fall outside the grid are
-/// ignored.
+/// pair of antennas. Each antinode's distance from the nearest antenna is the same as the distance
+/// between this pair of antennas. Antinodes that would fall outside the grid are ignored.
 fn get_antinodes(grid: &Grid) -> HashSet<Position> {
     let mut antinodes = HashSet::new();
 
-    // for (_, locations) in &grid.antennas {
     for locations in grid.antennas.values() {
         let locations_vec: Vec<_> = locations.iter().collect();
         let location_pairs = all_distinct_pairs(&locations_vec);
