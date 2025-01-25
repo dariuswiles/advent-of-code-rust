@@ -71,7 +71,9 @@ impl TopoMap {
             todo.remove(&(current_row, current_col));
             let current_value = self.cells[current_row][current_col];
 
-            if self.cells[current_row][current_col] == 9 && !visited.contains(&(current_row, current_col)) {
+            if self.cells[current_row][current_col] == 9
+                && !visited.contains(&(current_row, current_col))
+            {
                 trail_count += 1;
             } else {
                 if current_row > 0
