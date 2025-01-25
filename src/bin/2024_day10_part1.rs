@@ -67,43 +67,43 @@ impl TopoMap {
         todo.insert(p);
 
         while !todo.is_empty() {
-            let (current_x, current_y) = *todo.iter().next().unwrap();
-            todo.remove(&(current_x, current_y));
-            let current_value = self.cells[current_x][current_y];
+            let (current_row, current_col) = *todo.iter().next().unwrap();
+            todo.remove(&(current_row, current_col));
+            let current_value = self.cells[current_row][current_col];
 
-            if self.cells[current_x][current_y] == 9 && !visited.contains(&(current_x, current_y)) {
+            if self.cells[current_row][current_col] == 9 && !visited.contains(&(current_row, current_col)) {
                 trail_count += 1;
             } else {
-                if current_x > 0
-                    && !visited.contains(&(current_x - 1, current_y))
-                    && self.cells[current_x - 1][current_y] == current_value + 1
+                if current_row > 0
+                    && !visited.contains(&(current_row - 1, current_col))
+                    && self.cells[current_row - 1][current_col] == current_value + 1
                 {
-                    todo.insert((current_x - 1, current_y));
+                    todo.insert((current_row - 1, current_col));
                 }
 
-                if current_y > 0
-                    && !visited.contains(&(current_x, current_y - 1))
-                    && self.cells[current_x][current_y - 1] == current_value + 1
+                if current_col > 0
+                    && !visited.contains(&(current_row, current_col - 1))
+                    && self.cells[current_row][current_col - 1] == current_value + 1
                 {
-                    todo.insert((current_x, current_y - 1));
+                    todo.insert((current_row, current_col - 1));
                 }
 
-                if current_x + 1 < self.width
-                    && !visited.contains(&(current_x + 1, current_y))
-                    && self.cells[current_x + 1][current_y] == current_value + 1
+                if current_row + 1 < self.width
+                    && !visited.contains(&(current_row + 1, current_col))
+                    && self.cells[current_row + 1][current_col] == current_value + 1
                 {
-                    todo.insert((current_x + 1, current_y));
+                    todo.insert((current_row + 1, current_col));
                 }
 
-                if current_y + 1 < self.height
-                    && !visited.contains(&(current_x, current_y + 1))
-                    && self.cells[current_x][current_y + 1] == current_value + 1
+                if current_col + 1 < self.height
+                    && !visited.contains(&(current_row, current_col + 1))
+                    && self.cells[current_row][current_col + 1] == current_value + 1
                 {
-                    todo.insert((current_x, current_y + 1));
+                    todo.insert((current_row, current_col + 1));
                 }
             }
 
-            visited.insert((current_x, current_y));
+            visited.insert((current_row, current_col));
         }
 
         trail_count
